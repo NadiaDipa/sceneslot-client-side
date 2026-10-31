@@ -1,0 +1,613 @@
+import type { Booking, DemoUser, Listing, Studio } from "@/lib/types";
+
+const img = (id: string, w = 1600) =>
+  `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
+
+const avatar = (n: number) => `https://i.pravatar.cc/150?img=${n}`;
+
+export const demoUser: DemoUser = {
+  name: "Amara Hossain",
+  email: "amara.hossain@sceneslot.io",
+  avatar: avatar(47),
+  role: "Creator & Studio Host",
+  memberSince: "March 2025",
+};
+
+export const studios: Studio[] = [
+  {
+    id: "golden-hour-portrait-loft",
+    title: "Golden Hour Portrait Loft",
+    category: "Photo Studios",
+    description:
+      "North-light portrait loft with a 6m cyc wall, a motorized backdrop rack, and a make-up corner — ready for editorial and portrait work.",
+    overview:
+      "The Golden Hour Portrait Loft sits in a converted textile warehouse in Williamsburg, flooded with soft north light from 9am to 4pm. The main floor offers a 6m painted cyc wall in warm ivory, a matte-black interview corner, and over 30 seamless paper backdrops on a motorized rack. Power drops on every wall, a make-up room with ring lighting, and a small prop pantry make this a favorite for portrait, lifestyle, and editorial work. Wi-Fi is wired for tethered capture, and the freight elevator doubles as a rolling staging bay for gear cases. Quiet, cozy, and instant to book — check-in takes two minutes, and most creators are shooting within the hour.",
+    image: img("1500051638674-ff996a0ec29e"),
+    gallery: [
+      img("1500051638674-ff996a0ec29e"),
+      img("1516575150278-77136aed6920"),
+      img("1510127034890-ba27508e9f1c"),
+      img("1497366754035-f200968a6e72"),
+    ],
+    hourlyRate: 45,
+    deposit: 100,
+    maxCapacity: 12,
+    location: "Brooklyn, NY",
+    address: "212 Water Street, Williamsburg, Brooklyn, NY 11249",
+    amenities: [
+      "Cyc Wall",
+      "Profoto Strobes",
+      "Changing Room",
+      "Backdrop Rack",
+      "Tethering Station",
+      "Make-up Corner",
+      "Free Wi-Fi",
+      "Kitchenette",
+    ],
+    rating: 4.9,
+    reviewsCount: 132,
+    featured: true,
+    host: {
+      name: "Lena Marsh",
+      email: "lena.marsh@sceneslot.io",
+      avatar: avatar(32),
+      joined: "Joined in 2024",
+      responseRate: "98% response rate",
+      bio: "Retoucher-turned-studio owner. I keep this loft ready for shoots around the clock, so you can walk in and start creating right away.",
+    },
+    reviews: [
+      {
+        id: 1,
+        author: "Priya Nair",
+        avatar: avatar(44),
+        date: "Sep 2026",
+        rating: 5,
+        comment:
+          "The light in this loft is unreal — my editorial shoot needed almost zero retouching. Check-in took two minutes.",
+      },
+      {
+        id: 2,
+        author: "Marcus Bell",
+        avatar: avatar(12),
+        date: "Aug 2026",
+        rating: 5,
+        comment:
+          "Great props, great strobes, zero fuss. Lena even helped us carry a 4x8 scrim up the freight lift.",
+      },
+      {
+        id: 3,
+        author: "Danielle Okafor",
+        avatar: avatar(26),
+        date: "Jul 2026",
+        rating: 4,
+        comment:
+          "Beautiful space and super organised backdrops. Parking nearby is tight, so arrive a little early.",
+      },
+    ],
+  },
+  {
+    id: "the-lamplight-podcast-bar",
+    title: "The Lamplight Podcast Bar",
+    category: "Podcast Rooms",
+    description:
+      "A brass-and-velvet podcast bar with four Shure SM7Bs, a broadcast mixer, and a listening lounge for live audience takes.",
+    overview:
+      "The Lamplight is what happens when a late-night radio studio falls in love with a cocktail bar. A four-position interview table is wired with Shure SM7Bs on broadcast arms, mixed through a Rodecaster Pro, and the absorber-walled room keeps conversation warm and tight. Live audience nights are easy: the 18-seat listening lounge has its own stage light and house sound. Every session includes the engineer's station (a Mac running Logic), 4K video capture, and a guest green-room. Sessions start on the hour and include a 10-minute technical walk-through, so all you have to do is talk.",
+    image: img("1590602847861-f357a9332bbc"),
+    gallery: [
+      img("1590602847861-f357a9332bbc"),
+      img("1581368135153-a506cf13b1e1"),
+      img("1478737270239-2f02b77fc618"),
+      img("1497366216548-37526070297c"),
+    ],
+    hourlyRate: 38,
+    deposit: 75,
+    maxCapacity: 6,
+    location: "Austin, TX",
+    address: "88 Rio Grande Street, Austin, TX 78701",
+    amenities: [
+      "Shure SM7B ×4",
+      "Rodecaster Pro",
+      "Video Capture",
+      "Acoustic Treatment",
+      "On-site Engineer",
+      "Green Room",
+      "Free Wi-Fi",
+      "Refreshments",
+    ],
+    rating: 4.8,
+    reviewsCount: 96,
+    featured: true,
+    host: {
+      name: "Ray Delgado",
+      email: "ray.delgado@sceneslot.io",
+      avatar: avatar(52),
+      joined: "Joined in 2023",
+      responseRate: "96% response rate",
+      bio: "Audio engineer with 12 years in broadcast radio. I built the Lamplight so podcasters never have to think about engineering again.",
+    },
+    reviews: [
+      {
+        id: 1,
+        author: "Sofia Kim",
+        avatar: avatar(45),
+        date: "Sep 2026",
+        rating: 5,
+        comment:
+          "Recorded two episodes back-to-back and the audio was pristine. The in-house engineer is a gem.",
+      },
+      {
+        id: 2,
+        author: "Tom Okafor",
+        avatar: avatar(59),
+        date: "Aug 2026",
+        rating: 5,
+        comment:
+          "Perfect for remote guests too — the hybrid setup routed Zoom and clean local tracks simultaneously.",
+      },
+    ],
+  },
+  {
+    id: "aurora-audio-suites",
+    title: "Aurora Audio Suites",
+    category: "Music Suites",
+    description:
+      "A two-room tracking suite with a wall of vintage guitars, an SSL console, and a drum live room that sounds like a record.",
+    overview:
+      "Aurora is a working songwriter's dream: an SSL-equipped control room, an isolated live room tuned for drums, and a wall of vintage guitars (you can use them — mention them when you book). Monitoring on Barefoot speakers, tape-style compression on every channel, and a piano that has been on three platinum records. The annex lounge doubles as an overdub booth and has a couch with legendary nap credentials. Neighbors are protected by serious isolation, so night sessions are fine — the last slot runs until midnight.",
+    image: img("1598488035139-bdbb2231ce04"),
+    gallery: [
+      img("1598488035139-bdbb2231ce04"),
+      img("1520523839897-bd0b52f945a0"),
+      img("1519508234439-4f23643125c1"),
+      img("1519892300165-cb5542fb47c7"),
+    ],
+    hourlyRate: 65,
+    deposit: 150,
+    maxCapacity: 10,
+    location: "Los Angeles, CA",
+    address: "740 Santa Monica Blvd, Los Angeles, CA 90026",
+    amenities: [
+      "SSL Console",
+      "Vintage Guitar Wall",
+      "Barefoot Monitors",
+      "Isolated Live Room",
+      "Backline Available",
+      "Grand Piano",
+      "Session Drum Kit",
+      "Night Sessions OK",
+    ],
+    rating: 4.9,
+    reviewsCount: 78,
+    featured: true,
+    host: {
+      name: "Marisol Vega",
+      email: "marisol.vega@sceneslot.io",
+      avatar: avatar(23),
+      joined: "Joined in 2023",
+      responseRate: "94% response rate",
+      bio: "Producer & studio curator. Aurora was built around one rule: no gear bottleneck between you and the song.",
+    },
+    reviews: [
+      {
+        id: 1,
+        author: "Jae Park",
+        avatar: avatar(15),
+        date: "Sep 2026",
+        rating: 5,
+        comment:
+          "We cut drums live to tape-style sessions in one take. Console sounds massive.",
+      },
+      {
+        id: 2,
+        author: "Renee Cole",
+        avatar: avatar(41),
+        date: "Aug 2026",
+        rating: 5,
+        comment:
+          "The guitar wall alone is worth the rate. Marisol solved a tone problem in ten minutes that we'd fought for weeks.",
+      },
+    ],
+  },
+  {
+    id: "backlot-five-sound-stage",
+    title: "Backlot Five Sound Stage",
+    category: "Sound Stages",
+    description:
+      "3,000 sq ft blackout stage with a 20ft rigging grid, drive-in door, and production office — built for commercial shoots and indie features.",
+    overview:
+      "Backlot Five is a true production floor. Full blackout, a 20-foot trussing grid pre-loaded with over 100 amps of power, and a ground-level drive-in door wide enough for a grip truck. The stage floor is sealed concrete with painted centerline marks, ready for track or dolly work. Onsite you get a production office, dressing rooms with lit mirrors, a craft services prep kitchen, and secure yard parking. Gaffers welcome — the house grip package (c-stands, flags, dollies) can be added for a flat fee.",
+    image: img("1485846234645-a62644f84728"),
+    gallery: [
+      img("1485846234645-a62644f84728"),
+      img("1470229722913-7c0e2dbbafd3"),
+      img("1497366216548-37526070297c"),
+      img("1497366754035-f200968a6e72"),
+    ],
+    hourlyRate: 120,
+    deposit: 400,
+    maxCapacity: 40,
+    location: "Atlanta, GA",
+    address: "1 Johnson Ferry Road, Atlanta, GA 30305",
+    amenities: [
+      "20ft Rigging Grid",
+      "Three-Phase Power",
+      "Full Blackout",
+      "Drive-in Door",
+      "Production Office",
+      "Dressing Rooms",
+      "Crafty Kitchen",
+      "Yard Parking",
+    ],
+    rating: 4.7,
+    reviewsCount: 54,
+    featured: true,
+    host: {
+      name: "Drew Callahan",
+      email: "drew.callahan@sceneslot.io",
+      avatar: avatar(60),
+      joined: "Joined in 2022",
+      responseRate: "92% response rate",
+      bio: "Line producer who got tired of overpriced stages. Backlot Five is priced for indie budgets without cutting corners on power.",
+    },
+    reviews: [
+      {
+        id: 1,
+        author: "Anika Roy",
+        avatar: avatar(49),
+        date: "Sep 2026",
+        rating: 5,
+        comment:
+          "Shot a car commercial here — the drive-in door and yard parking saved us half a day.",
+      },
+      {
+        id: 2,
+        author: "Gus Freeman",
+        avatar: avatar(33),
+        date: "Jul 2026",
+        rating: 4,
+        comment:
+          "Solid stage with real three-phase power. Crafty kitchen is basic but the yard makes up for it.",
+      },
+    ],
+  },
+  {
+    id: "aperture-product-lab",
+    title: "Aperture Product Lab",
+    category: "Photo Studios",
+    description:
+      "A tabletop-first product studio with softbox farms, turntable rigs, and daylight LED panels tuned for e-commerce work.",
+    overview:
+      "Aperture Product Lab is built for volume. Four softbox farms sit on rail-mounted booms, a motorized turntable runs programmable stops, and colour-accurate daylight LEDs (95+ CRI) feed through diffusers that keep shadows off the sweep. The included prop library runs from slate trays to cosmetic pedestals, and the tethering room has four calibrated monitors for instant QC. Book a half-day for catalog shots or an hour for a drop of 20 SKUs — the lab is optimised so small brands get agency-grade output without agency overheads.",
+    image: img("1510127034890-ba27508e9f1c"),
+    gallery: [
+      img("1510127034890-ba27508e9f1c"),
+      img("1500051638674-ff996a0ec29e"),
+      img("1516575150278-77136aed6920"),
+      img("1497366754035-f200968a6e72"),
+    ],
+    hourlyRate: 40,
+    deposit: 80,
+    maxCapacity: 8,
+    location: "Chicago, IL",
+    address: "4043 N Ravenswood Ave, Chicago, IL 60613",
+    amenities: [
+      "Softbox Farm ×4",
+      "Turntable Rig",
+      "95+ CRI LEDs",
+      "Color-Calibrated Monitors",
+      "Prop Library",
+      "Seamless Sweeps",
+      "Free Wi-Fi",
+      "Loading Dock",
+    ],
+    rating: 4.6,
+    reviewsCount: 61,
+    host: {
+      name: "Lena Marsh",
+      email: "lena.marsh@sceneslot.io",
+      avatar: avatar(32),
+      joined: "Joined in 2024",
+      responseRate: "98% response rate",
+      bio: "Retoucher-turned-studio owner. I run the Product Lab with the same obsession for calibration as my first darkroom.",
+    },
+    reviews: [
+      {
+        id: 1,
+        author: "Wes Tanaka",
+        avatar: avatar(11),
+        date: "Sep 2026",
+        rating: 5,
+        comment:
+          "Shot 120 SKUs in a day. The turntable and calibrated monitors turned post-production into a five-minute job.",
+      },
+      {
+        id: 2,
+        author: "Ella Fontaine",
+        avatar: avatar(20),
+        date: "Aug 2026",
+        rating: 4,
+        comment:
+          "Great white setup, clean sweeps. Would love a bigger prop wall, but the essentials are all here.",
+      },
+    ],
+  },
+  {
+    id: "makers-atelier-workshop",
+    title: "The Makers' Atelier",
+    category: "Art Workshops",
+    description:
+      "A bright, skylit makers' atelier with two pottery wheels, a hand-building bench, and wall-to-wall tools for craft workshops.",
+    overview:
+      "The Makers' Atelier hosts classes and collaborations under a double skylight. Equipment includes two speckled-but-reliable pottery wheels, a 30-slot hand-tool wall, slab roller, extruder kit, and a drying rack that can hold a fortnight of student work. The long communal bench seats twelve, the wash-down room keeps clay out of your car, and the adjacent lounge is perfect for tea-and-critique sessions. Perfect for teaching artists: the room has wipe-clean whiteboard walls, shelving sized for class kits, and a booking calendar that plays nice with term-based courses.",
+    image: img("1452860606245-08befc0ff44b"),
+    gallery: [
+      img("1452860606245-08befc0ff44b"),
+      img("1516575150278-77136aed6920"),
+      img("1500051638674-ff996a0ec29e"),
+      img("1497366216548-37526070297c"),
+    ],
+    hourlyRate: 32,
+    deposit: 60,
+    maxCapacity: 15,
+    location: "Seattle, WA",
+    address: "610 1st Ave S, Seattle, WA 98134",
+    amenities: [
+      "Pottery Wheels ×2",
+      "Slab Roller",
+      "Tool Wall",
+      "Skylight",
+      "Wash-down Room",
+      "Whiteboard Walls",
+      "Student Shelving",
+      "Lounge Corner",
+    ],
+    rating: 4.8,
+    reviewsCount: 87,
+    featured: true,
+    host: {
+      name: "Bianca Reyes",
+      email: "bianca.reyes@sceneslot.io",
+      avatar: avatar(16),
+      joined: "Joined in 2024",
+      responseRate: "97% response rate",
+      bio: "Ceramics teacher of six years. The Atelier exists so artists can teach without signing a year-long lease.",
+    },
+    reviews: [
+      {
+        id: 1,
+        author: "Noah Adeyemi",
+        avatar: avatar(57),
+        date: "Sep 2026",
+        rating: 5,
+        comment:
+          "Ran a 12-person ceramics workshop here — the wash-down room and drying racks made logistics effortless.",
+      },
+      {
+        id: 2,
+        author: "Hana Suzuki",
+        avatar: avatar(25),
+        date: "Aug 2026",
+        rating: 5,
+        comment:
+          "Light, clean, and welcoming. Bianca left us a fully stocked tool wall and even spare aprons.",
+      },
+    ],
+  },
+  {
+    id: "whisper-room-voice-booth",
+    title: "Whisper Room Voice Booth",
+    category: "Podcast Rooms",
+    description:
+      "A compact, dead-silent voiceover booth with broadcast chain, self-serve sessions, and instant remote patch-ins.",
+    overview:
+      "The Whisper Room is a two-seat isolation booth for voice actors, audiobook narrators, and one-on-one podcast interviews. Expect -60dB of silence, an isolation-proof glass window, and a broadcast chain that includes a Neumann TLM 103 in precisely positioned booth acoustics, plus a pre-routed session template with corrective EQ. It's self-serve: book a slot, receive the door PIN, and add a 4K remote patch if you want a director listening in. Turnarounds are fast — ad spots and promo VO have been cut here in 30-minute windows: three takes and out.",
+    image: img("1478737270239-2f02b77fc618"),
+    gallery: [
+      img("1478737270239-2f02b77fc618"),
+      img("1590602847861-f357a9332bbc"),
+      img("1581368135153-a506cf13b1e1"),
+      img("1497366216548-37526070297c"),
+    ],
+    hourlyRate: 25,
+    deposit: 50,
+    maxCapacity: 2,
+    location: "New York, NY",
+    address: "305 W Broadway, New York, NY 10013",
+    amenities: [
+      "Neumann TLM 103",
+      "Isolation Booth",
+      "Remote Patch-in",
+      "Session Templates",
+      "Self-serve Access",
+      "Free Wi-Fi",
+      "Silent HVAC",
+      "Source-Connect Ready",
+    ],
+    rating: 4.7,
+    reviewsCount: 143,
+    host: {
+      name: "Ray Delgado",
+      email: "ray.delgado@sceneslot.io",
+      avatar: avatar(52),
+      joined: "Joined in 2023",
+      responseRate: "96% response rate",
+      bio: "Audio engineer with 12 years in broadcast radio. Voice actors book the Whisper Room and never look back.",
+    },
+    reviews: [
+      {
+        id: 1,
+        author: "Bea Lindqvist",
+        avatar: avatar(10),
+        date: "Sep 2026",
+        rating: 5,
+        comment:
+          "Cut three audiobook chapters in the 30-minute slots. The template simply works.",
+      },
+      {
+        id: 2,
+        author: "Omar Haddad",
+        avatar: avatar(36),
+        date: "Aug 2026",
+        rating: 4,
+        comment:
+          "Silence is absolute. Coming from a home booth treatment, this felt like upgrading to first class.",
+      },
+    ],
+  },
+  {
+    id: "blue-hour-film-set",
+    title: "Blue Hour Film Set",
+    category: "Sound Stages",
+    description:
+      "A mid-size hybrid sound stage with a permanent kitchen set, living room corner, and silent HVAC for dialogue shoots.",
+    overview:
+      "Blue Hour is a standing-set stage for narrative and commercial work that doesn't want to build from scratch. The permanent kitchen and living-room corner are styled quarterly by a house art team, and the adjoining open floor takes custom builds. Dialog-friendly silent HVAC, a rigged lighting package over the sets, and a 4K video village make director days faster. DPs love the practical-heavy design: every lamp in both sets works and is on scenes. Book the morning slot and you can be rolled on a real set in under an hour.",
+    image: img("1497366216548-37526070297c"),
+    gallery: [
+      img("1497366216548-37526070297c"),
+      img("1485846234645-a62644f84728"),
+      img("1470229722913-7c0e2dbbafd3"),
+      img("1497366754035-f200968a6e72"),
+    ],
+    hourlyRate: 95,
+    deposit: 300,
+    maxCapacity: 25,
+    location: "Toronto, ON",
+    address: "125 Eastern Avenue, Toronto, ON M5A 1C2",
+    amenities: [
+      "Standing Kitchen Set",
+      "Living Room Corner",
+      "Silent HVAC",
+      "Rigged Lighting Package",
+      "Video Village",
+      "Art Department",
+      "Hair & Make-up Room",
+      "Street Parking",
+    ],
+    rating: 4.5,
+    reviewsCount: 39,
+    host: {
+      name: "Drew Callahan",
+      email: "drew.callahan@sceneslot.io",
+      avatar: avatar(60),
+      joined: "Joined in 2022",
+      responseRate: "92% response rate",
+      bio: "Line producer who got tired of overpriced stages. Standing sets mean less build time, more shooting time.",
+    },
+    reviews: [
+      {
+        id: 1,
+        author: "Femi Balogun",
+        avatar: avatar(58),
+        date: "Sep 2026",
+        rating: 5,
+        comment:
+          "The standing sets saved an entire build day. Kitchen scene looked straight out of an appliance ad.",
+      },
+      {
+        id: 2,
+        author: "Grace Mulenga",
+        avatar: avatar(43),
+        date: "Jul 2026",
+        rating: 4,
+        comment:
+          "Great for two-camera dialogue days. The art team restyles sets between bookings, so check photos first.",
+      },
+    ],
+  },
+];
+
+export function getStudioById(id: string) {
+  return studios.find((s) => s.id === id);
+}
+
+export const listings: Listing[] = [
+  {
+    studioId: "golden-hour-portrait-loft",
+    title: "Golden Hour Portrait Loft",
+    category: "Photo Studios",
+    image: img("1500051638674-ff996a0ec29e", 800),
+    location: "Brooklyn, NY",
+    hourlyRate: 45,
+    bookingsThisMonth: 14,
+    status: "Active",
+  },
+  {
+    studioId: "the-lamplight-podcast-bar",
+    title: "The Lamplight Podcast Bar",
+    category: "Podcast Rooms",
+    image: img("1590602847861-f357a9332bbc", 800),
+    location: "Austin, TX",
+    hourlyRate: 38,
+    bookingsThisMonth: 11,
+    status: "Active",
+  },
+  {
+    studioId: "aperture-product-lab",
+    title: "Aperture Product Lab",
+    category: "Photo Studios",
+    image: img("1510127034890-ba27508e9f1c", 800),
+    location: "Chicago, IL",
+    hourlyRate: 40,
+    bookingsThisMonth: 6,
+    status: "Draft",
+  },
+];
+
+export const bookings: Booking[] = [
+  {
+    id: "BK-2418",
+    studioId: "aurora-audio-suites",
+    studioTitle: "Aurora Audio Suites",
+    studioImage: img("1598488035139-bdbb2231ce04", 800),
+    category: "Music Suites",
+    location: "Los Angeles, CA",
+    date: "Nov 14, 2026",
+    hours: ["10:00", "14:00"],
+    guests: 5,
+    total: 260,
+    status: "Confirmed",
+  },
+  {
+    id: "BK-2402",
+    studioId: "golden-hour-portrait-loft",
+    studioTitle: "Golden Hour Portrait Loft",
+    studioImage: img("1500051638674-ff996a0ec29e", 800),
+    category: "Photo Studios",
+    location: "Brooklyn, NY",
+    date: "Nov 5, 2026",
+    hours: ["09:00", "12:00"],
+    guests: 4,
+    total: 135,
+    status: "Pending",
+  },
+  {
+    id: "BK-2377",
+    studioId: "whisper-room-voice-booth",
+    studioTitle: "Whisper Room Voice Booth",
+    studioImage: img("1478737270239-2f02b77fc618", 800),
+    category: "Podcast Rooms",
+    location: "New York, NY",
+    date: "Oct 22, 2026",
+    hours: ["15:00", "17:00"],
+    guests: 2,
+    total: 50,
+    status: "Completed",
+  },
+  {
+    id: "BK-2356",
+    studioId: "makers-atelier-workshop",
+    studioTitle: "The Makers' Atelier",
+    studioImage: img("1452860606245-08befc0ff44b", 800),
+    category: "Art Workshops",
+    location: "Seattle, WA",
+    date: "Oct 9, 2026",
+    hours: ["13:00", "17:00"],
+    guests: 10,
+    total: 128,
+    status: "Cancelled",
+  },
+];
+
+export const uniqueLocations = [...new Set(studios.map((s) => s.location))];

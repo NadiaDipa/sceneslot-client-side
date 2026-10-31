@@ -1,0 +1,175 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import Link from "next/link";
+import { useState, type FormEvent } from "react";
+import { GoogleButton } from "@/components/auth/login-form";
+
+const rules = [
+  { label: "At least 8 characters", test: (v: string) => v.length >= 8 },
+  { label: "One uppercase letter", test: (v: string) => /[A-Z]/.test(v) },
+  { label: "One number", test: (v: string) => /\d/.test(v) },
+];
+
+export function RegisterForm() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    /* UI only — registration arrives in a later stage */
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-2">
+        <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
+          Create your SceneSlot account
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          One account to book studios — and to host spaces of your own.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <GoogleButton label="Sign up with Google" />
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="h-px flex-1 bg-border" />
+          or register with email
+          <span className="h-px flex-1 bg-border" />
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="reg-name">Full name</Label>
+          <div className="relative">
+            <User className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+            <Input
+              id="reg-name"
+              required
+              autoComplete="name"
+              placeholder="Amara Hossain"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="reg-email">Email</Label>
+          <div className="relative">
+            <Mail className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+            <Input
+              id="reg-email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="you@studio.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="reg-photo">Photo URL</Label>
+          <Input
+            id="reg-photo"
+            type="url"
+            placeholder="https://i.pravatar.cc/150?img=12 (optional)"
+            value={photoUrl}
+            onChange={(e) => setPhotoUrl(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Optional — a profile photo builds trust with hosts.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="reg-password">Password</Label>
+          <div className="relative">
+            <Lock className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+            <Input
+              id="reg-password"
+              type={showPassword ? "text" : "password"}
+              required
+              autoComplete="new-password"
+              placeholder="Create a strong password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="px-8 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute top-0.5 right-1 rounded-md p-2 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+            >
+              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
+          {password ? (
+            <ul className="flex flex-col gap-0.5 pt-1">
+              {rules.map((r) => {
+                const ok = r.test(password);
+                return (
+                  <li
+                    key={r.label}
+                    className={ok ? "text-xs text-emerald-700" : "text-xs text-muted-foreground"}
+                  >
+                    {ok ? "✓" : "•"} {r.label}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
+        </div>
+
+        <label className="flex cursor-pointer items-start gap-2.5 text-sm text-muted-foreground">
+          <input
+            type="checkbox"
+            required
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 size-4 accent-[var(--primary)]"
+          />
+          <span>
+            I agree to the{" "}
+            <Link href="/terms" className="font-medium text-accent-foreground underline-offset-4 hover:underline">
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="font-medium text-accent-foreground underline-offset-4 hover:underline">
+              Privacy Policy
+            </Link>
+            .
+          </span>
+        </label>
+
+        <Button type="submit" size="lg" className="mt-1 w-full">
+          Create account
+        </Button>
+      </form>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <Link
+          href="/login"
+          className="font-medium text-accent-foreground underline-offset-4 hover:underline"
+        >
+          Log in
+        </Link>
+      </p>
+    </div>
+  );
+}
