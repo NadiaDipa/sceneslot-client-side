@@ -3,13 +3,11 @@
 import { DeleteConfirmDialog } from "@/components/studio/delete-confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
-import { listings } from "@/data/studios";
-import type { Listing } from "@/lib/types";
 import { cn } from "cn";
-import { Edit3, Eye, Plus, Trash2, Users } from "lucide-react";
+import { Edit3, Eye, Plus, Trash2, Users, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const statusStyles: Record<string, string> = {
   Active: "bg-emerald-500/10 text-emerald-700",
@@ -17,13 +15,19 @@ const statusStyles: Record<string, string> = {
   Inactive: "bg-destructive/10 text-destructive",
 };
 
-export function ListingRow({ listing }: { listing: Listing }) {
+export function ListingRow({ listing }: { listing: any }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   return (
     <li className="flex flex-col gap-4 rounded-2xl border-border bg-card p-4 ring-1 ring-foreground/10 transition-shadow hover:shadow-md hover:shadow-foreground/5 sm:flex-row sm:items-center sm:p-5">
       <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl sm:aspect-video sm:h-24 sm:w-40">
-        <Image src={listing.image} alt={listing.title} fill sizes="200px" className="object-cover" />
+        <Image 
+          src={listing.image || listing.imageUrl} 
+          alt={listing.title} 
+          fill 
+          sizes="200px" 
+          className="object-cover" 
+        />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -32,17 +36,17 @@ export function ListingRow({ listing }: { listing: Listing }) {
           <span
             className={cn(
               "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold",
-              statusStyles[listing.status]
+              statusStyles[listing.status || "Active"]
             )}
           >
-            {listing.status}
+            {listing.status || "Active"}
           </span>
         </div>
         <p className="text-xs text-muted-foreground">
           {listing.category} · {listing.location} ·{" "}
           <span className="inline-flex items-center gap-1">
             <Users className="size-3" />
-            {listing.bookingsThisMonth} bookings this month
+            {listing.bookingsThisMonth || 0} bookings this month
           </span>
         </p>
         <p className="text-sm">
@@ -52,10 +56,10 @@ export function ListingRow({ listing }: { listing: Listing }) {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
-        <Button variant="outline" size="icon" aria-label={`Edit ${listing.title}`} render={<Link href={`/studios/edit/${listing.studioId}`} />}>
+        <Button variant="outline" size="icon" aria-label={`Edit ${listing.title}`} render={<Link href={`/studios/edit/${listing._id || listing.studioId}`} />}>
           <Edit3 />
         </Button>
-        <Button variant="outline" size="icon" aria-label={`View ${listing.title}`} render={<Link href={`/studios/${listing.studioId}`} />}>
+        <Button variant="outline" size="icon" aria-label={`View ${listing.title}`} render={<Link href={`/studios/${listing._id || listing.studioId}`} />}>
           <Eye />
         </Button>
         <Button
@@ -79,6 +83,32 @@ export function ListingRow({ listing }: { listing: Listing }) {
 }
 
 export function MyListingsContent() {
+  const [listings, setListings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/studios")
+      .then((res) => res.json())
+      .then((data) => {
+        setListings(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch listings:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const totalBookings = listings.reduce((a, l) => a + (l.bookingsThisMonth || 0), 0);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -87,9 +117,7 @@ export function MyListingsContent() {
             My studio listings
           </h1>
           <p className="text-sm text-muted-foreground sm:text-base">
-            {listings.length} spaces ·{" "}
-            {listings.reduce((a, l) => a + l.bookingsThisMonth, 0)} bookings this
-            month
+            {listings.length} spaces · {totalBookings} bookings this month
           </p>
         </div>
         <Button className="gap-2" render={<Link href="/add-studio" />}>
@@ -108,8 +136,8 @@ export function MyListingsContent() {
         />
       ) : (
         <ul className="flex flex-col gap-4">
-          {listings.map((l) => (
-            <ListingRow key={l.studioId} listing={l} />
+          {listings.map((l: any) => (
+            <ListingRow key={l._id || l.studioId} listing={l} />
           ))}
         </ul>
       )}

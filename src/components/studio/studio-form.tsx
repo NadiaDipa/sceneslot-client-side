@@ -88,17 +88,51 @@ export function StudioForm({
     }));
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    /* Visual only — persistence arrives with the API stage */
-    setSubmitted(true);
+
+    const studioData = {
+      title: form.title,
+      category: form.category,
+      hourlyRate: Number(form.hourlyRate),
+      deposit: Number(form.deposit),
+      maxCapacity: Number(form.maxCapacity),
+      location: form.location,
+      address: form.address,
+      image: form.imageUrl,
+      amenities: form.amenities,
+      overview: form.overview,
+      hostName: demoUser.name,
+      hostEmail: demoUser.email,
+    };
+
+    try {
+      const res = await fetch("http://localhost:5000/studios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(studioData),
+      });
+      const data = await res.json();
+
+      if (data.insertedId) {
+        setSubmitted(true);
+        alert("Studio published successfully!");
+      }
+    } catch (error) {
+      console.error("Error publishing studio:", error);
+      alert("Failed to publish studio.");
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-10">
       {/* Basics */}
       <fieldset className="flex flex-col gap-5">
-        <legend className="font-heading text-lg font-semibold">Studio basics</legend>
+        <legend className="font-heading text-lg font-semibold">
+          Studio basics
+        </legend>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="studio-title">Studio title</Label>
           <Input
@@ -112,7 +146,10 @@ export function StudioForm({
 
         <div className="flex flex-col gap-1.5">
           <Label>Category</Label>
-          <Select value={form.category} onValueChange={(v) => set("category", v ?? "")}>
+          <Select
+            value={form.category}
+            onValueChange={(v) => set("category", v ?? "")}
+          >
             <SelectTrigger className="w-full sm:w-72" aria-label="Category">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
@@ -195,7 +232,9 @@ export function StudioForm({
 
       {/* Imagery */}
       <fieldset className="flex flex-col gap-5">
-        <legend className="font-heading text-lg font-semibold">Cover image</legend>
+        <legend className="font-heading text-lg font-semibold">
+          Cover image
+        </legend>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="studio-image">Image URL</Label>
           <div className="relative">
@@ -237,7 +276,9 @@ export function StudioForm({
 
       {/* Amenities */}
       <fieldset className="flex flex-col gap-4">
-        <legend className="font-heading text-lg font-semibold">Amenities</legend>
+        <legend className="font-heading text-lg font-semibold">
+          Amenities
+        </legend>
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {AMENITY_OPTIONS.map((a) => (
             <label
@@ -246,7 +287,7 @@ export function StudioForm({
                 "flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-sm transition-colors",
                 form.amenities.includes(a)
                   ? "border-primary bg-accent text-accent-foreground"
-                  : "border-input hover:bg-muted/60"
+                  : "border-input hover:bg-muted/60",
               )}
             >
               <Checkbox
@@ -283,7 +324,9 @@ export function StudioForm({
 
       {/* Overview */}
       <fieldset className="flex flex-col gap-5">
-        <legend className="font-heading text-lg font-semibold">Detailed overview</legend>
+        <legend className="font-heading text-lg font-semibold">
+          Detailed overview
+        </legend>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="studio-overview">
             Tell creators what makes this space special
@@ -298,8 +341,8 @@ export function StudioForm({
             className="resize-y"
           />
           <p className="text-xs text-muted-foreground">
-            {form.overview.length} characters · you can edit this later from
-            My Studio Listings.
+            {form.overview.length} characters · you can edit this later from My
+            Studio Listings.
           </p>
         </div>
       </fieldset>
@@ -308,16 +351,28 @@ export function StudioForm({
       <fieldset className="rounded-2xl border border-border bg-muted/40 p-5">
         <div className="mb-4 flex items-center gap-2">
           <Lock className="size-4 text-primary" />
-          <legend className="font-heading text-lg font-semibold">Host information</legend>
+          <legend className="font-heading text-lg font-semibold">
+            Host information
+          </legend>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="host-name">Host name</Label>
-            <Input id="host-name" value={demoUser.name} readOnly className="bg-background text-muted-foreground" />
+            <Input
+              id="host-name"
+              value={demoUser.name}
+              readOnly
+              className="bg-background text-muted-foreground"
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="host-email">Host email</Label>
-            <Input id="host-email" value={demoUser.email} readOnly className="bg-background text-muted-foreground" />
+            <Input
+              id="host-email"
+              value={demoUser.email}
+              readOnly
+              className="bg-background text-muted-foreground"
+            />
           </div>
         </div>
       </fieldset>
@@ -325,11 +380,15 @@ export function StudioForm({
       {/* Actions */}
       <div className="flex flex-col items-start gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          Fields marked <span className="text-destructive">*</span> are required.
-          This preview doesn&apos;t send data anywhere yet.
+          Fields marked <span className="text-destructive">*</span> are
+          required. This preview doesn&apos;t send data anywhere yet.
         </p>
         <Button type="submit" size="lg" className="shrink-0 gap-2">
-          {submitted ? <BadgeCheck className="size-4" /> : <Plus className="size-4" />}
+          {submitted ? (
+            <BadgeCheck className="size-4" />
+          ) : (
+            <Plus className="size-4" />
+          )}
           {mode === "edit" ? "Save Changes" : "Publish Studio"}
         </Button>
       </div>
