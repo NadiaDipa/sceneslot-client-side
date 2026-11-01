@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +6,6 @@ import { mapStudioDoc, type StudioDoc } from "@/lib/api";
 import { cn } from "cn";
 import { CircleCheck, Clock, MapPin, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { BookingPanel } from "./booking-panel";
 import { StudioGallery } from "@/components/studio/studio-gallery";
 
@@ -19,7 +17,7 @@ export default async function StudioDetailsPage({ params }: Props) {
   const { id } = await params;
 
   const res = await fetch(`http://localhost:5000/studios/${id}`);
-  const doc = await res.json();
+  const doc: StudioDoc = await res.json();
 
   const studio = mapStudioDoc(doc);
 
