@@ -3,7 +3,6 @@ import { RatingStars } from "@/components/shared/rating-stars";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { fetchStudioById } from "@/lib/api";
 import { cn } from "cn";
 import { CircleCheck, Clock, MapPin, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
@@ -15,17 +14,14 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const studio = await fetchStudioById(id);
-  if (!studio) return { title: "Studio not found" };
-  return { title: studio.title, description: studio.description };
+async function getStudio(id: string) {
+  const res = await fetch(`http://localhost:5000/studios/${id}`);
+  return res.json();
 }
 
 export default async function StudioDetailsPage({ params }: Props) {
   const { id } = await params;
-  const studio = await fetchStudioById(id);
-  if (!studio) notFound();
+  const studio = await getStudio(id);
 
   return (
     <>
