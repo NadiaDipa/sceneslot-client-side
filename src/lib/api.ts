@@ -56,3 +56,18 @@ export function mapStudioDoc(doc: StudioDoc): Studio {
 }
 
 
+
+// Fetch a single studio by ID
+export async function fetchStudioById(id: string): Promise<Studio> {
+  const res = await fetch(`${API_BASE}/studios/${id}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch studio");
+  }
+
+  const doc: StudioDoc = await res.json();
+
+  return mapStudioDoc(doc);
+}

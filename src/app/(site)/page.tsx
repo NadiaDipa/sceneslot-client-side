@@ -3,16 +3,22 @@ import { TrustSection } from "@/components/home/trust-section";
 import { CategoryCard } from "@/components/studio/category-card";
 import { HeroSlider } from "@/components/studio/hero-slider";
 import { StudioCard } from "@/components/studio/studio-card";
+import { mapStudioDoc, type StudioDoc } from "@/lib/api";
+import type { Studio } from "@/lib/types";
 import { buttonVariants } from "@/components/ui/button";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { categories } from "@/data/categories";
-import { studios } from "@/data/studios";
 import { ArrowRight } from "lucide-react";
 import { cn } from "cn";
 import Link from "next/link";
 
-export default function HomePage() {
-  const featured = studios.filter((s) => s.featured).slice(0, 6);
+export default async function HomePage() {
+ const res = await fetch("http://localhost:5000/studios",{
+   cache: "no-store",
+ });
+const docs: StudioDoc[] = await res.json();
+const studios = docs.map((doc) => mapStudioDoc(doc));
+const featured = studios.slice(0, 6);
 
   return (
     <>
@@ -44,7 +50,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((studio) => (
+            {featured.map((studio:Studio) => (
               <StudioCard key={studio.id} studio={studio} />
             ))}
           </div>

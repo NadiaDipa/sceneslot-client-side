@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { categoryNames } from "@/data/categories";
-import { studios, uniqueLocations } from "@/data/studios";
+import { API_BASE, mapStudioDoc, type StudioDoc } from "@/lib/api";
+import type { Studio } from "@/lib/types";
 import { ExploreStudios } from "./explore-studios";
 
 export const metadata: Metadata = {
@@ -15,6 +16,17 @@ export default async function StudiosPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const params = await searchParams;
+  const res = await fetch(`${API_BASE}/studios`, {
+    cache: "no-store",
+  });
+
+  const docs: StudioDoc[] = await res.json();
+
+  const studios: Studio[] = docs.map(mapStudioDoc);
+
+  const uniqueLocations = [
+    ...new Set(studios.map((studio) => studio.location)),
+  ];
   const initialCategory =
     params.category && (categoryNames as string[]).includes(params.category)
       ? params.category
@@ -24,7 +36,10 @@ export default async function StudiosPage({
     <>
       {/* Page header */}
       <section className="relative overflow-hidden bg-secondary/50 py-12 sm:py-16">
-        <div aria-hidden className="bg-dotted-ink absolute inset-0 opacity-60" />
+        <div
+          aria-hidden
+          className="bg-dotted-ink absolute inset-0 opacity-60"
+        />
         <div className="container-page relative flex flex-col items-center gap-3 text-center">
           <span className="font-mono text-xs font-medium tracking-widest text-muted-foreground uppercase">
             The marketplace

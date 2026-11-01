@@ -17,7 +17,15 @@ import { demoUser } from "@/data/studios";
 import { API_BASE } from "@/lib/api";
 import type { Studio } from "@/lib/types";
 import { cn } from "cn";
-import { BadgeCheck, Camera, ImageUp, Loader2, Lock, Plus, X } from "lucide-react";
+import {
+  BadgeCheck,
+  Camera,
+  ImageUp,
+  Loader2,
+  Lock,
+  Plus,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
@@ -145,7 +153,9 @@ export function StudioForm({
 
     // Edit mode updates the existing document; create mode inserts a new one.
     const isEdit = mode === "edit" && studio;
-    const url = isEdit ? `${API_BASE}/studios/${studio.id}` : `${API_BASE}/studios`;
+    const url = isEdit
+      ? `${API_BASE}/studios/${studio.id}`
+      : `${API_BASE}/studios`;
 
     try {
       const res = await fetch(url, {
@@ -159,7 +169,11 @@ export function StudioForm({
 
       if (res.ok || data.insertedId || data.updatedStudio) {
         setSubmitted(true);
-        alert(isEdit ? "Changes saved successfully!" : "Studio published successfully!");
+        alert(
+          isEdit
+            ? "Changes saved successfully!"
+            : "Studio published successfully!",
+        );
         router.push("/my-listings");
       } else {
         alert(isEdit ? "Failed to save changes." : "Failed to publish studio.");
@@ -301,28 +315,31 @@ export function StudioForm({
               <ImageUp className="size-5 text-primary" />
             )}
             <span className="text-sm font-medium">
-              {uploading ? "Uploading image…" : "Click to upload from your computer"}
+              {uploading
+                ? "Uploading image…"
+                : "Click to upload from your computer"}
             </span>
             <span className="text-xs text-muted-foreground">
-              JPG, PNG, or WebP · up to 5 MB · wide 16:10 images look best on cards
+              JPG, PNG, or WebP · up to 20 MB · wide 16:10 images look best on
+              cards
             </span>
           </button>
           {form.imageUrl ? (
             <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
               <Camera className="size-3.5 text-primary" />
-              <span className="truncate">Uploaded: {form.imageUrl.split("/uploads/").pop()}</span>
+              <span className="truncate">
+                Uploaded: {form.imageUrl.split("/uploads/").pop()}
+              </span>
             </p>
           ) : null}
         </div>
         {form.imageUrl ? (
           <div className="relative aspect-video w-full max-w-md overflow-hidden rounded-xl ring-1 ring-foreground/10">
-            <Image
-              src={form.imageUrl}
-              alt="Cover preview"
-              fill
-              sizes="400px"
-              className="object-cover"
-            />
+           <img
+  src={form.imageUrl}
+  alt="Cover preview"
+  className="absolute inset-0 h-full w-full object-cover"
+/>
             <button
               type="button"
               onClick={() => set("imageUrl", "")}
