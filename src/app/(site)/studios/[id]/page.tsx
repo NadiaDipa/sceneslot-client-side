@@ -3,7 +3,7 @@ import { RatingStars } from "@/components/shared/rating-stars";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { getStudioById } from "@/data/studios";
+import { fetchStudioById } from "@/lib/api";
 import { cn } from "cn";
 import { CircleCheck, Clock, MapPin, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
@@ -17,20 +17,15 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const studio = getStudioById(id);
+  const studio = await fetchStudioById(id);
   if (!studio) return { title: "Studio not found" };
   return { title: studio.title, description: studio.description };
 }
 
 export default async function StudioDetailsPage({ params }: Props) {
   const { id } = await params;
-  const studio = getStudioById(id);
+  const studio = await fetchStudioById(id);
   if (!studio) notFound();
-
-  const initials = studio.host.name
-    .split(" ")
-    .map((p) => p[0])
-    .join("");
 
   return (
     <>
@@ -72,11 +67,15 @@ export default async function StudioDetailsPage({ params }: Props) {
                 {studio.title}
               </h1>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-                <span className="inline-flex items-center gap-2">
-                  <RatingStars rating={studio.rating} />
-                  <span className="font-semibold text-foreground">{studio.rating}</span>
-                  ({studio.reviewsCount} reviews)
-                </span>
+                {studio.reviewsCount > 0 ? (
+                  <span className="inline-flex items-center gap-2">
+                    <RatingStars rating={studio.rating} />
+                    <span className="font-semibold text-foreground">{studio.rating}</span>
+                    ({studio.reviewsCount} reviews)
+                  </span>
+                ) : (
+                  <span className="text-emerald-700">New listing</span>
+                )}
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="size-4 text-primary" />
                   {studio.location}
@@ -139,12 +138,20 @@ export default async function StudioDetailsPage({ params }: Props) {
               <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 sm:flex-row sm:items-start">
                 <Avatar size="lg" className="size-14">
                   <AvatarImage src={studio.host.avatar} alt={studio.host.name} />
-                  <AvatarFallback>{initials}</AvatarFallback>
+                  <AvatarFallback>
+                    {studio.host.name
+                      .split(" ")
+                      .map((p) => p[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-1">
                   <p className="font-heading text-base font-semibold">{studio.host.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {studio.host.joined} · {studio.host.responseRate}
+                    {studio.host.joined}
+                    {studio.host.responseRate ? ` · ${studio.host.responseRate}` : ""}
                   </p>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                     {studio.host.bio}
@@ -155,42 +162,44 @@ export default async function StudioDetailsPage({ params }: Props) {
 
             <Separator />
 
-            {/* Reviews */}
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="font-heading text-xl font-semibold">
-                  Creator reviews
-                </h2>
-                <span className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">{studio.rating}</span>{" "}
-                  · {studio.reviewsCount} reviews
-                </span>
-              </div>
+            {/* Reviews (backend-backed listings have none yet) */}
+            {studio.reviews.length > 0 ? (
               <div className="flex flex-col gap-4">
-                {studio.reviews.map((r) => (
-                  <article
-                    key={r.id}
-                    className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-5"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <Avatar size="sm">
-                          <AvatarImage src={r.avatar} alt={r.author} />
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-semibold">{r.author}</p>
-                          <p className="text-xs text-muted-foreground">{r.date}</p>
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h2 className="font-heading text-xl font-semibold">
+                    Creator reviews
+                  </h2>
+                  <span className="text-sm text-muted-foreground">
+                    <span className="font-semibold text-foreground">{studio.rating}</span>{" "}
+                    · {studio.reviewsCount} reviews
+                  </span>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {studio.reviews.map((r) => (
+                    <article
+                      key={r.id}
+                      className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-5"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar size="sm">
+                            <AvatarImage src={r.avatar} alt={r.author} />
+                          </Avatar>
+                          <div>
+                            <p className="text-sm font-semibold">{r.author}</p>
+                            <p className="text-xs text-muted-foreground">{r.date}</p>
+                          </div>
                         </div>
+                        <RatingStars rating={r.rating} />
                       </div>
-                      <RatingStars rating={r.rating} />
-                    </div>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {r.comment}
-                    </p>
-                  </article>
-                ))}
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {r.comment}
+                      </p>
+                    </article>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
           </div>
 
           {/* Right column — booking */}
