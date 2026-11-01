@@ -55,14 +55,4 @@ export function mapStudioDoc(doc: StudioDoc): Studio {
   };
 }
 
-/** Fetch one studio from the backend by its MongoDB `_id`. */
-export async function fetchStudioById(id: string): Promise<Studio | null> {
-  try {
-    const res = await fetch(`${API_BASE}/studios/${id}`, { cache: "no-store" });
-    if (!res.ok) return null;
-    const doc = await res.json();
-    return mapStudioDoc(doc);
-  } catch {
-    return null;
-  }
-}
+
