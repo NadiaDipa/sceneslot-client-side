@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { StudioForm } from "@/components/studio/studio-form";
-import { getStudioById } from "@/data/studios";
+import { fetchStudioById } from "@/lib/api";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -10,13 +10,13 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const studio = getStudioById(id);
+  const studio = await fetchStudioById(id);
   return { title: studio ? `Edit ${studio.title}` : "Edit Studio" };
 }
 
 export default async function EditStudioPage({ params }: Props) {
   const { id } = await params;
-  const studio = getStudioById(id);
+  const studio = await fetchStudioById(id);
   if (!studio) notFound();
 
   return (

@@ -14,11 +14,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { categoryNames } from "@/data/categories";
 import { demoUser } from "@/data/studios";
+import { API_BASE } from "@/lib/api";
 import type { Studio } from "@/lib/types";
 import { cn } from "cn";
-import { BadgeCheck, Camera, Lock, Plus, X } from "lucide-react";
+import { BadgeCheck, Camera, ImageUp, Loader2, Lock, Plus, X } from "lucide-react";
 import Image from "next/image";
-import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 
 const AMENITY_OPTIONS = [
   "Cyc Wall",
@@ -73,8 +75,11 @@ export function StudioForm({
   studio?: Studio;
   mode?: "create" | "edit";
 }) {
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<FormState>(() => toFormState(studio));
   const [submitted, setSubmitted] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const set = (key: keyof FormState, value: string | string[]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -88,8 +93,40 @@ export function StudioForm({
     }));
   }
 
+  /** Upload a file picked from the user's computer to the backend. */
+  async function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch(`${API_BASE}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.imageUrl) {
+        alert(data.error || "Image upload failed.");
+      } else {
+        set("imageUrl", data.imageUrl);
+      }
+    } catch {
+      alert("Image upload failed. Is the server (port 5000) running?");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
+    if (!form.imageUrl.trim()) {
+      alert("Please upload a cover image from your computer.");
+      return;
+    }
 
     const studioData = {
       title: form.title,
@@ -106,9 +143,13 @@ export function StudioForm({
       hostEmail: demoUser.email,
     };
 
+    // Edit mode updates the existing document; create mode inserts a new one.
+    const isEdit = mode === "edit" && studio;
+    const url = isEdit ? `${API_BASE}/studios/${studio.id}` : `${API_BASE}/studios`;
+
     try {
-      const res = await fetch("http://localhost:5000/studios", {
-        method: "POST",
+      const res = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -116,13 +157,16 @@ export function StudioForm({
       });
       const data = await res.json();
 
-      if (data.insertedId) {
+      if (res.ok || data.insertedId || data.updatedStudio) {
         setSubmitted(true);
-        alert("Studio published successfully!");
+        alert(isEdit ? "Changes saved successfully!" : "Studio published successfully!");
+        router.push("/my-listings");
+      } else {
+        alert(isEdit ? "Failed to save changes." : "Failed to publish studio.");
       }
     } catch (error) {
-      console.error("Error publishing studio:", error);
-      alert("Failed to publish studio.");
+      console.error("Error saving studio:", error);
+      alert(isEdit ? "Failed to save changes." : "Failed to publish studio.");
     }
   }
 
@@ -236,22 +280,39 @@ export function StudioForm({
           Cover image
         </legend>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="studio-image">Image URL</Label>
-          <div className="relative">
-            <Camera className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-            <Input
-              id="studio-image"
-              required
-              className="pl-8"
-              placeholder="https://images.unsplash.com/…"
-              value={form.imageUrl}
-              onChange={(e) => set("imageUrl", e.target.value)}
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Tip: paste a link from Unsplash or your CDN — wide 16:10 images look
-            best on cards.
-          </p>
+          <Label htmlFor="studio-image">Cover image</Label>
+          <input
+            ref={fileInputRef}
+            id="studio-image"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="sr-only w-full"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 px-6 py-8 text-center transition-colors hover:border-primary/50 hover:bg-muted/70 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-60"
+          >
+            {uploading ? (
+              <Loader2 className="size-5 animate-spin text-primary" />
+            ) : (
+              <ImageUp className="size-5 text-primary" />
+            )}
+            <span className="text-sm font-medium">
+              {uploading ? "Uploading image…" : "Click to upload from your computer"}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              JPG, PNG, or WebP · up to 5 MB · wide 16:10 images look best on cards
+            </span>
+          </button>
+          {form.imageUrl ? (
+            <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Camera className="size-3.5 text-primary" />
+              <span className="truncate">Uploaded: {form.imageUrl.split("/uploads/").pop()}</span>
+            </p>
+          ) : null}
         </div>
         {form.imageUrl ? (
           <div className="relative aspect-video w-full max-w-md overflow-hidden rounded-xl ring-1 ring-foreground/10">
@@ -381,7 +442,7 @@ export function StudioForm({
       <div className="flex flex-col items-start gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
           Fields marked <span className="text-destructive">*</span> are
-          required. This preview doesn&apos;t send data anywhere yet.
+          required. Your listing is saved to the SceneSlot database.
         </p>
         <Button type="submit" size="lg" className="shrink-0 gap-2">
           {submitted ? (

@@ -1,5 +1,6 @@
 "use client";
 
+import { API_BASE } from "@/lib/api";
 import { DeleteConfirmDialog } from "@/components/studio/delete-confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
@@ -15,8 +16,30 @@ const statusStyles: Record<string, string> = {
   Inactive: "bg-destructive/10 text-destructive",
 };
 
-export function ListingRow({ listing }: { listing: any }) {
+export function ListingRow({
+  listing,
+  onDeleted,
+}: {
+  listing: any;
+  onDeleted?: (id: string) => void;
+}) {
   const [deleteOpen, setDeleteOpen] = useState(false);
+
+  async function handleDelete() {
+    const id = listing._id || listing.studioId;
+    try {
+      const res = await fetch(`${API_BASE}/studios/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setDeleteOpen(false);
+        onDeleted?.(id);
+      } else {
+        alert("Failed to delete the listing.");
+      }
+    } catch (err) {
+      console.error("Failed to delete listing:", err);
+      alert("Failed to delete the listing.");
+    }
+  }
 
   return (
     <li className="flex flex-col gap-4 rounded-2xl border-border bg-card p-4 ring-1 ring-foreground/10 transition-shadow hover:shadow-md hover:shadow-foreground/5 sm:flex-row sm:items-center sm:p-5">
@@ -77,6 +100,7 @@ export function ListingRow({ listing }: { listing: any }) {
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         itemName={listing.title}
+        onConfirm={handleDelete}
       />
     </li>
   );
@@ -86,8 +110,11 @@ export function MyListingsContent() {
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const onDeleted = (id: string) =>
+    setListings((prev) => prev.filter((l) => (l._id || l.studioId) !== id));
+
   useEffect(() => {
-    fetch("http://localhost:5000/studios")
+    fetch(`${API_BASE}/studios`)
       .then((res) => res.json())
       .then((data) => {
         setListings(data);
@@ -137,7 +164,11 @@ export function MyListingsContent() {
       ) : (
         <ul className="flex flex-col gap-4">
           {listings.map((l: any) => (
-            <ListingRow key={l._id || l.studioId} listing={l} />
+            <ListingRow
+              key={l._id || l.studioId}
+              listing={l}
+              onDeleted={onDeleted}
+            />
           ))}
         </ul>
       )}

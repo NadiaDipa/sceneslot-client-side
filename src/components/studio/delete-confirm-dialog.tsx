@@ -17,6 +17,8 @@ interface DeleteConfirmDialogProps {
   title?: string;
   /** e.g. a studio name — shown inside the dialog copy */
   itemName: string;
+  /** Runs when the user confirms deletion (e.g. the DELETE request). */
+  onConfirm?: () => void | Promise<void>;
 }
 
 export function DeleteConfirmDialog({
@@ -24,6 +26,7 @@ export function DeleteConfirmDialog({
   onOpenChange,
   title = "Delete listing",
   itemName,
+  onConfirm,
 }: DeleteConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,8 +45,7 @@ export function DeleteConfirmDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Keep listing
           </Button>
-          {/* Demo only — no records are deleted until the backend stage */}
-          <Button variant="destructive" onClick={() => onOpenChange(false)}>
+          <Button variant="destructive" onClick={onConfirm}>
             Delete listing
           </Button>
         </DialogFooter>
