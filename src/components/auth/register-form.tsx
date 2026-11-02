@@ -22,10 +22,12 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log("Submit handler called");
+    // console.log("Submit handler called");
+    setIsLoading(true);
 
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
@@ -33,12 +35,16 @@ export function RegisterForm() {
     const name = String(data.name);
     const email = String(data.email);
     const password = String(data.password);
+    console.log("Submitted email:", email);
+    const photoUrl = String(data.photoUrl || "");
+
 
     try {
       const { data: signUpData, error } = await signUp.email({
         name,
         email,
         password,
+        image: photoUrl || undefined,
         callbackURL: "/",
       });
 
@@ -46,7 +52,10 @@ export function RegisterForm() {
       console.log("Signup error:", error);
     } catch (err) {
       console.error("Signup failed:", err);
+    } finally {
+      setIsLoading(false);
     }
+    
   }
 
   return (
@@ -197,9 +206,14 @@ export function RegisterForm() {
           </span>
         </label>
 
-        <Button type="submit" size="lg" className="mt-1 w-full">
-          Create account
-        </Button>
+        <Button
+  type="submit"
+  size="lg"
+  className="mt-1 w-full"
+  disabled={isLoading}
+>
+  {isLoading ? "Creating account..." : "Create account"}
+</Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
