@@ -1,10 +1,20 @@
 import type { Metadata } from "next";
 import { StudioForm } from "@/components/studio/studio-form";
 import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = { title: "Host a Studio" };
 
-export default function AddStudioPage() {
+export default async function AddStudioPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
   return (
     <section aria-busy="false" className="py-10 sm:py-14">
       <div className="container-page max-w-4xl">

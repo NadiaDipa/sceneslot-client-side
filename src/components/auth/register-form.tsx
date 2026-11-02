@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { GoogleButton } from "@/components/auth/login-form";
 import { signUp } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 const rules = [
   { label: "At least 8 characters", test: (v: string) => v.length >= 8 },
@@ -23,6 +24,7 @@ export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,24 +40,25 @@ export function RegisterForm() {
     console.log("Submitted email:", email);
     const photoUrl = String(data.photoUrl || "");
 
-
     try {
       const { data: signUpData, error } = await signUp.email({
         name,
         email,
         password,
         image: photoUrl || undefined,
-        callbackURL: "/",
       });
 
-      console.log("Signup response:", signUpData);
-      console.log("Signup error:", error);
+      if (signUpData && !error) {
+        router.push("/login");
+      }
+
+      // console.log("Signup response:", signUpData);
+      // console.log("Signup error:", error);
     } catch (err) {
       console.error("Signup failed:", err);
     } finally {
       setIsLoading(false);
     }
-    
   }
 
   return (
@@ -207,13 +210,13 @@ export function RegisterForm() {
         </label>
 
         <Button
-  type="submit"
-  size="lg"
-  className="mt-1 w-full"
-  disabled={isLoading}
->
-  {isLoading ? "Creating account..." : "Create account"}
-</Button>
+          type="submit"
+          size="lg"
+          className="mt-1 w-full"
+          disabled={isLoading}
+        >
+          {isLoading ? "Creating account..." : "Create account"}
+        </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
