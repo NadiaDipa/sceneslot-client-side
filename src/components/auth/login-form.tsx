@@ -38,7 +38,12 @@ export function GoogleButton({ label }: { label: string }) {
       type="button"
       variant="outline"
       className="w-full gap-2.5"
-      onClick={() => {}}
+      onClick={() =>
+        authClient.signIn.social({
+          provider: "google",
+          callbackURL: "/",
+        })
+      }
     >
       <GoogleIcon />
       {label}
