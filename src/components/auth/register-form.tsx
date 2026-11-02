@@ -29,7 +29,6 @@ export function RegisterForm() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     // console.log("Submit handler called");
-    setIsLoading(true);
 
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
@@ -37,7 +36,12 @@ export function RegisterForm() {
     const name = String(data.name);
     const email = String(data.email);
     const password = String(data.password);
-    console.log("Submitted email:", email);
+    if (!rules.every((rule) => rule.test(password))) {
+      return;
+    }
+    setIsLoading(true);
+
+    // console.log("Submitted email:", email);
     const photoUrl = String(data.photoUrl || "");
 
     try {
