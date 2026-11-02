@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 function GoogleIcon() {
   return (
@@ -32,7 +34,12 @@ function GoogleIcon() {
 
 export function GoogleButton({ label }: { label: string }) {
   return (
-    <Button type="button" variant="outline" className="w-full gap-2.5" onClick={() => {}}>
+    <Button
+      type="button"
+      variant="outline"
+      className="w-full gap-2.5"
+      onClick={() => {}}
+    >
       <GoogleIcon />
       {label}
     </Button>
@@ -42,18 +49,53 @@ export function GoogleButton({ label }: { label: string }) {
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
-  const [sent, setSent] = useState(false);
+  const router = useRouter();
 
-  function handleSubmit(e: FormEvent) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    /* UI only — authentication arrives in a later stage */
-    setSent(true);
+
+    setErrorMessage("");
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await authClient.signIn.email({
+        
+        email,
+        password,
+        rememberMe: remember,
+        callbackURL: "/",
+      });
+      console.log("Login data:", data);
+console.log("Login error:", error);
+
+      if (error) {
+        setErrorMessage(error.message || "Login failed. Please try again.");
+        return;
+      }
+
+      if (data) {
+        router.push("/");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrorMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="font-heading text-2xl font-semibold sm:text-3xl">Welcome back</h1>
+        <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
+          Welcome back
+        </h1>
         <p className="text-sm text-muted-foreground">
           Log in to book studios, manage listings, and see your schedule.
         </p>
@@ -68,7 +110,11 @@ export function LoginForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate={false}>
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+        noValidate={false}
+      >
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="login-email">Email</Label>
           <div className="relative">
@@ -78,6 +124,8 @@ export function LoginForm() {
               type="email"
               required
               autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="you@studio.com"
               className="pl-8"
             />
@@ -102,6 +150,8 @@ export function LoginForm() {
               type={showPassword ? "text" : "password"}
               required
               autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               className="px-8 pr-10"
             />
@@ -111,7 +161,11 @@ export function LoginForm() {
               aria-label={showPassword ? "Hide password" : "Show password"}
               className="absolute top-0.5 right-1 rounded-md p-2 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
             >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              {showPassword ? (
+                <EyeOff className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
             </button>
           </div>
         </div>
@@ -125,16 +179,20 @@ export function LoginForm() {
           />
           Remember me on this device
         </label>
-
-        <Button type="submit" size="lg" className="mt-1 w-full">
-          Login
-        </Button>
-
-        {sent ? (
-          <p role="status" className="text-center text-xs text-muted-foreground">
-            (Demo only — no credentials are checked until the auth stage.)
+        {errorMessage && (
+          <p role="alert" className="text-center text-sm text-destructive">
+            {errorMessage}
           </p>
-        ) : null}
+        )}
+
+        <Button
+          type="submit"
+          size="lg"
+          className="mt-1 w-full"
+          disabled={isLoading}
+        >
+          {isLoading ? "Logging in..." : "Login"}
+        </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
@@ -148,4 +206,4 @@ export function LoginForm() {
       </p>
     </div>
   );
-} 
+}

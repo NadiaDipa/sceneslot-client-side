@@ -50,8 +50,16 @@ const featured = studios.slice(0, 6);
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((studio:Studio) => (
-              <StudioCard key={studio.id} studio={studio} />
+            {featured.map((studio:Studio, i: number) => (
+              <StudioCard
+                key={studio.id}
+                studio={studio}
+                className={cn(
+                  "animate-in fade-in fill-mode-both slide-in-from-bottom-4 duration-700",
+                  // gentle stagger: 0, 100ms, 150ms, 200ms, 300ms, 500ms
+                  ["", "delay-100", "delay-150", "delay-200", "delay-300", "delay-500"][i] ?? "",
+                )}
+              />
             ))}
           </div>
         </div>

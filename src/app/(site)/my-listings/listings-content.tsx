@@ -24,20 +24,26 @@ export function ListingRow({
   onDeleted?: (id: string) => void;
 }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteFailed, setDeleteFailed] = useState(false);
 
   async function handleDelete() {
     const id = listing._id || listing.studioId;
+    setDeleteFailed(false);
+    setDeleting(true);
     try {
       const res = await fetch(`${API_BASE}/studios/${id}`, { method: "DELETE" });
       if (res.ok) {
         setDeleteOpen(false);
         onDeleted?.(id);
       } else {
-        alert("Failed to delete the listing.");
+        setDeleteFailed(true);
       }
     } catch (err) {
       console.error("Failed to delete listing:", err);
-      alert("Failed to delete the listing.");
+      setDeleteFailed(true);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -101,6 +107,8 @@ export function ListingRow({
         onOpenChange={setDeleteOpen}
         itemName={listing.title}
         onConfirm={handleDelete}
+        pending={deleting}
+        onError={deleteFailed}
       />
     </li>
   );

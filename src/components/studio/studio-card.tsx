@@ -18,7 +18,7 @@ export function StudioCard({
   return (
     <Card
       className={cn(
-        "group gap-0 overflow-hidden pt-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-foreground/10",
+        "group gap-0 overflow-hidden pt-0 transition-all duration-300 hover:-translate-y-1 hover:ring-foreground/20 hover:shadow-lg hover:shadow-foreground/10",
         className,
       )}
     >
@@ -52,7 +52,7 @@ export function StudioCard({
         <h3 className="font-heading text-lg font-semibold leading-snug">
           <Link
             href={`/studios/${studio.id}`}
-            className="rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="rounded-sm outline-none transition-colors hover:text-primary focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             {studio.title}
           </Link>

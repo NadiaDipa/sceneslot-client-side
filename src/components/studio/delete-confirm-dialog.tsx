@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TriangleAlert } from "lucide-react";
+import { Loader2, TriangleAlert } from "lucide-react";
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -19,34 +19,64 @@ interface DeleteConfirmDialogProps {
   itemName: string;
   /** Runs when the user confirms deletion (e.g. the DELETE request). */
   onConfirm?: () => void | Promise<void>;
+  /** True while the delete request is in flight — shows a spinner. */
+  pending?: boolean;
+  /** True when the delete request failed — shows an inline error. */
+  onError?: boolean;
 }
 
 export function DeleteConfirmDialog({
   open,
   onOpenChange,
-  title = "Delete listing",
+  title = "Delete this listing?",
   itemName,
   onConfirm,
+  pending = false,
+  onError = false,
 }: DeleteConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <div className="grid size-11 place-items-center rounded-xl bg-destructive/10">
+          <div className="me-auto grid size-11 place-items-center rounded-xl bg-destructive/10 ring-1 ring-destructive/20">
             <TriangleAlert className="size-5 text-destructive" />
           </div>
-          <DialogTitle className="font-heading text-lg">{title}</DialogTitle>
+          <DialogTitle className="font-heading text-lg font-semibold">
+            {title}
+          </DialogTitle>
           <DialogDescription>
-            &ldquo;{itemName}&rdquo; will be permanently removed, along with any
-            pending booking requests. This action can&apos;t be undone.
+            <span className="font-medium text-foreground">
+              &ldquo;{itemName}&rdquo;
+            </span>{" "}
+            will be permanently removed, along with any pending booking
+            requests. This action can&apos;t be undone.
           </DialogDescription>
+          {onError ? (
+            <p
+              role="alert"
+              className="text-xs font-medium text-destructive"
+            >
+              Couldn&apos;t delete this listing — please try again.
+            </p>
+          ) : null}
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={pending}
+          >
             Keep listing
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
-            Delete listing
+          <Button variant="destructive" onClick={onConfirm} disabled={pending}>
+            {pending ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Deleting…
+              </>
+            ) : (
+              "Delete listing"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

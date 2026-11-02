@@ -7,6 +7,7 @@ import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { GoogleButton } from "@/components/auth/login-form";
+import { signUp } from "@/lib/auth-client";
 
 const rules = [
   { label: "At least 8 characters", test: (v: string) => v.length >= 8 },
@@ -22,9 +23,30 @@ export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    /* UI only — registration arrives in a later stage */
+    console.log("Submit handler called");
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    const name = String(data.name);
+    const email = String(data.email);
+    const password = String(data.password);
+
+    try {
+      const { data: signUpData, error } = await signUp.email({
+        name,
+        email,
+        password,
+        callbackURL: "/",
+      });
+
+      console.log("Signup response:", signUpData);
+      console.log("Signup error:", error);
+    } catch (err) {
+      console.error("Signup failed:", err);
+    }
   }
 
   return (
@@ -58,6 +80,7 @@ export function RegisterForm() {
               autoComplete="name"
               placeholder="Amara Hossain"
               value={name}
+              name="name"
               onChange={(e) => setName(e.target.value)}
               className="pl-8"
             />
@@ -71,6 +94,7 @@ export function RegisterForm() {
             <Input
               id="reg-email"
               type="email"
+              name="email"
               required
               autoComplete="email"
               placeholder="you@studio.com"
@@ -88,6 +112,7 @@ export function RegisterForm() {
             type="url"
             placeholder="https://i.pravatar.cc/150?img=12 (optional)"
             value={photoUrl}
+            name="photoUrl"
             onChange={(e) => setPhotoUrl(e.target.value)}
           />
           <p className="text-xs text-muted-foreground">
@@ -106,6 +131,7 @@ export function RegisterForm() {
               autoComplete="new-password"
               placeholder="Create a strong password"
               value={password}
+              name="password"
               onChange={(e) => setPassword(e.target.value)}
               className="px-8 pr-10"
             />
@@ -115,7 +141,11 @@ export function RegisterForm() {
               aria-label={showPassword ? "Hide password" : "Show password"}
               className="absolute top-0.5 right-1 rounded-md p-2 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
             >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              {showPassword ? (
+                <EyeOff className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
             </button>
           </div>
           {password ? (
@@ -125,7 +155,11 @@ export function RegisterForm() {
                 return (
                   <li
                     key={r.label}
-                    className={ok ? "text-xs text-emerald-700" : "text-xs text-muted-foreground"}
+                    className={
+                      ok
+                        ? "text-xs text-emerald-700"
+                        : "text-xs text-muted-foreground"
+                    }
                   >
                     {ok ? "✓" : "•"} {r.label}
                   </li>
@@ -140,16 +174,23 @@ export function RegisterForm() {
             type="checkbox"
             required
             checked={agreed}
+            name="agreed"
             onChange={(e) => setAgreed(e.target.checked)}
             className="mt-0.5 size-4 accent-[var(--primary)]"
           />
           <span>
             I agree to the{" "}
-            <Link href="/terms" className="font-medium text-accent-foreground underline-offset-4 hover:underline">
+            <Link
+              href="/terms"
+              className="font-medium text-accent-foreground underline-offset-4 hover:underline"
+            >
               Terms
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="font-medium text-accent-foreground underline-offset-4 hover:underline">
+            <Link
+              href="/privacy"
+              className="font-medium text-accent-foreground underline-offset-4 hover:underline"
+            >
               Privacy Policy
             </Link>
             .

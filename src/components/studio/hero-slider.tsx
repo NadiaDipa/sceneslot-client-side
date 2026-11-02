@@ -28,7 +28,7 @@ export interface HeroSlide {
 const slides: HeroSlide[] = [
   {
     image:
-      "https://images.unsplash.com/photo-1516575150278-77136aed6920?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1600&auto=format&fit=crop",
     category: "Photo Studios",
     headline: "Shot-ready studios, booked in minutes",
     description:
@@ -36,7 +36,7 @@ const slides: HeroSlide[] = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1600&auto=format&fit=crop",
     category: "Sound Stages",
     headline: "Full-scale stages for full-scale ideas",
     description:
@@ -44,7 +44,7 @@ const slides: HeroSlide[] = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1581368135153-a506cf13b1e1?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=1600&auto=format&fit=crop",
     category: "Podcast Rooms",
     headline: "Press record in a room that sounds rich",
     description:
@@ -69,14 +69,14 @@ export function HeroSlider() {
       >
         {slides.map((slide, i) => (
           <SwiperSlide key={i} className="relative overflow-hidden">
-            {/* Slide image */}
+            {/* Slide image — slow cinematic zoom (see .hero-slide-img in globals.css) */}
             <Image
               src={slide.image}
               alt={slide.category}
               fill
               priority={i === 0}
               sizes="100vw"
-              className="object-cover"
+              className="hero-slide-img object-cover"
             />
             {/* Textural overlays */}
             <span
@@ -90,7 +90,7 @@ export function HeroSlider() {
 
             {/* Copy */}
             <div className="container-page relative flex h-full items-end pb-16 sm:items-center sm:pb-0">
-              <div className="max-w-2xl pb-10 sm:pb-16">
+              <div className="max-w-2xl animate-in fade-in fill-mode-both slide-in-from-bottom-4 pb-10 duration-700 sm:pb-16">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/95 px-3 py-1 text-xs font-semibold tracking-wide text-primary-foreground uppercase">
                   <Sparkles className="size-3.5" />
                   {slide.category}
@@ -110,7 +110,7 @@ export function HeroSlider() {
                     })}
                   >
                     Explore Studios
-                    <ArrowRight className="size-4" />
+                    <ArrowRight className="size-4 transition-transform duration-300 group-hover/button:translate-x-0.5" />
                   </Link>
                   <Link
                     href="/add-studio"

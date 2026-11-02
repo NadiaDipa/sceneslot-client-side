@@ -3,12 +3,18 @@
 import { Logo } from "@/components/layout/logo";
 import { ProfileDropdown } from "@/components/layout/profile-dropdown";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "cn";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useSession } from "@/lib/auth-client";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -17,10 +23,10 @@ const navLinks = [
   { href: "/about", label: "About Us" },
 ];
 
-/** Demo switch — flip to false to preview the guest navbar. */
-const DEMO_AUTHENTICATED = true;
-
 export function Navbar() {
+  const { data: session, isPending } = useSession();
+ const isAuthenticated = session?.user ? true : false;
+
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -33,7 +39,10 @@ export function Navbar() {
         <Logo />
 
         {/* Desktop nav */}
-        <nav aria-label="Main navigation" className="hidden items-center gap-1 md:flex">
+        <nav
+          aria-label="Main navigation"
+          className="hidden items-center gap-1 md:flex"
+        >
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -42,7 +51,7 @@ export function Navbar() {
                 "relative rounded-lg px-3 py-2 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                 isActive(link.href)
                   ? "text-foreground after:absolute after:inset-x-3 after:-bottom-px after:h-0.5 after:rounded-full after:bg-primary"
-                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
               )}
               aria-current={isActive(link.href) ? "page" : undefined}
             >
@@ -53,24 +62,30 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          {DEMO_AUTHENTICATED ? (
-            <div className="hidden md:block">
-              <ProfileDropdown />
-            </div>
-          ) : (
-            <div className="hidden items-center gap-2 md:flex">
-              <Button variant="ghost" render={<Link href="/login" />}>
-                Login
-              </Button>
-              <Button render={<Link href="/register" />}>Register</Button>
-            </div>
-          )}
+          {!isPending &&
+            (isAuthenticated ? (
+              <div className="hidden md:block">
+                <ProfileDropdown />
+              </div>
+            ) : (
+              <div className="hidden items-center gap-2 md:flex">
+                <Button variant="ghost" render={<Link href="/login" />}>
+                  Login
+                </Button>
+                <Button render={<Link href="/register" />}>Register</Button>
+              </div>
+            ))}
 
           {/* Mobile menu trigger */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
               render={
-                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                  aria-label="Open menu"
+                />
               }
             >
               <Menu className="size-5" />
@@ -81,7 +96,10 @@ export function Navbar() {
                 <div className="border-b p-4">
                   <Logo />
                 </div>
-                <nav aria-label="Mobile navigation" className="flex flex-col gap-1 p-4">
+                <nav
+                  aria-label="Mobile navigation"
+                  className="flex flex-col gap-1 p-4"
+                >
                   {navLinks.map((link) => (
                     <Link
                       key={link.href}
@@ -91,7 +109,7 @@ export function Navbar() {
                         "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                         isActive(link.href)
                           ? "bg-accent text-accent-foreground"
-                          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                       )}
                     >
                       {link.label}
@@ -99,18 +117,26 @@ export function Navbar() {
                   ))}
                 </nav>
                 <div className="mt-auto border-t p-4">
-                  {DEMO_AUTHENTICATED ? (
+                  {isPending ? null : isAuthenticated ? (
                     <ProfileDropdown />
                   ) : (
                     <div className="flex flex-col gap-2">
-                      <Button variant="outline" render={<Link href="/login" />} onClick={() => setOpen(false)}>
+                      <Button
+                        variant="outline"
+                        render={<Link href="/login" />}
+                        onClick={() => setOpen(false)}
+                      >
                         Login
                       </Button>
-                      <Button render={<Link href="/register" />} onClick={() => setOpen(false)}>
+                      <Button
+                        render={<Link href="/register" />}
+                        onClick={() => setOpen(false)}
+                      >
                         Register
                       </Button>
                     </div>
                   )}
+                  <ProfileDropdown />
                 </div>
               </div>
             </SheetContent>

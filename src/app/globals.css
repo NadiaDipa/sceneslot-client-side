@@ -126,6 +126,10 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Subtle amber selection that matches the spotlight palette */
+  ::selection {
+    background: color-mix(in oklch, var(--primary) 25%, transparent);
+  }
   html {
     @apply font-sans scroll-smooth;
   }
@@ -138,6 +142,16 @@
 }
 
 @layer components {
+  /* Ken Burns — very slow zoom so the hero feels alive without distracting */
+  @keyframes ken-burns {
+    from {
+      transform: scale(1.02);
+    }
+    to {
+      transform: scale(1.1);
+    }
+  }
+
   /* Consistent page container used across every section */
   .container-page {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
@@ -150,6 +164,17 @@
   .bg-dotted-ink {
     background-image: radial-gradient(var(--border) 1px, transparent 1px);
     background-size: 22px 22px;
+  }
+
+  /* Cinematic slow zoom on the hero slide images */
+  .hero-slide-img {
+    animation: ken-burns 9s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-slide-img {
+      animation: none;
+    }
   }
 
   /* Hero slider pagination */
