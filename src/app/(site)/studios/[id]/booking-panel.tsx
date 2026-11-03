@@ -4,7 +4,7 @@ import { BookingModal } from "@/components/studio/booking-modal";
 import { Button } from "@/components/ui/button";
 import type { Studio } from "@/lib/types";
 import { cn } from "cn";
-import { CalendarCheck, Heart, Share2 } from "lucide-react";
+import { CalendarCheck, Heart } from "lucide-react";
 import { useState } from "react";
 
 export function BookingPanel({ studio }: { studio: Studio }) {
@@ -21,14 +21,11 @@ export function BookingPanel({ studio }: { studio: Studio }) {
           </span>
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
             <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden />
-            Instant booking
+           Booking available
           </span>
         </div>
 
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          Refundable security deposit: ${studio.deposit} · Free cancellation up
-          to 24 hours before the slot
-        </p>
+        
 
         <Button size="lg" className="w-full gap-2" onClick={() => setOpen(true)}>
           <CalendarCheck className="size-4" />
@@ -46,10 +43,7 @@ export function BookingPanel({ studio }: { studio: Studio }) {
             <Heart className={cn("size-4", wished && "fill-primary text-primary")} />
             {wished ? "Saved" : "Save"}
           </Button>
-          <Button variant="outline" className="gap-2">
-            <Share2 className="size-4" />
-            Share
-          </Button>
+         
         </div>
       </aside>
 

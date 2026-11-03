@@ -1,14 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { Booking, BookingStatus } from "@/lib/types";
+import { API_BASE } from "@/lib/api";
 import { cn } from "cn";
 import { Ban, CalendarDays, Clock, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { DeleteConfirmDialog } from "@/components/studio/delete-confirm-dialog";
 
 const statusStyles: Record<BookingStatus, string> = {
   Pending: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
@@ -22,11 +22,52 @@ export function BookingCard({
   priority = false,
 }: {
   booking: Booking;
-  /** Set for above-the-fold cards so the image isn't LCP-warned. */
   priority?: boolean;
 }) {
-  const [cancelOpen, setCancelOpen] = useState(false);
-  const canCancel = booking.status === "Pending";
+  const [status, setStatus] = useState<BookingStatus>(booking.status);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [error, setError] = useState("");
+
+  const canCancel = status === "Pending";
+
+  const handleCancel = async () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to cancel "${booking.studioTitle}" on ${booking.date}?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setIsCancelling(true);
+      setError("");
+
+      const response = await fetch(
+        `${API_BASE}/bookings/${booking.id}/cancel`,
+        {
+          method: "PATCH",
+          credentials: "include",
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to cancel booking.");
+      }
+
+      setStatus("Cancelled");
+    } catch (error) {
+      console.error("Cancel booking error:", error);
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   return (
     <li className="overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/10 transition-shadow hover:shadow-md hover:shadow-foreground/5">
@@ -54,24 +95,28 @@ export function BookingCard({
             >
               {booking.studioTitle}
             </Link>
+
             <span
               className={cn(
                 "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
-                statusStyles[booking.status]
+                statusStyles[status]
               )}
             >
-              {booking.status}
+              {status}
             </span>
           </div>
+
           <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <MapPin className="size-3.5" />
               {booking.location}
             </span>
+
             <span className="inline-flex items-center gap-1">
               <CalendarDays className="size-3.5" />
               {booking.date}
             </span>
+
             <span className="inline-flex items-center gap-1">
               <Clock className="size-3.5" />
               {booking.hours[0]} – {booking.hours[1]} ·{" "}
@@ -79,44 +124,47 @@ export function BookingCard({
                 Number(booking.hours[0].split(":")[0])}
               h
             </span>
+
             <span className="inline-flex items-center gap-1">
               <Users className="size-3.5" />
               {booking.guests} guests
             </span>
           </p>
+
           <p className="text-xs text-muted-foreground">
-            Booking ref <span className="font-mono font-medium">{booking.id}</span>
+            Booking ref{" "}
+            <span className="font-mono font-medium">{booking.id}</span>
           </p>
+
+          {error && (
+            <p className="text-xs text-destructive">{error}</p>
+          )}
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-2 sm:items-stretch">
           <p className="font-heading text-lg font-semibold">
             ${booking.total}
-            <span className="text-xs font-normal text-muted-foreground"> total</span>
+            <span className="text-xs font-normal text-muted-foreground">
+              {" "}total
+            </span>
           </p>
+
           {canCancel ? (
             <Button
               variant="destructive"
               size="sm"
               className="gap-1.5"
-              onClick={() => setCancelOpen(true)}
+              onClick={handleCancel}
+              disabled={isCancelling}
             >
               <Ban className="size-3.5" />
-              Cancel Booking
+              {isCancelling ? "Cancelling..." : "Cancel Booking"}
             </Button>
           ) : (
             <Separator className="w-24" />
           )}
         </div>
       </div>
-
-      {/* Demo only — booking state changes land with the API */}
-      <DeleteConfirmDialog
-        open={cancelOpen}
-        onOpenChange={setCancelOpen}
-        title="Cancel this booking?"
-        itemName={`${booking.studioTitle} — ${booking.date}`}
-      />
     </li>
   );
 }

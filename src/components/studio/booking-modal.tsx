@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { API_BASE } from "@/lib/api";
 import type { Studio } from "@/lib/types";
 import { cn } from "cn";
 import { BadgeCheck, CalendarDays, Clock, Users } from "lucide-react";
@@ -30,26 +32,70 @@ interface BookingModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-/** Visual booking flow — hours are mock availability for the chosen date. */
 function mockHours() {
   return ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 }
 
-export function BookingModal({ studio, open, onOpenChange }: BookingModalProps) {
+export function BookingModal({
+  studio,
+  open,
+  onOpenChange,
+}: BookingModalProps) {
   const [date, setDate] = useState("");
   const [startHour, setStartHour] = useState("");
   const [duration, setDuration] = useState("2");
   const [guests, setGuests] = useState("1");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const rate = studio.hourlyRate;
   const hours = Number(duration) || 0;
   const subtotal = rate * hours;
   const serviceFee = Math.round(subtotal * 0.08);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    /* Visual only — real booking logic lands with the backend stage */
-    onOpenChange(false);
+
+    setLoading(true);
+    setMessage("");
+    setSuccess(false);
+
+    try {
+      const response = await fetch(`${API_BASE}/bookings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          studioId: studio.id,
+          date,
+          startTime: startHour,
+          duration: hours,
+          guests: Number(guests),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Booking failed");
+      }
+
+      setSuccess(true);
+      setMessage("Booking request submitted successfully!");
+
+    } catch (error) {
+      setSuccess(false);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -60,8 +106,7 @@ export function BookingModal({ studio, open, onOpenChange }: BookingModalProps) 
             Book this workspace
           </DialogTitle>
           <DialogDescription>
-            {studio.title} · {studio.location} — pick your slot and the host
-            confirms instantly.
+            {studio.title} · {studio.location} — choose your preferred date and time.
           </DialogDescription>
         </DialogHeader>
 
@@ -81,6 +126,7 @@ export function BookingModal({ studio, open, onOpenChange }: BookingModalProps) 
                 min={new Date().toISOString().split("T")[0]}
               />
             </div>
+
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="booking-guests">
                 <Users className="size-3.5 text-primary" />
@@ -91,6 +137,7 @@ export function BookingModal({ studio, open, onOpenChange }: BookingModalProps) 
                 type="number"
                 min={1}
                 max={studio.maxCapacity}
+                required
                 value={guests}
                 onChange={(e) => setGuests(e.target.value)}
               />
@@ -103,7 +150,11 @@ export function BookingModal({ studio, open, onOpenChange }: BookingModalProps) 
                 <Clock className="size-3.5 text-primary" />
                 Start time
               </Label>
-              <Select value={startHour} onValueChange={(v) => setStartHour(v ?? "")}>
+
+              <Select
+                value={startHour}
+                onValueChange={(v) => setStartHour(v ?? "")}
+              >
                 <SelectTrigger className="w-full" aria-label="Start time">
                   <SelectValue placeholder="Select a slot" />
                 </SelectTrigger>
@@ -116,9 +167,13 @@ export function BookingModal({ studio, open, onOpenChange }: BookingModalProps) 
                 </SelectContent>
               </Select>
             </div>
+
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="booking-duration">Duration</Label>
-              <Select value={duration} onValueChange={(v) => setDuration(v ?? "2")}>
+              <Select
+                value={duration}
+                onValueChange={(v) => setDuration(v ?? "2")}
+              >
                 <SelectTrigger className="w-full" aria-label="Duration">
                   <SelectValue />
                 </SelectTrigger>
@@ -137,6 +192,7 @@ export function BookingModal({ studio, open, onOpenChange }: BookingModalProps) 
             <p className="mb-1.5 text-xs font-medium text-muted-foreground">
               Mock availability for {date || "your date"}
             </p>
+
             <div className="flex flex-wrap gap-1.5">
               {mockHours().map((h) => (
                 <span
@@ -156,7 +212,6 @@ export function BookingModal({ studio, open, onOpenChange }: BookingModalProps) 
 
           <Separator />
 
-          {/* Price summary */}
           <div className="flex flex-col gap-1.5 text-sm">
             <div className="flex justify-between text-muted-foreground">
               <span>
@@ -164,33 +219,59 @@ export function BookingModal({ studio, open, onOpenChange }: BookingModalProps) 
               </span>
               <span className="text-foreground">${subtotal}</span>
             </div>
+
             <div className="flex justify-between text-muted-foreground">
               <span>SceneSlot service fee</span>
               <span className="text-foreground">${serviceFee}</span>
             </div>
+
             <div className="flex justify-between text-muted-foreground">
               <span>Refundable deposit</span>
               <span className="text-foreground">${studio.deposit}</span>
             </div>
+
             <Separator className="my-1" />
+
             <div className="flex justify-between font-semibold">
               <span>Session total</span>
               <span>${subtotal + serviceFee + studio.deposit}</span>
             </div>
           </div>
 
+          {message && (
+            <p
+              className={cn(
+                "rounded-md p-3 text-sm",
+                success
+                  ? "bg-green-50 text-green-700"
+                  : "bg-destructive/10 text-destructive"
+              )}
+            >
+              {message}
+            </p>
+          )}
+
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Close
             </Button>
-            <Button type="submit" disabled={!date || !startHour}>
+
+            <Button
+              type="submit"
+              disabled={!date || !startHour || loading || success}
+            >
               <BadgeCheck className="size-4" />
-              Book Workspace Now
+              {loading
+                ? "Submitting..."
+                : success
+                  ? "Booking Submitted"
+                  : "Book Workspace Now"}
             </Button>
           </DialogFooter>
-          <p className="text-center text-xs text-muted-foreground sm:-mt-2">
-            Demo UI — booking requests are not sent until the backend stage.
-          </p>
         </form>
       </DialogContent>
     </Dialog>

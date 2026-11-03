@@ -15,6 +15,9 @@ import {
   X as Close,
 } from "lucide-react";
 import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -58,7 +61,7 @@ const activity = [
     id: 2,
     icon: Star,
     title: "Priya Nair left a 5★ review",
-    detail: "\u201CThe light in this loft is unreal…\u201D",
+    detail: "“The light in this loft is unreal…”",
     time: "1d ago",
   },
   {
@@ -77,7 +80,15 @@ const activity = [
   },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
+
   const initials = demoUser.name
     .split(" ")
     .map((p) => p[0])

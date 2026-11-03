@@ -136,7 +136,7 @@ export function Navbar() {
                       </Button>
                     </div>
                   )}
-                  <ProfileDropdown />
+                 
                 </div>
               </div>
             </SheetContent>

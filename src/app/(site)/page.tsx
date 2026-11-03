@@ -13,9 +13,14 @@ import { cn } from "cn";
 import Link from "next/link";
 
 export default async function HomePage() {
- const res = await fetch("http://localhost:5000/studios",{
-   cache: "no-store",
- });
+ const res = await fetch(`${process.env.API_BASE_URL}/featured-studios`, {
+  cache: "no-store",
+});
+
+if (!res.ok) {
+  throw new Error("Failed to fetch featured studios");
+}
+
 const docs: StudioDoc[] = await res.json();
 const studios = docs.map((doc) => mapStudioDoc(doc));
 const featured = studios.slice(0, 6);

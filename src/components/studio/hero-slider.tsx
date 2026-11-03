@@ -155,8 +155,6 @@ export function HeroSlider() {
           <ChevronRight className="size-5" />
         </button>
       </Swiper>
-
-      {/* Amber pagination identity, scoped to this slider */}
     
     </section>
   );

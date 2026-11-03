@@ -3,6 +3,9 @@ import { StudioForm } from "@/components/studio/studio-form";
 import { fetchStudioById } from "@/lib/api";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -16,6 +19,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function EditStudioPage({ params }: Props) {
   const { id } = await params;
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
+
   const studio = await fetchStudioById(id);
   if (!studio) notFound();
 

@@ -48,9 +48,7 @@ export default async function StudiosPage({
             Explore creative studios
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-            Hundreds of verified photo, film, podcast, music and maker spaces —
-            searchable by category, location, and hourly rate. Real photos, real
-            gear lists, instant booking.
+            Discover creative photo, film, podcast, music and maker spaces — searchable by category, location, and hourly rate.
           </p>
           <div className="flex flex-wrap justify-center gap-2 text-sm">
             {categoryNames.map((c) => {

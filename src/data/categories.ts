@@ -8,7 +8,6 @@ export interface Category {
   tagline: string;
   description: string;
   image: string;
-  listings: string;
 }
 
 export const categories: Category[] = [
@@ -18,7 +17,7 @@ export const categories: Category[] = [
     description:
       "Cyclorama walls, strobes, and daylight studios ready for your next shoot.",
     image: img("1516575150278-77136aed6920"),
-    listings: "128 spaces",
+    
   },
   {
     name: "Sound Stages",
@@ -26,7 +25,7 @@ export const categories: Category[] = [
     description:
       "Blackout stages, rigging grids, and drive-in access for film and video crews.",
     image: img("1470229722913-7c0e2dbbafd3"),
-    listings: "46 spaces",
+    
   },
   {
     name: "Podcast Rooms",
@@ -34,7 +33,7 @@ export const categories: Category[] = [
     description:
       "Acoustically treated rooms with mixers, mics, and live-editing setups.",
     image: img("1478737270239-2f02b77fc618"),
-    listings: "87 spaces",
+   
   },
   {
     name: "Music Suites",
@@ -42,7 +41,7 @@ export const categories: Category[] = [
     description:
       "Isolated live rooms, control rooms, and backline-equipped rehearsal spaces.",
     image: img("1520523839897-bd0b52f945a0"),
-    listings: "63 spaces",
+    
   },
   {
     name: "Art Workshops",
@@ -50,7 +49,7 @@ export const categories: Category[] = [
     description:
       "Pottery wheels, easels, and workshop benches for teaching and creating.",
     image: img("1452860606245-08befc0ff44b"),
-    listings: "52 spaces",
+    
   },
 ];
 

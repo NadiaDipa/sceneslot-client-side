@@ -19,6 +19,8 @@ export interface StudioDoc {
   amenities?: string[];
   hostName?: string;
   hostEmail?: string;
+  rating?: number;
+  reviewsCount?: number;
 }
 
 /** Map a Mongo document to the `Studio` shape the UI expects. */
@@ -41,8 +43,8 @@ export function mapStudioDoc(doc: StudioDoc): Studio {
     address: doc.address ?? "",
     amenities: Array.isArray(doc.amenities) ? doc.amenities : [],
     // Backend-backed listings have no reviews yet
-    rating: 0,
-    reviewsCount: 0,
+    rating: Number(doc.rating ?? 0),
+reviewsCount: Number(doc.reviewsCount ?? 0),
     host: {
       name: doc.hostName ?? "SceneSlot Host",
       email: doc.hostEmail ?? "",
@@ -54,8 +56,6 @@ export function mapStudioDoc(doc: StudioDoc): Studio {
     reviews: [],
   };
 }
-
-
 
 // Fetch a single studio by ID
 export async function fetchStudioById(id: string): Promise<Studio> {

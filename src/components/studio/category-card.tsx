@@ -41,9 +41,6 @@ export function CategoryCard({
             <ArrowUpRight className="size-4" />
           </span>
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-5">
-            <p className="text-xs font-semibold tracking-wide text-primary uppercase">
-              {category.listings}
-            </p>
             <p className="font-heading text-xl font-semibold text-background">
               {category.name}
             </p>

@@ -45,9 +45,19 @@ export function StudioCard({
 
       <CardContent className="flex flex-col gap-2 p-5">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <RatingStars rating={studio.rating} />
-          <span className="font-semibold text-foreground">{studio.rating}</span>
-          <span>({studio.reviewsCount} reviews)</span>
+          {studio.reviewsCount > 0 ? (
+            <>
+              <RatingStars rating={studio.rating} />
+              <span className="font-semibold text-foreground">
+                {studio.rating.toFixed(1)}
+              </span>
+              <span>({studio.reviewsCount} reviews)</span>
+            </>
+          ) : (
+            <span className="text-xs text-muted-foreground">
+              New Studio · No reviews yet
+            </span>
+          )}
         </div>
         <h3 className="font-heading text-lg font-semibold leading-snug">
           <Link
