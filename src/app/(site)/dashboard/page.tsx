@@ -68,6 +68,7 @@ export default async function DashboardPage() {
   }
 
   const userName = session.user.name || "User";
+
   const initials = userName
     .split(" ")
     .map((part) => part[0])
@@ -101,19 +102,15 @@ export default async function DashboardPage() {
     },
   ];
 
-  const activity = dashboardData?.recentActivity ?? [];
+  const activity = (dashboardData?.recentActivity ?? []).slice(0, 4);
 
   return (
     <section className="py-10 sm:py-14">
       <div className="container-page flex flex-col gap-10">
-        {/* Welcome */}
         <header className="flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <Avatar className="size-14">
-              <AvatarImage
-                src={session.user.image || ""}
-                alt={userName}
-              />
+              <AvatarImage src={session.user.image || ""} alt={userName} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
 
@@ -121,7 +118,6 @@ export default async function DashboardPage() {
               <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
                 Welcome back, {userName.split(" ")[0]}
               </h1>
-
               <p className="text-sm text-muted-foreground">
                 Here's an overview of your studio activity.
               </p>
@@ -133,7 +129,6 @@ export default async function DashboardPage() {
           </Button>
         </header>
 
-        {/* Summary cards */}
         <div
           className="grid grid-cols-2 gap-4 lg:grid-cols-4"
           aria-label="Summary"
@@ -151,9 +146,7 @@ export default async function DashboardPage() {
                 <p className="font-heading text-2xl font-semibold">
                   {item.value}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {item.label}
-                </p>
+                <p className="text-xs text-muted-foreground">{item.label}</p>
               </div>
             </div>
           ))}
@@ -166,7 +159,6 @@ export default async function DashboardPage() {
         )}
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-          {/* Recent activity */}
           <div className="flex flex-col gap-4">
             <div className="flex items-baseline justify-between">
               <h2 className="font-heading text-xl font-semibold">
@@ -228,7 +220,6 @@ export default async function DashboardPage() {
             )}
           </div>
 
-          {/* Quick actions */}
           <div className="flex flex-col gap-4">
             <h2 className="font-heading text-xl font-semibold">
               Quick actions

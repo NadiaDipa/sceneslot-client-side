@@ -1,3 +1,4 @@
+
 "use client";
 
 import { API_BASE } from "@/lib/api";
@@ -29,16 +30,30 @@ export function ListingRow({
 
   async function handleDelete() {
     const id = listing._id || listing.studioId;
+
+    if (!id) {
+      setDeleteFailed(true);
+      return;
+    }
+
     setDeleteFailed(false);
     setDeleting(true);
+
     try {
-      const res = await fetch(`${API_BASE}/studios/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setDeleteOpen(false);
-        onDeleted?.(id);
-      } else {
+      const res = await fetch(`${API_BASE}/studios/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        console.error("Delete failed:", res.status, errorData);
         setDeleteFailed(true);
+        return;
       }
+
+      setDeleteOpen(false);
+      onDeleted?.(id);
     } catch (err) {
       console.error("Failed to delete listing:", err);
       setDeleteFailed(true);
@@ -50,18 +65,21 @@ export function ListingRow({
   return (
     <li className="flex flex-col gap-4 rounded-2xl border-border bg-card p-4 ring-1 ring-foreground/10 transition-shadow hover:shadow-md hover:shadow-foreground/5 sm:flex-row sm:items-center sm:p-5">
       <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl sm:aspect-video sm:h-24 sm:w-40">
-        <Image 
-          src={listing.image || listing.imageUrl} 
-          alt={listing.title} 
-          fill 
-          sizes="200px" 
-          className="object-cover" 
+        <Image
+          src={listing.image || listing.imageUrl}
+          alt={listing.title}
+          fill
+          sizes="200px"
+          className="object-cover"
         />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="font-heading text-base font-semibold">{listing.title}</h2>
+          <h2 className="font-heading text-base font-semibold">
+            {listing.title}
+          </h2>
+
           <span
             className={cn(
               "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold",
@@ -71,6 +89,7 @@ export function ListingRow({
             {listing.status || "Active"}
           </span>
         </div>
+
         <p className="text-xs text-muted-foreground">
           {listing.category} · {listing.location} ·{" "}
           <span className="inline-flex items-center gap-1">
@@ -78,6 +97,7 @@ export function ListingRow({
             {listing.bookingsThisMonth || 0} bookings this month
           </span>
         </p>
+
         <p className="text-sm">
           <span className="font-semibold">${listing.hourlyRate}</span>
           <span className="text-muted-foreground"> / hour</span>
@@ -85,12 +105,28 @@ export function ListingRow({
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
-        <Button variant="outline" size="icon" aria-label={`Edit ${listing.title}`} render={<Link href={`/studios/edit/${listing._id || listing.studioId}`} />}>
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label={`Edit ${listing.title}`}
+          render={
+            <Link href={`/studios/edit/${listing._id || listing.studioId}`} />
+          }
+        >
           <Edit3 />
         </Button>
-        <Button variant="outline" size="icon" aria-label={`View ${listing.title}`} render={<Link href={`/studios/${listing._id || listing.studioId}`} />}>
+
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label={`View ${listing.title}`}
+          render={
+            <Link href={`/studios/${listing._id || listing.studioId}`} />
+          }
+        >
           <Eye />
         </Button>
+
         <Button
           variant="ghost"
           size="icon"
@@ -118,12 +154,22 @@ export function MyListingsContent() {
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const onDeleted = (id: string) =>
-    setListings((prev) => prev.filter((l) => (l._id || l.studioId) !== id));
+  const onDeleted = (id: string) => {
+    setListings((prev) =>
+      prev.filter((listing) => (listing._id || listing.studioId) !== id)
+    );
+  };
 
   useEffect(() => {
-    fetch(`${API_BASE}/studios`)
-      .then((res) => res.json())
+    fetch(`${API_BASE}/studios`, {
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch studios");
+        }
+        return res.json();
+      })
       .then((data) => {
         setListings(data);
         setLoading(false);
@@ -136,13 +182,16 @@ export function MyListingsContent() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-20">
+      <div className="flex items-center justify-center py-20">
         <Loader2 className="size-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
-  const totalBookings = listings.reduce((a, l) => a + (l.bookingsThisMonth || 0), 0);
+  const totalBookings = listings.reduce(
+    (total, listing) => total + (listing.bookingsThisMonth || 0),
+    0
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -151,10 +200,12 @@ export function MyListingsContent() {
           <h1 className="font-heading text-3xl font-semibold sm:text-4xl">
             My studio listings
           </h1>
+
           <p className="text-sm text-muted-foreground sm:text-base">
             {listings.length} spaces · {totalBookings} bookings this month
           </p>
         </div>
+
         <Button className="gap-2" render={<Link href="/add-studio" />}>
           <Plus className="size-4" />
           Add New Studio
@@ -171,10 +222,10 @@ export function MyListingsContent() {
         />
       ) : (
         <ul className="flex flex-col gap-4">
-          {listings.map((l: any) => (
+          {listings.map((listing: any) => (
             <ListingRow
-              key={l._id || l.studioId}
-              listing={l}
+              key={listing._id || listing.studioId}
+              listing={listing}
               onDeleted={onDeleted}
             />
           ))}
