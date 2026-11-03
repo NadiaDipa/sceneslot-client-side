@@ -38,12 +38,13 @@ export function GoogleButton({ label }: { label: string }) {
       type="button"
       variant="outline"
       className="w-full gap-2.5"
-      onClick={() =>
+      onClick={() => {
+        console.log("Google button clicked");
         authClient.signIn.social({
           provider: "google",
-          callbackURL: "/",
-        })
-      }
+          callbackURL: window.location.origin,
+        });
+      }}
     >
       <GoogleIcon />
       {label}
@@ -69,14 +70,13 @@ export function LoginForm() {
 
     try {
       const { data, error } = await authClient.signIn.email({
-        
         email,
         password,
         rememberMe: remember,
         callbackURL: "/",
       });
       console.log("Login data:", data);
-console.log("Login error:", error);
+      console.log("Login error:", error);
 
       if (error) {
         setErrorMessage(error.message || "Login failed. Please try again.");
