@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { categoryNames } from "@/data/categories";
-import { demoUser } from "@/data/studios";
 import { API_BASE } from "@/lib/api";
 import type { Studio } from "@/lib/types";
 import { cn } from "cn";
@@ -26,7 +26,6 @@ import {
   Plus,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 
@@ -79,18 +78,25 @@ function toFormState(studio?: Studio): FormState {
 export function StudioForm({
   studio,
   mode = "create",
+  hostName = "",
+  hostEmail = "",
 }: {
   studio?: Studio;
   mode?: "create" | "edit";
+  hostName?: string;
+  hostEmail?: string;
 }) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [form, setForm] = useState<FormState>(() => toFormState(studio));
   const [submitted, setSubmitted] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const set = (key: keyof FormState, value: string | string[]) =>
+  const set = (key: keyof FormState, value: string | string[]) => {
     setForm((f) => ({ ...f, [key]: value }));
+  };
 
   function toggleAmenity(a: string) {
     setForm((f) => ({
@@ -101,40 +107,52 @@ export function StudioForm({
     }));
   }
 
-  /** Upload a file picked from the user's computer to the backend. */
+  // Upload a file from the user's computer.
   async function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+
     if (!file) return;
 
     setUploading(true);
+
     try {
       const formData = new FormData();
       formData.append("image", file);
+
       const res = await fetch(`${API_BASE}/upload`, {
         method: "POST",
         body: formData,
+        credentials: "include",
       });
+
       const data = await res.json();
+
       if (!res.ok || !data.imageUrl) {
         alert(data.error || "Image upload failed.");
       } else {
         set("imageUrl", data.imageUrl);
       }
-    } catch {
+    } catch (error) {
+      console.error("Image upload error:", error);
       alert("Image upload failed. Is the server (port 5000) running?");
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   }
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!form.imageUrl.trim()) {
       alert("Please upload a cover image from your computer.");
       return;
     }
+
+    if (saving) return;
 
     const studioData = {
       title: form.title,
@@ -147,40 +165,60 @@ export function StudioForm({
       image: form.imageUrl,
       amenities: form.amenities,
       overview: form.overview,
-      hostName: demoUser.name,
-      hostEmail: demoUser.email,
     };
 
-    // Edit mode updates the existing document; create mode inserts a new one.
     const isEdit = mode === "edit" && studio;
+
     const url = isEdit
       ? `${API_BASE}/studios/${studio.id}`
       : `${API_BASE}/studios`;
 
+    setSaving(true);
+
     try {
       const res = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(studioData),
       });
+
       const data = await res.json();
 
-      if (res.ok || data.insertedId || data.updatedStudio) {
+      if (res.ok) {
         setSubmitted(true);
+
         alert(
           isEdit
             ? "Changes saved successfully!"
             : "Studio published successfully!",
         );
+
         router.push("/my-listings");
+        router.refresh();
       } else {
-        alert(isEdit ? "Failed to save changes." : "Failed to publish studio.");
+        console.error("Studio save failed:", data);
+
+        alert(
+          data.error ||
+            data.message ||
+            (isEdit
+              ? "Failed to save changes."
+              : "Failed to publish studio."),
+        );
       }
     } catch (error) {
       console.error("Error saving studio:", error);
-      alert(isEdit ? "Failed to save changes." : "Failed to publish studio.");
+
+      alert(
+        isEdit
+          ? "Failed to save changes. Please try again."
+          : "Failed to publish studio. Please try again.",
+      );
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -191,6 +229,7 @@ export function StudioForm({
         <legend className="font-heading text-lg font-semibold">
           Studio basics
         </legend>
+
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="studio-title">Studio title</Label>
           <Input
@@ -211,6 +250,7 @@ export function StudioForm({
             <SelectTrigger className="w-full sm:w-72" aria-label="Category">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
+
             <SelectContent>
               {categoryNames.map((c) => (
                 <SelectItem key={c} value={c}>
@@ -234,6 +274,7 @@ export function StudioForm({
               onChange={(e) => set("hourlyRate", e.target.value)}
             />
           </div>
+
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="studio-deposit">Security deposit (USD)</Label>
             <Input
@@ -246,6 +287,7 @@ export function StudioForm({
               onChange={(e) => set("deposit", e.target.value)}
             />
           </div>
+
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="studio-capacity">Maximum capacity</Label>
             <Input
@@ -263,7 +305,10 @@ export function StudioForm({
 
       {/* Location */}
       <fieldset className="flex flex-col gap-5">
-        <legend className="font-heading text-lg font-semibold">Location</legend>
+        <legend className="font-heading text-lg font-semibold">
+          Location
+        </legend>
+
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="studio-location">City / area</Label>
@@ -275,6 +320,7 @@ export function StudioForm({
               onChange={(e) => set("location", e.target.value)}
             />
           </div>
+
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="studio-address">Street address</Label>
             <Input
@@ -293,8 +339,10 @@ export function StudioForm({
         <legend className="font-heading text-lg font-semibold">
           Cover image
         </legend>
+
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="studio-image">Cover image</Label>
+
           <input
             ref={fileInputRef}
             id="studio-image"
@@ -303,6 +351,7 @@ export function StudioForm({
             onChange={handleImageChange}
             className="sr-only w-full"
           />
+
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -314,16 +363,19 @@ export function StudioForm({
             ) : (
               <ImageUp className="size-5 text-primary" />
             )}
+
             <span className="text-sm font-medium">
               {uploading
                 ? "Uploading image…"
                 : "Click to upload from your computer"}
             </span>
+
             <span className="text-xs text-muted-foreground">
               JPG, PNG, or WebP · up to 20 MB · wide 16:10 images look best on
               cards
             </span>
           </button>
+
           {form.imageUrl ? (
             <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
               <Camera className="size-3.5 text-primary" />
@@ -333,13 +385,15 @@ export function StudioForm({
             </p>
           ) : null}
         </div>
+
         {form.imageUrl ? (
           <div className="relative aspect-video w-full max-w-md overflow-hidden rounded-xl ring-1 ring-foreground/10">
-           <img
-  src={form.imageUrl}
-  alt="Cover preview"
-  className="absolute inset-0 h-full w-full object-cover"
-/>
+            <img
+              src={form.imageUrl}
+              alt="Cover preview"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+
             <button
               type="button"
               onClick={() => set("imageUrl", "")}
@@ -357,6 +411,7 @@ export function StudioForm({
         <legend className="font-heading text-lg font-semibold">
           Amenities
         </legend>
+
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {AMENITY_OPTIONS.map((a) => (
             <label
@@ -386,6 +441,7 @@ export function StudioForm({
                 className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground"
               >
                 {a}
+
                 <button
                   type="button"
                   onClick={() => toggleAmenity(a)}
@@ -405,10 +461,12 @@ export function StudioForm({
         <legend className="font-heading text-lg font-semibold">
           Detailed overview
         </legend>
+
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="studio-overview">
             Tell creators what makes this space special
           </Label>
+
           <Textarea
             id="studio-overview"
             required
@@ -418,6 +476,7 @@ export function StudioForm({
             onChange={(e) => set("overview", e.target.value)}
             className="resize-y"
           />
+
           <p className="text-xs text-muted-foreground">
             {form.overview.length} characters · you can edit this later from My
             Studio Listings.
@@ -425,29 +484,32 @@ export function StudioForm({
         </div>
       </fieldset>
 
-      {/* Host info (read-only) */}
+      {/* Host info */}
       <fieldset className="rounded-2xl border border-border bg-muted/40 p-5">
         <div className="mb-4 flex items-center gap-2">
           <Lock className="size-4 text-primary" />
+
           <legend className="font-heading text-lg font-semibold">
             Host information
           </legend>
         </div>
+
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="host-name">Host name</Label>
             <Input
               id="host-name"
-              value={demoUser.name}
+              value={hostName}
               readOnly
               className="bg-background text-muted-foreground"
             />
           </div>
+
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="host-email">Host email</Label>
             <Input
               id="host-email"
-              value={demoUser.email}
+              value={hostEmail}
               readOnly
               className="bg-background text-muted-foreground"
             />
@@ -461,13 +523,26 @@ export function StudioForm({
           Fields marked <span className="text-destructive">*</span> are
           required. Your listing is saved to the SceneSlot database.
         </p>
-        <Button type="submit" size="lg" className="shrink-0 gap-2">
-          {submitted ? (
+
+        <Button
+          type="submit"
+          size="lg"
+          className="shrink-0 gap-2"
+          disabled={saving || uploading}
+        >
+          {saving ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : submitted ? (
             <BadgeCheck className="size-4" />
           ) : (
             <Plus className="size-4" />
           )}
-          {mode === "edit" ? "Save Changes" : "Publish Studio"}
+
+          {saving
+            ? "Publishing..."
+            : mode === "edit"
+              ? "Save Changes"
+              : "Publish Studio"}
         </Button>
       </div>
     </form>

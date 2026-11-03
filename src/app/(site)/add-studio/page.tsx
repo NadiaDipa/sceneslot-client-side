@@ -39,7 +39,11 @@ export default async function AddStudioPage() {
         </div>
 
         <div className="rounded-3xl border border-border bg-card p-6 shadow-sm shadow-foreground/5 sm:p-10">
-          <StudioForm mode="create" />
+          <StudioForm
+            mode="create"
+            hostName={session.user.name ?? ""}
+            hostEmail={session.user.email ?? ""}
+          />
         </div>
       </div>
     </section>
