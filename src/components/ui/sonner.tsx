@@ -1,49 +1,30 @@
-"use client"
+"use client";
 
-import { useTheme } from "next-themes"
-import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { Toaster as Sonner } from "sonner";
+import { AlertTriangle, CheckCircle2, Info, Loader2, XCircle } from "lucide-react";
 
-const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
-
+export function Toaster() {
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
-      className="toaster group"
+      theme="system"
+      position="top-center"
+      duration={4000}
+      gap={10}
       icons={{
-        success: (
-          <CircleCheckIcon className="size-4" />
-        ),
-        info: (
-          <InfoIcon className="size-4" />
-        ),
-        warning: (
-          <TriangleAlertIcon className="size-4" />
-        ),
-        error: (
-          <OctagonXIcon className="size-4" />
-        ),
-        loading: (
-          <Loader2Icon className="size-4 animate-spin" />
-        ),
+        success: <CheckCircle2 className="size-5 text-emerald-500" />,
+        error: <XCircle className="size-5 text-red-500" />,
+        info: <Info className="size-5 text-sky-500" />,
+        warning: <AlertTriangle className="size-5 text-amber-500" />,
+        loading: <Loader2 className="size-5 animate-spin text-primary" />,
       }}
-      style={
-        {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
-          "--border-radius": "var(--radius)",
-        } as React.CSSProperties
-      }
       toastOptions={{
         classNames: {
-          toast: "cn-toast",
+          toast:
+            "!w-full !gap-3 !rounded-2xl !border !border-border/60 !bg-background/85 !px-4 !py-3.5 !text-foreground !shadow-[0_12px_40px_-12px_rgba(0,0,0,0.35)] !backdrop-blur-xl",
+          title: "!text-sm !font-semibold",
+          description: "!text-xs !text-muted-foreground",
         },
       }}
-      {...props}
     />
-  )
+  );
 }
-
-export { Toaster }

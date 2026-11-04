@@ -3,12 +3,26 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { motion, type Variants } from "motion/react";
+
+const container: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+};
+
+const inputCls =
+  "h-11 rounded-xl bg-muted/40 pl-10 transition-colors focus-visible:bg-background";
 
 function GoogleIcon() {
   return (
@@ -38,7 +52,7 @@ export function GoogleButton({ label }: { label: string }) {
     <Button
       type="button"
       variant="outline"
-      className="w-full gap-2.5"
+      className="h-11 w-full gap-2.5 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md"
       onClick={() => {
         authClient.signIn.social({
           provider: "google",
@@ -68,8 +82,7 @@ export function LoginForm() {
   const isRegistered = searchParams.get("registered") === "true";
   const isGoogleLogin = searchParams.get("googleLogin") === "success";
 
-  // Registration এর পর better-auth auto sign-in করে দেয়।
-  // তাই এখানে এসে সেই session মুছে দিচ্ছি, যাতে ইউজারকে নিজে লগইন করতে হয়।
+  // Registration এর পর auto sign-in হওয়া session মুছে দেওয়া
   useEffect(() => {
     if (isRegistered && !hasClearedSession.current) {
       hasClearedSession.current = true;
@@ -129,28 +142,32 @@ export function LoginForm() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="flex flex-col gap-7"
+    >
+      <motion.div variants={item} className="flex flex-col gap-2">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
           Welcome back
         </h1>
-
         <p className="text-sm text-muted-foreground">
           Log in to book studios, manage listings, and see your schedule.
         </p>
-      </div>
+      </motion.div>
 
-      {/* Registration Success Message */}
       {isRegistered && (
-        <p
+        <motion.p
+          variants={item}
           role="status"
-          className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
         >
-          Please log in with your email and password.
-        </p>
+          Account created! Please log in with your email and password.
+        </motion.p>
       )}
 
-      <div className="flex flex-col gap-3">
+      <motion.div variants={item} className="flex flex-col gap-4">
         <GoogleButton label="Continue with Google" />
 
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -158,16 +175,18 @@ export function LoginForm() {
           or log in with email
           <span className="h-px flex-1 bg-border" />
         </div>
-      </div>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <motion.form
+        variants={item}
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-5"
+      >
         {/* Email */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="login-email">Email</Label>
-
           <div className="relative">
-            <Mail className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-
+            <Mail className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="login-email"
               type="email"
@@ -176,7 +195,7 @@ export function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@studio.com"
-              className="pl-8"
+              className={inputCls}
             />
           </div>
         </div>
@@ -185,7 +204,6 @@ export function LoginForm() {
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <Label htmlFor="login-password">Password</Label>
-
             <Link
               href="/login"
               className="text-xs font-medium text-accent-foreground underline-offset-4 hover:underline"
@@ -194,10 +212,8 @@ export function LoginForm() {
               Forgot password?
             </Link>
           </div>
-
           <div className="relative">
-            <Lock className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-
+            <Lock className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="login-password"
               type={showPassword ? "text" : "password"}
@@ -206,14 +222,13 @@ export function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="px-8 pr-10"
+              className={`${inputCls} pr-11`}
             />
-
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute top-0.5 right-1 rounded-md p-2 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg p-2 text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
             >
               {showPassword ? (
                 <EyeOff className="size-4" />
@@ -230,30 +245,43 @@ export function LoginForm() {
             type="checkbox"
             checked={remember}
             onChange={(e) => setRemember(e.target.checked)}
-            className="size-4 accent-[var(--primary)]"
+            className="size-4 rounded accent-[var(--primary)]"
           />
           Remember me on this device
         </label>
 
-        {/* Login Error */}
         {errorMessage && (
-          <p role="alert" className="text-center text-sm text-destructive">
+          <motion.p
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            role="alert"
+            className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-2.5 text-center text-sm text-destructive"
+          >
             {errorMessage}
-          </p>
+          </motion.p>
         )}
 
-        {/* Login Button */}
         <Button
           type="submit"
           size="lg"
-          className="mt-1 w-full"
           disabled={isLoading}
+          className="h-12 w-full rounded-xl text-base font-semibold shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/40 active:translate-y-0"
         >
-          {isLoading ? "Logging in..." : "Login"}
+          {isLoading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Logging in...
+            </>
+          ) : (
+            "Login"
+          )}
         </Button>
-      </form>
+      </motion.form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <motion.p
+        variants={item}
+        className="text-center text-sm text-muted-foreground"
+      >
         New to SceneSlot?{" "}
         <Link
           href="/register"
@@ -261,7 +289,7 @@ export function LoginForm() {
         >
           Create an account
         </Link>
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 }

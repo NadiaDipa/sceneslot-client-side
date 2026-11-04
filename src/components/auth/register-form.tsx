@@ -1,22 +1,35 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { Check, Circle, Eye, EyeOff, Loader2, Lock, Mail, User } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { GoogleButton } from "@/components/auth/login-form";
 import { signUp } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { motion, type Variants } from "motion/react";
 
 const rules = [
   { label: "At least 6 characters", test: (v: string) => v.length >= 6 },
   { label: "One uppercase letter", test: (v: string) => /[A-Z]/.test(v) },
   { label: "One lowercase letter", test: (v: string) => /[a-z]/.test(v) },
 ];
+
+const container: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+};
+
+const inputCls =
+  "h-11 rounded-xl bg-muted/40 transition-colors focus-visible:bg-background";
 
 export function RegisterForm() {
   const [name, setName] = useState("");
@@ -37,7 +50,6 @@ export function RegisterForm() {
     setPasswordError("");
     setErrorMessage("");
 
-    // Password validation
     if (!rules.every((rule) => rule.test(password))) {
       setPasswordError("Please meet all password requirements.");
       return;
@@ -73,18 +85,22 @@ export function RegisterForm() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="flex flex-col gap-7"
+    >
+      <motion.div variants={item} className="flex flex-col gap-2">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
           Create your SceneSlot account
         </h1>
-
         <p className="text-sm text-muted-foreground">
           One account to book studios — and to host spaces of your own.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="flex flex-col gap-3">
+      <motion.div variants={item} className="flex flex-col gap-4">
         <GoogleButton label="Sign up with Google" />
 
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -92,16 +108,18 @@ export function RegisterForm() {
           or register with email
           <span className="h-px flex-1 bg-border" />
         </div>
-      </div>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <motion.form
+        variants={item}
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-5"
+      >
         {/* Name */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="reg-name">Full name</Label>
-
           <div className="relative">
-            <User className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-
+            <User className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="reg-name"
               name="name"
@@ -110,7 +128,7 @@ export function RegisterForm() {
               placeholder="Amara Hossain"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="pl-8"
+              className={`${inputCls} pl-10`}
             />
           </div>
         </div>
@@ -118,10 +136,8 @@ export function RegisterForm() {
         {/* Email */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="reg-email">Email</Label>
-
           <div className="relative">
-            <Mail className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-
+            <Mail className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="reg-email"
               type="email"
@@ -131,7 +147,7 @@ export function RegisterForm() {
               placeholder="you@studio.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-8"
+              className={`${inputCls} pl-10`}
             />
           </div>
         </div>
@@ -139,7 +155,6 @@ export function RegisterForm() {
         {/* Photo URL */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="reg-photo">Photo URL</Label>
-
           <Input
             id="reg-photo"
             type="url"
@@ -147,8 +162,8 @@ export function RegisterForm() {
             placeholder="https://i.pravatar.cc/150?img=12 (optional)"
             value={photoUrl}
             onChange={(e) => setPhotoUrl(e.target.value)}
+            className={inputCls}
           />
-
           <p className="text-xs text-muted-foreground">
             Optional — a profile photo builds trust with hosts.
           </p>
@@ -157,10 +172,8 @@ export function RegisterForm() {
         {/* Password */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="reg-password">Password</Label>
-
           <div className="relative">
-            <Lock className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-
+            <Lock className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="reg-password"
               type={showPassword ? "text" : "password"}
@@ -173,14 +186,13 @@ export function RegisterForm() {
                 setPassword(e.target.value);
                 setPasswordError("");
               }}
-              className="px-8 pr-10"
+              className={`${inputCls} pr-11 pl-10`}
             />
-
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute top-0.5 right-1 rounded-md p-2 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg p-2 text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
             >
               {showPassword ? (
                 <EyeOff className="size-4" />
@@ -191,24 +203,33 @@ export function RegisterForm() {
           </div>
 
           {password && (
-            <ul className="flex flex-col gap-0.5 pt-1">
+            <motion.ul
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="flex flex-col gap-1 overflow-hidden pt-1.5"
+            >
               {rules.map((rule) => {
                 const isValid = rule.test(password);
 
                 return (
                   <li
                     key={rule.label}
-                    className={
+                    className={`flex items-center gap-2 text-xs transition-colors ${
                       isValid
-                        ? "text-xs text-emerald-700"
-                        : "text-xs text-muted-foreground"
-                    }
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-muted-foreground"
+                    }`}
                   >
-                    {isValid ? "✓" : "•"} {rule.label}
+                    {isValid ? (
+                      <Check className="size-3.5" />
+                    ) : (
+                      <Circle className="size-3.5" />
+                    )}
+                    {rule.label}
                   </li>
                 );
               })}
-            </ul>
+            </motion.ul>
           )}
 
           {passwordError && (
@@ -226,9 +247,8 @@ export function RegisterForm() {
             checked={agreed}
             name="agreed"
             onChange={(e) => setAgreed(e.target.checked)}
-            className="mt-0.5 size-4 accent-[var(--primary)]"
+            className="mt-0.5 size-4 rounded accent-[var(--primary)]"
           />
-
           <span>
             I agree to the{" "}
             <Link
@@ -248,25 +268,38 @@ export function RegisterForm() {
           </span>
         </label>
 
-        {/* Registration Error */}
         {errorMessage && (
-          <p className="text-sm text-destructive" role="alert">
+          <motion.p
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            role="alert"
+            className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-2.5 text-center text-sm text-destructive"
+          >
             {errorMessage}
-          </p>
+          </motion.p>
         )}
 
-        {/* Register Button */}
         <Button
           type="submit"
           size="lg"
-          className="mt-1 w-full"
           disabled={isLoading}
+          className="h-12 w-full rounded-xl text-base font-semibold shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/40 active:translate-y-0"
         >
-          {isLoading ? "Creating account..." : "Create account"}
+          {isLoading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Creating account...
+            </>
+          ) : (
+            "Create account"
+          )}
         </Button>
-      </form>
+      </motion.form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <motion.p
+        variants={item}
+        className="text-center text-sm text-muted-foreground"
+      >
         Already have an account?{" "}
         <Link
           href="/login"
@@ -274,7 +307,7 @@ export function RegisterForm() {
         >
           Log in
         </Link>
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 }
