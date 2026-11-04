@@ -1,11 +1,11 @@
+
 import type { Metadata } from "next";
 import { StudioForm } from "@/components/studio/studio-form";
 import { fetchStudioById } from "@/lib/api";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -53,7 +53,12 @@ export default async function EditStudioPage({ params }: Props) {
         </div>
 
         <div className="rounded-3xl border border-border bg-card p-6 shadow-sm shadow-foreground/5 sm:p-10">
-          <StudioForm studio={studio} mode="edit" />
+          <StudioForm
+            studio={studio}
+            mode="edit"
+            hostName={session.user.name || ""}
+            hostEmail={session.user.email || ""}
+          />
         </div>
       </div>
     </section>

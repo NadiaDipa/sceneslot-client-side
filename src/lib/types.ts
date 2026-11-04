@@ -40,6 +40,8 @@ export interface Studio {
   rating: number;
   reviewsCount: number;
   host: Host;
+  ownerName?: string;
+  ownerEmail?: string;
   reviews: Review[];
   featured?: boolean;
 }

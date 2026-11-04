@@ -11,9 +11,9 @@ import { signUp } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 const rules = [
-  { label: "At least 8 characters", test: (v: string) => v.length >= 8 },
+  { label: "At least 6 characters", test: (v: string) => v.length >= 6 },
   { label: "One uppercase letter", test: (v: string) => /[A-Z]/.test(v) },
-  { label: "One number", test: (v: string) => /\d/.test(v) },
+  { label: "One lowercase letter", test: (v: string) => /[a-z]/.test(v) },
 ];
 
 export function RegisterForm() {
@@ -24,11 +24,11 @@ export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
   const router = useRouter();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // console.log("Submit handler called");
 
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
@@ -36,12 +36,15 @@ export function RegisterForm() {
     const name = String(data.name);
     const email = String(data.email);
     const password = String(data.password);
+
     if (!rules.every((rule) => rule.test(password))) {
+      setPasswordError("Please meet all password requirements.");
       return;
     }
+
+    setPasswordError("");
     setIsLoading(true);
 
-    // console.log("Submitted email:", email);
     const photoUrl = String(data.photoUrl || "");
 
     try {
@@ -56,8 +59,9 @@ export function RegisterForm() {
         router.push("/login");
       }
 
-      // console.log("Signup response:", signUpData);
-      // console.log("Signup error:", error);
+      if (error) {
+        console.error("Signup error:", error);
+      }
     } catch (err) {
       console.error("Signup failed:", err);
     } finally {
@@ -148,7 +152,10 @@ export function RegisterForm() {
               placeholder="Create a strong password"
               value={password}
               name="password"
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError("");
+              }}
               className="px-8 pr-10"
             />
             <button
@@ -164,6 +171,7 @@ export function RegisterForm() {
               )}
             </button>
           </div>
+
           {password ? (
             <ul className="flex flex-col gap-0.5 pt-1">
               {rules.map((r) => {
@@ -183,6 +191,10 @@ export function RegisterForm() {
               })}
             </ul>
           ) : null}
+
+          {passwordError && (
+            <p className="text-xs text-destructive">{passwordError}</p>
+          )}
         </div>
 
         <label className="flex cursor-pointer items-start gap-2.5 text-sm text-muted-foreground">

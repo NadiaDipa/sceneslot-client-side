@@ -94,6 +94,13 @@ export function StudioForm({
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Host information fallback
+  const displayedHostName =
+    hostName || studio?.ownerName || studio?.host?.name || "";
+
+  const displayedHostEmail =
+    hostEmail || studio?.ownerEmail || studio?.host?.email || "";
+
   const set = (key: keyof FormState, value: string | string[]) => {
     setForm((f) => ({ ...f, [key]: value }));
   };
@@ -499,7 +506,7 @@ export function StudioForm({
             <Label htmlFor="host-name">Host name</Label>
             <Input
               id="host-name"
-              value={hostName}
+              value={displayedHostName}
               readOnly
               className="bg-background text-muted-foreground"
             />
@@ -509,7 +516,7 @@ export function StudioForm({
             <Label htmlFor="host-email">Host email</Label>
             <Input
               id="host-email"
-              value={hostEmail}
+              value={displayedHostEmail}
               readOnly
               className="bg-background text-muted-foreground"
             />

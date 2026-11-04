@@ -1,4 +1,3 @@
-
 "use client";
 
 import { API_BASE } from "@/lib/api";
@@ -6,7 +5,16 @@ import { DeleteConfirmDialog } from "@/components/studio/delete-confirm-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { cn } from "cn";
-import { Edit3, Eye, Plus, Trash2, Users, Loader2 } from "lucide-react";
+import {
+  Edit3,
+  Eye,
+  Plus,
+  Trash2,
+  Users,
+  Loader2,
+  UserRound,
+  Mail,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -74,7 +82,7 @@ export function ListingRow({
         />
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="font-heading text-base font-semibold">
             {listing.title}
@@ -102,6 +110,18 @@ export function ListingRow({
           <span className="font-semibold">${listing.hourlyRate}</span>
           <span className="text-muted-foreground"> / hour</span>
         </p>
+
+        <div className="flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:gap-4">
+          <span className="inline-flex items-center gap-1.5">
+            <UserRound className="size-3.5" />
+            Host: {listing.ownerName || "Not available"}
+          </span>
+
+          <span className="inline-flex items-center gap-1.5">
+            <Mail className="size-3.5" />
+            {listing.ownerEmail || "Not available"}
+          </span>
+        </div>
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
@@ -161,12 +181,12 @@ export function MyListingsContent() {
   };
 
   useEffect(() => {
-    fetch(`${API_BASE}/studios`, {
+    fetch(`${API_BASE}/my-listings`, {
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error("Failed to fetch studios");
+          throw new Error("Failed to fetch my listings");
         }
         return res.json();
       })
@@ -175,7 +195,7 @@ export function MyListingsContent() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch listings:", err);
+        console.error("Failed to fetch my listings:", err);
         setLoading(false);
       });
   }, []);
