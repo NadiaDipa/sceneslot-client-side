@@ -10,13 +10,14 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
-import { Autoplay, Keyboard, Navigation, Pagination } from "swiper/modules";
+import { useRef, useState } from "react";
+import { motion, type Variants } from "motion/react";
+import { Autoplay, Keyboard, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
+import { cn } from "cn";
 import "swiper/css";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
 
 export interface HeroSlide {
   image: string;
@@ -52,56 +53,107 @@ const slides: HeroSlide[] = [
   },
 ];
 
+// Slow Ken Burns push-in on the active slide (idle resets softly for the next pass)
+const kenBurnsVariants: Variants = {
+  idle: { scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
+  zoom: { scale: 1.08, transition: { duration: 6, ease: "linear" } },
+};
+
+// Staggered headline → subtext → buttons entrance, replayed on the active slide
+const copyVariants: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.11, delayChildren: 0.2 } },
+};
+
+const copyItemVariants: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 export function HeroSlider() {
   const swiperRef = useRef<SwiperType | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <section className="relative" aria-label="Featured spaces">
       <Swiper
-        modules={[Autoplay, Navigation, Pagination, Keyboard]}
+        modules={[Autoplay, Keyboard, Navigation]}
         onSwiper={(s) => (swiperRef.current = s)}
+        onSlideChange={(s) => setActiveIndex(s.realIndex)}
         loop
         keyboard={{ enabled: true }}
         autoplay={{ delay: 6000, disableOnInteraction: false }}
         grabCursor
-        pagination={{ el: ".hero-pagination", clickable: true }}
         className="group/hero h-[34rem] sm:h-[38rem] lg:h-[42rem] w-full"
       >
         {slides.map((slide, i) => (
           <SwiperSlide key={i} className="relative overflow-hidden">
-            {/* Slide image — slow cinematic zoom (see .hero-slide-img in globals.css) */}
-            <Image
-              src={slide.image}
-              alt={slide.category}
-              fill
-              priority={i === 0}
-              sizes="100vw"
-              className="hero-slide-img object-cover"
-            />
-            {/* Textural overlays */}
+            {/* Slide image — slow cinematic Ken Burns zoom while active */}
+            <motion.span
+              className="absolute inset-0 motion-reduce:transform-none!"
+              variants={kenBurnsVariants}
+              initial="idle"
+              animate={activeIndex === i ? "zoom" : "idle"}
+            >
+              <Image
+                src={slide.image}
+                alt={slide.category}
+                fill
+                priority={i === 0}
+                sizes="100vw"
+                className="object-cover"
+              />
+            </motion.span>
+
+            {/* Textural overlays — dark cinematic gradients + dot grain */}
             <span
               aria-hidden
               className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/60 to-foreground/10"
             />
             <span
               aria-hidden
+              className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent"
+            />
+            <span
+              aria-hidden
               className="bg-dotted absolute inset-0 opacity-50"
             />
 
-            {/* Copy */}
-            <div className="container-page relative flex h-full items-end pb-16 sm:items-center sm:pb-0">
-              <div className="max-w-2xl animate-in fade-in fill-mode-both slide-in-from-bottom-4 pb-10 duration-700 sm:pb-16">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/95 px-3 py-1 text-xs font-semibold tracking-wide text-primary-foreground uppercase">
+            {/* Copy — staggered entrance for headline / subtext / buttons */}
+            <motion.div
+              className="container-page relative flex h-full items-end pb-16 sm:items-center sm:pb-0"
+              variants={copyVariants}
+              initial="hidden"
+              animate={activeIndex === i ? "show" : "hidden"}
+            >
+              <div className="max-w-2xl pb-10 sm:pb-16">
+                <motion.span
+                  variants={copyItemVariants}
+                  className="motion-reduce:transform-none! motion-reduce:opacity-100! inline-flex items-center gap-1.5 rounded-full bg-primary/95 px-3 py-1 text-xs font-semibold tracking-wide text-primary-foreground uppercase"
+                >
                   <Sparkles className="size-3.5" />
                   {slide.category}
-                </span>
-                <h1 className="mt-4 font-heading text-4xl leading-[1.05] font-semibold text-background sm:text-5xl lg:text-6xl">
+                </motion.span>
+                <motion.h1
+                  variants={copyItemVariants}
+                  className="motion-reduce:transform-none! motion-reduce:opacity-100! mt-4 font-heading text-4xl leading-[1.05] font-bold tracking-tight text-background sm:text-5xl lg:text-6xl"
+                >
                   {slide.headline}
-                </h1>
-                <p className="mt-4 max-w-xl text-base leading-relaxed text-background/75 sm:text-lg">
+                </motion.h1>
+                <motion.p
+                  variants={copyItemVariants}
+                  className="motion-reduce:transform-none! motion-reduce:opacity-100! mt-4 max-w-xl text-base leading-relaxed text-background/80 sm:text-lg"
+                >
                   {slide.description}
-                </p>
-                <div className="mt-8 flex flex-wrap items-center gap-3">
+                </motion.p>
+                <motion.div
+                  variants={copyItemVariants}
+                  className="motion-reduce:transform-none! motion-reduce:opacity-100! mt-8 flex flex-wrap items-center gap-3"
+                >
                   <Link
                     href="/studios"
                     className={buttonVariants({
@@ -124,18 +176,34 @@ export function HeroSlider() {
                     <Building2 className="size-4" />
                     Host Your Space
                   </Link>
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
           </SwiperSlide>
         ))}
 
-        {/* Pagination bullets (wired via pagination.el) */}
+        {/* Animated pagination bars (per-slide buttons; stretch when active) */}
         <div
-          className="hero-pagination absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5"
+          className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2"
           role="group"
           aria-label="Slide bullets"
-        />
+        >
+          {slides.map((slide, idx) => (
+            <button
+              key={slide.category}
+              type="button"
+              aria-label={`Go to slide ${idx + 1}`}
+              aria-current={activeIndex === idx ? "true" : undefined}
+              onClick={() => swiperRef.current?.slideToLoop(idx)}
+              className={cn(
+                "h-1.5 shrink-0 cursor-pointer rounded-full transition-all duration-300 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
+                activeIndex === idx
+                  ? "w-10 bg-background"
+                  : "w-5 bg-background/40 hover:w-7 hover:bg-background/70",
+              )}
+            />
+          ))}
+        </div>
 
         {/* Arrows */}
         <button
@@ -155,7 +223,6 @@ export function HeroSlider() {
           <ChevronRight className="size-5" />
         </button>
       </Swiper>
-    
     </section>
   );
 }

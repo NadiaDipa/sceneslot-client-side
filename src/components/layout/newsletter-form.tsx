@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 export function NewsletterForm() {
   const [subscribed, setSubscribed] = useState(false);
@@ -11,6 +12,7 @@ export function NewsletterForm() {
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubscribed(true);
+    toast.success("You're subscribed. Welcome to the SceneSlot newsletter!");
   }
 
   if (subscribed) {

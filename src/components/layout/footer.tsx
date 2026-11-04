@@ -25,13 +25,16 @@ const footerColumns = [
   { title: "Quick Links", links: quickLinks },
   {
     title: "Studio Categories",
-    links: categories.map((c) => ({ href: "/studios", label: c.name })),
+    links: categories.map((c) => ({
+      href: `/studios?category=${encodeURIComponent(c.name)}`,
+      label: c.name,
+    })),
   },
 ];
 
 const socialIcons = [
   {
-    label: "X (Twitter)",
+    label: "X",
     href: "https://x.com",
     node: <XIcon className="size-4" />,
   },
@@ -90,7 +93,7 @@ export function Footer() {
             <p className="max-w-xs text-sm leading-relaxed text-background/65">
               SceneSlot is the peer-to-peer marketplace where creators find the
               spaces that bring their ideas to light — and where studio owners
-              turn Downtime into income.
+              turn downtime into income.
             </p>
             <div className="flex items-center gap-2">
               {socialIcons.map((s) => (

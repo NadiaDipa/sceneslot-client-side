@@ -2,6 +2,7 @@
 
 import { Logo } from "@/components/layout/logo";
 import { ProfileDropdown } from "@/components/layout/profile-dropdown";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,7 +14,7 @@ import { cn } from "cn";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "@/lib/auth-client";
 
 const navLinks = [
@@ -25,16 +26,31 @@ const navLinks = [
 
 export function Navbar() {
   const { data: session, isPending } = useSession();
- const isAuthenticated = session?.user ? true : false;
+  const isAuthenticated = Boolean(session?.user);
 
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  // Visual only: increase backdrop blur + add a soft bottom shadow after 10px scroll
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/85 backdrop-blur-md">
+    <header
+      className={cn(
+        "sticky top-0 z-40 w-full border-b border-transparent bg-background/60 backdrop-blur-sm transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300 motion-reduce:transition-none",
+        scrolled &&
+          "border-border/70 bg-background/80 backdrop-blur-xl shadow-lg shadow-foreground/5",
+      )}
+    >
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <Logo />
 
@@ -62,19 +78,25 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          {!isPending &&
-            (isAuthenticated ? (
-              <div className="hidden md:block">
-                <ProfileDropdown />
-              </div>
-            ) : (
-              <div className="hidden items-center gap-2 md:flex">
-                <Button variant="ghost" render={<Link href="/login" />}>
-                  Login
-                </Button>
-                <Button render={<Link href="/register" />}>Register</Button>
-              </div>
-            ))}
+          <ThemeToggle />
+
+          {isPending ? (
+            <div
+              className="hidden h-10 w-24 animate-pulse rounded-full bg-muted md:block"
+              aria-hidden
+            />
+          ) : isAuthenticated ? (
+            <div className="hidden md:block">
+              <ProfileDropdown />
+            </div>
+          ) : (
+            <div className="hidden items-center gap-2 md:flex">
+              <Button variant="ghost" render={<Link href="/login" />}>
+                Login
+              </Button>
+              <Button render={<Link href="/register" />}>Register</Button>
+            </div>
+          )}
 
           {/* Mobile menu trigger */}
           <Sheet open={open} onOpenChange={setOpen}>
@@ -117,7 +139,12 @@ export function Navbar() {
                   ))}
                 </nav>
                 <div className="mt-auto border-t p-4">
-                  {isPending ? null : isAuthenticated ? (
+                  {isPending ? (
+                    <div
+                      className="h-10 w-full animate-pulse rounded-full bg-muted"
+                      aria-hidden
+                    />
+                  ) : isAuthenticated ? (
                     <ProfileDropdown />
                   ) : (
                     <div className="flex flex-col gap-2">
@@ -136,7 +163,6 @@ export function Navbar() {
                       </Button>
                     </div>
                   )}
-                 
                 </div>
               </div>
             </SheetContent>

@@ -1,4 +1,5 @@
 import { buttonVariants } from "@/components/ui/button";
+import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { cn } from "cn";
 import {
   ArrowRight,
@@ -53,25 +54,31 @@ export function TrustSection({ className }: { className?: string }) {
       />
 
       <div className="container-page relative">
-        <div className="mx-auto mb-10 flex max-w-2xl flex-col items-center gap-4 text-center sm:mb-12">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold tracking-wide text-primary uppercase">
-            <ShieldCheck className="size-3.5" />
-            Host guarantee · Creator support
-          </span>
-          <h2 className="font-heading text-3xl font-semibold text-foreground sm:text-4xl">
-            Rolling should feel safe, start to wrap
-          </h2>
-          <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
-            The systems beneath every SceneSlot booking protect people, gear and
-            schedules — so both sides of the marketplace can take creative
-            risks.
-          </p>
-        </div>
+        <Reveal>
+          <div className="mx-auto mb-10 flex max-w-2xl flex-col items-center gap-4 text-center sm:mb-12">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold tracking-wide text-primary uppercase">
+              <ShieldCheck className="size-3.5" />
+              Host guarantee · Creator support
+            </span>
+            <h2 className="font-heading text-3xl font-semibold text-foreground sm:text-4xl">
+              Rolling should feel safe, start to wrap
+            </h2>
+            <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
+              The systems beneath every SceneSlot booking protect people, gear and
+              schedules — so both sides of the marketplace can take creative
+              risks.
+            </p>
+          </div>
+        </Reveal>
 
-        <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Four equal guarantee cards, revealed in stagger */}
+        <RevealGroup className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
           {pillars.map((p) => (
-            <div key={p.title} className="flex flex-col gap-3">
-              <span className="grid size-11 place-items-center rounded-xl bg-card text-primary ring-1 ring-border">
+            <RevealItem
+              key={p.title}
+              className="group flex h-full flex-col gap-3 rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/15 motion-reduce:transition-none"
+            >
+              <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20 transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                 <p.icon className="size-5" strokeWidth={1.8} />
               </span>
               <h3 className="font-heading text-base font-semibold text-foreground">
@@ -80,32 +87,34 @@ export function TrustSection({ className }: { className?: string }) {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {p.description}
               </p>
-            </div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
 
         {/* CTA */}
-        <div className="mt-12 flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8 text-center shadow-sm sm:mt-14 sm:flex-row sm:justify-between sm:text-left">
-          <div className="flex max-w-xl flex-col gap-2">
-            <h3 className="font-heading text-xl font-semibold text-foreground sm:text-2xl">
-              Own a creative space? Let it shoot for you.
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              List your studio in 15 minutes, set your own hours, and keep 88%
-              of every booking. No listing fees.
-            </p>
+        <Reveal delay={0.15} className="mt-12 sm:mt-14">
+          <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8 text-center shadow-sm sm:flex-row sm:justify-between sm:text-left">
+            <div className="flex max-w-xl flex-col gap-2">
+              <h3 className="font-heading text-xl font-semibold text-foreground sm:text-2xl">
+                Own a creative space? Let it shoot for you.
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                List your studio in 15 minutes, set your own hours, and keep 88%
+                of every booking. No listing fees.
+              </p>
+            </div>
+            <Link
+              href="/add-studio"
+              className={buttonVariants({
+                size: "lg",
+                className: "shrink-0 gap-2",
+              })}
+            >
+              Host Your Space
+              <ArrowRight className="size-4" />
+            </Link>
           </div>
-          <Link
-            href="/add-studio"
-            className={buttonVariants({
-              size: "lg",
-              className: "shrink-0 gap-2",
-            })}
-          >
-            Host Your Space
-            <ArrowRight className="size-4" />
-          </Link>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+import { Reveal, RevealGroup, RevealItem, DrawLine } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { cn } from "cn";
 import type { LucideIcon } from "lucide-react";
@@ -40,16 +41,31 @@ export function BookingSteps() {
   return (
     <section className="py-16 sm:py-24" aria-label="How booking works">
       <div className="container-page">
-        <SectionHeading
-          eyebrow="How it works"
-          title="Four steps between idea and footage"
-          description="SceneSlot handles the paperwork so you can focus on the work — from first browse to final take."
-        />
-        <ol className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Reveal>
+          <SectionHeading
+            eyebrow="How it works"
+            title="Four steps between idea and footage"
+            description="SceneSlot handles the paperwork so you can focus on the work — from first browse to final take."
+          />
+        </Reveal>
+        {/* Steps reveal in sequence; the connector line draws itself through the gaps */}
+        <RevealGroup
+          as="ol"
+          className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <DrawLine
+            orientation="horizontal"
+            className="absolute top-[46px] right-0 left-0 z-0 hidden h-px bg-border lg:block"
+          />
+          <DrawLine
+            orientation="vertical"
+            className="absolute top-[46px] bottom-[46px] left-[46px] z-0 w-px bg-border lg:hidden"
+          />
           {steps.map((step, i) => (
-            <li
+            <RevealItem
               key={step.title}
-              className="group relative flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-foreground/5"
+              as="li"
+              className="group relative z-10 flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-foreground/5"
             >
               <div className="flex items-center justify-between">
                 <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
@@ -71,9 +87,9 @@ export function BookingSteps() {
                   {step.description}
                 </p>
               </div>
-            </li>
+            </RevealItem>
           ))}
-        </ol>
+        </RevealGroup>
       </div>
     </section>
   );

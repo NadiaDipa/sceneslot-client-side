@@ -18,7 +18,7 @@ export function StudioCard({
   return (
     <Card
       className={cn(
-        "group gap-0 overflow-hidden pt-0 transition-all duration-300 hover:-translate-y-1 hover:ring-foreground/20 hover:shadow-lg hover:shadow-foreground/10",
+        "group h-full gap-0 overflow-hidden pt-0 transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/25 hover:ring-primary/30 motion-reduce:transition-none",
         className,
       )}
     >
@@ -29,13 +29,13 @@ export function StudioCard({
           alt={studio.title}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-110 motion-reduce:transition-none"
         />
         <span
           aria-hidden
           className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-transparent to-transparent opacity-60"
         />
-        <Badge className="absolute top-3 left-3 h-6 bg-background/90 text-foreground backdrop-blur-sm hover:bg-background">
+        <Badge className="absolute top-3 left-3 h-6 rounded-full bg-background/90 px-3 text-foreground ring-1 ring-foreground/10 backdrop-blur-sm hover:bg-background">
           {studio.category}
         </Badge>
         <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground backdrop-blur-sm">
@@ -43,7 +43,7 @@ export function StudioCard({
         </span>
       </div>
 
-      <CardContent className="flex flex-col gap-2 p-5">
+      <CardContent className="flex flex-1 flex-col gap-2 p-5">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {studio.reviewsCount > 0 ? (
             <>

@@ -1,4 +1,5 @@
 import { Logo } from "@/components/layout/logo";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -13,7 +14,7 @@ export default function AuthLayout({
       <div className="relative hidden overflow-hidden bg-foreground lg:block">
         <Image
           src="https://images.unsplash.com/photo-1516575150278-77136aed6920?q=80&w=1600&auto=format&fit=crop"
-          alt="Creator posing in a red-backdrop photo studio"
+          alt="Creator working in a professional photo studio"
           fill
           priority
           className="object-cover opacity-80"
@@ -36,19 +37,21 @@ export default function AuthLayout({
       <div className="flex flex-col px-5 py-6 sm:px-10 lg:px-16 xl:px-24">
         <div className="flex items-center justify-between">
           <Logo />
-          <Link
-            href="/"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            ← Back to home
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link
+              href="/"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              ← Back to home
+            </Link>
+          </div>
         </div>
         <div className="flex flex-1 items-center justify-center py-14">
           <div className="w-full max-w-md">{children}</div>
         </div>
         <p className="text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} SceneSlot Inc. · UI preview, no real
-          accounts are created yet.
+          © {new Date().getFullYear()} SceneSlot Inc. All rights reserved.
         </p>
       </div>
     </div>

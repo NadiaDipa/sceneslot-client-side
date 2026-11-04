@@ -23,13 +23,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { signOut, useSession } from "@/lib/auth-client";
 
 const initials = (name: string) =>
   name
     .split(" ")
+    .filter(Boolean)
     .map((p) => p[0])
     .join("")
+    .slice(0, 2)
     .toUpperCase();
 
 export function ProfileDropdown({
@@ -45,9 +48,15 @@ export function ProfileDropdown({
   if (!user) return null;
 
   const handleLogout = async () => {
-    await signOut();
-    router.push("/login");
-    router.refresh();
+    try {
+      await signOut();
+      toast.success("You have been logged out.");
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Could not log out. Please try again.");
+    }
   };
 
   return (
