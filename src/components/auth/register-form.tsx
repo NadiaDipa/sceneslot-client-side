@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { useState, type FormEvent } from "react";
 import { GoogleButton } from "@/components/auth/login-form";
 import { signUp } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const rules = [
   { label: "At least 6 characters", test: (v: string) => v.length >= 6 },
@@ -25,45 +27,46 @@ export function RegisterForm() {
   const [agreed, setAgreed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const router = useRouter();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+    setPasswordError("");
+    setErrorMessage("");
 
-    const name = String(data.name);
-    const email = String(data.email);
-    const password = String(data.password);
-
+    // Password validation
     if (!rules.every((rule) => rule.test(password))) {
       setPasswordError("Please meet all password requirements.");
       return;
     }
 
-    setPasswordError("");
     setIsLoading(true);
 
-    const photoUrl = String(data.photoUrl || "");
-
     try {
-      const { data: signUpData, error } = await signUp.email({
+      const { data, error } = await signUp.email({
         name,
         email,
         password,
-        image: photoUrl || undefined,
+        image: photoUrl.trim() || undefined,
       });
 
-      if (signUpData && !error) {
-        router.push("/login");
+      if (error) {
+        setErrorMessage(
+          error.message || "Registration failed. Please try again."
+        );
+        return;
       }
 
-      if (error) {
-        console.error("Signup error:", error);
+      if (data) {
+        toast.success("Account created successfully!");
+        router.push("/login?registered=true");
       }
     } catch (err) {
       console.error("Signup failed:", err);
+      setErrorMessage("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -75,6 +78,7 @@ export function RegisterForm() {
         <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
           Create your SceneSlot account
         </h1>
+
         <p className="text-sm text-muted-foreground">
           One account to book studios — and to host spaces of your own.
         </p>
@@ -82,6 +86,7 @@ export function RegisterForm() {
 
       <div className="flex flex-col gap-3">
         <GoogleButton label="Sign up with Google" />
+
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="h-px flex-1 bg-border" />
           or register with email
@@ -90,27 +95,33 @@ export function RegisterForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {/* Name */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="reg-name">Full name</Label>
+
           <div className="relative">
             <User className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+
             <Input
               id="reg-name"
+              name="name"
               required
               autoComplete="name"
               placeholder="Amara Hossain"
               value={name}
-              name="name"
               onChange={(e) => setName(e.target.value)}
               className="pl-8"
             />
           </div>
         </div>
 
+        {/* Email */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="reg-email">Email</Label>
+
           <div className="relative">
             <Mail className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+
             <Input
               id="reg-email"
               type="email"
@@ -125,39 +136,46 @@ export function RegisterForm() {
           </div>
         </div>
 
+        {/* Photo URL */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="reg-photo">Photo URL</Label>
+
           <Input
             id="reg-photo"
             type="url"
+            name="photoUrl"
             placeholder="https://i.pravatar.cc/150?img=12 (optional)"
             value={photoUrl}
-            name="photoUrl"
             onChange={(e) => setPhotoUrl(e.target.value)}
           />
+
           <p className="text-xs text-muted-foreground">
             Optional — a profile photo builds trust with hosts.
           </p>
         </div>
 
+        {/* Password */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="reg-password">Password</Label>
+
           <div className="relative">
             <Lock className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+
             <Input
               id="reg-password"
               type={showPassword ? "text" : "password"}
+              name="password"
               required
               autoComplete="new-password"
               placeholder="Create a strong password"
               value={password}
-              name="password"
               onChange={(e) => {
                 setPassword(e.target.value);
                 setPasswordError("");
               }}
               className="px-8 pr-10"
             />
+
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
@@ -172,31 +190,35 @@ export function RegisterForm() {
             </button>
           </div>
 
-          {password ? (
+          {password && (
             <ul className="flex flex-col gap-0.5 pt-1">
-              {rules.map((r) => {
-                const ok = r.test(password);
+              {rules.map((rule) => {
+                const isValid = rule.test(password);
+
                 return (
                   <li
-                    key={r.label}
+                    key={rule.label}
                     className={
-                      ok
+                      isValid
                         ? "text-xs text-emerald-700"
                         : "text-xs text-muted-foreground"
                     }
                   >
-                    {ok ? "✓" : "•"} {r.label}
+                    {isValid ? "✓" : "•"} {rule.label}
                   </li>
                 );
               })}
             </ul>
-          ) : null}
+          )}
 
           {passwordError && (
-            <p className="text-xs text-destructive">{passwordError}</p>
+            <p className="text-xs text-destructive" role="alert">
+              {passwordError}
+            </p>
           )}
         </div>
 
+        {/* Terms and Privacy */}
         <label className="flex cursor-pointer items-start gap-2.5 text-sm text-muted-foreground">
           <input
             type="checkbox"
@@ -206,6 +228,7 @@ export function RegisterForm() {
             onChange={(e) => setAgreed(e.target.checked)}
             className="mt-0.5 size-4 accent-[var(--primary)]"
           />
+
           <span>
             I agree to the{" "}
             <Link
@@ -225,6 +248,14 @@ export function RegisterForm() {
           </span>
         </label>
 
+        {/* Registration Error */}
+        {errorMessage && (
+          <p className="text-sm text-destructive" role="alert">
+            {errorMessage}
+          </p>
+        )}
+
+        {/* Register Button */}
         <Button
           type="submit"
           size="lg"

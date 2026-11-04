@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 function GoogleIcon() {
   return (
@@ -39,10 +40,9 @@ export function GoogleButton({ label }: { label: string }) {
       variant="outline"
       className="w-full gap-2.5"
       onClick={() => {
-        console.log("Google button clicked");
         authClient.signIn.social({
           provider: "google",
-          callbackURL: window.location.origin,
+          callbackURL: `${window.location.origin}/login?googleLogin=success`,
         });
       }}
     >
@@ -55,12 +55,45 @@ export function GoogleButton({ label }: { label: string }) {
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const hasShownGoogleToast = useRef(false);
+  const hasClearedSession = useRef(false);
+
+  const isRegistered = searchParams.get("registered") === "true";
+  const isGoogleLogin = searchParams.get("googleLogin") === "success";
+
+  // Registration এর পর better-auth auto sign-in করে দেয়।
+  // তাই এখানে এসে সেই session মুছে দিচ্ছি, যাতে ইউজারকে নিজে লগইন করতে হয়।
+  useEffect(() => {
+    if (isRegistered && !hasClearedSession.current) {
+      hasClearedSession.current = true;
+
+      authClient
+        .signOut()
+        .then(() => router.refresh())
+        .catch((err) => console.error("Sign out after register failed:", err));
+    }
+  }, [isRegistered, router]);
+
+  // Google Login Success Toast
+  useEffect(() => {
+    if (isGoogleLogin && !hasShownGoogleToast.current) {
+      hasShownGoogleToast.current = true;
+
+      toast.success(
+        "Welcome back! You have successfully logged in with Google.",
+        { duration: 4000 }
+      );
+
+      router.replace("/");
+    }
+  }, [isGoogleLogin, router]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -73,10 +106,7 @@ export function LoginForm() {
         email,
         password,
         rememberMe: remember,
-        callbackURL: "/",
       });
-      console.log("Login data:", data);
-      console.log("Login error:", error);
 
       if (error) {
         setErrorMessage(error.message || "Login failed. Please try again.");
@@ -84,6 +114,9 @@ export function LoginForm() {
       }
 
       if (data) {
+        toast.success("Welcome back! You have successfully logged in.", {
+          duration: 4000,
+        });
         router.push("/");
         router.refresh();
       }
@@ -101,13 +134,25 @@ export function LoginForm() {
         <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
           Welcome back
         </h1>
+
         <p className="text-sm text-muted-foreground">
           Log in to book studios, manage listings, and see your schedule.
         </p>
       </div>
 
+      {/* Registration Success Message */}
+      {isRegistered && (
+        <p
+          role="status"
+          className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+        >
+          Please log in with your email and password.
+        </p>
+      )}
+
       <div className="flex flex-col gap-3">
         <GoogleButton label="Continue with Google" />
+
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="h-px flex-1 bg-border" />
           or log in with email
@@ -115,15 +160,14 @@ export function LoginForm() {
         </div>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-4"
-        noValidate={false}
-      >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {/* Email */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="login-email">Email</Label>
+
           <div className="relative">
             <Mail className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+
             <Input
               id="login-email"
               type="email"
@@ -137,9 +181,11 @@ export function LoginForm() {
           </div>
         </div>
 
+        {/* Password */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <Label htmlFor="login-password">Password</Label>
+
             <Link
               href="/login"
               className="text-xs font-medium text-accent-foreground underline-offset-4 hover:underline"
@@ -148,8 +194,10 @@ export function LoginForm() {
               Forgot password?
             </Link>
           </div>
+
           <div className="relative">
             <Lock className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+
             <Input
               id="login-password"
               type={showPassword ? "text" : "password"}
@@ -160,6 +208,7 @@ export function LoginForm() {
               placeholder="••••••••"
               className="px-8 pr-10"
             />
+
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
@@ -175,6 +224,7 @@ export function LoginForm() {
           </div>
         </div>
 
+        {/* Remember Me */}
         <label className="flex cursor-pointer items-center gap-2.5 text-sm text-muted-foreground">
           <input
             type="checkbox"
@@ -184,12 +234,15 @@ export function LoginForm() {
           />
           Remember me on this device
         </label>
+
+        {/* Login Error */}
         {errorMessage && (
           <p role="alert" className="text-center text-sm text-destructive">
             {errorMessage}
           </p>
         )}
 
+        {/* Login Button */}
         <Button
           type="submit"
           size="lg"

@@ -4,7 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { RatingStars } from "@/components/shared/rating-stars";
 import type { Studio } from "@/lib/types";
 import { cn } from "cn";
-import { ArrowRight, Clock, MapPin } from "lucide-react";
+import { ArrowRight, Clock, MapPin, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -38,6 +38,13 @@ export function StudioCard({
         <Badge className="absolute top-3 left-3 h-6 rounded-full bg-background/90 px-3 text-foreground ring-1 ring-foreground/10 backdrop-blur-sm hover:bg-background">
           {studio.category}
         </Badge>
+
+        {/* Rating badge: always visible */}
+        <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground backdrop-blur-sm">
+          <Star className="size-3 fill-primary text-primary" />
+          {studio.reviewsCount > 0 ? studio.rating.toFixed(1) : "New"}
+        </span>
+
         <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground backdrop-blur-sm">
           <Clock className="size-3 text-primary" />${studio.hourlyRate}/hr
         </span>
