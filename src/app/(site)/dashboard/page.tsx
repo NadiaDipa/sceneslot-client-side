@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -44,7 +43,7 @@ export default async function DashboardPage() {
   });
 
   if (!session) {
-    redirect("/login");
+    redirect("/login?redirect=/dashboard");
   }
 
   let dashboardData: DashboardData | null = null;

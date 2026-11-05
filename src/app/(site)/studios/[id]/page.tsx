@@ -4,8 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { mapStudioDoc, type StudioDoc } from "@/lib/api";
 import { cn } from "cn";
-import { CircleCheck, Clock, MapPin, Users } from "lucide-react";
+import { CircleCheck, Clock, MapPin, MessageSquare, Users } from "lucide-react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { BookingPanel } from "./booking-panel";
 import { StudioGallery } from "@/components/studio/studio-gallery";
 
@@ -19,9 +20,16 @@ export default async function StudioDetailsPage({ params }: Props) {
   const res = await fetch(`${process.env.API_BASE_URL}/studios/${id}`, {
     cache: "no-store",
   });
+
+  // Unknown or invalid studio id → show the custom 404 page
+  if (res.status === 404 || res.status === 400) {
+    notFound();
+  }
+
   if (!res.ok) {
     throw new Error("Failed to fetch studio details");
   }
+
   const doc: StudioDoc = await res.json();
 
   const studio = mapStudioDoc(doc);
@@ -83,7 +91,7 @@ export default async function StudioDetailsPage({ params }: Props) {
                     ({studio.reviewsCount} reviews)
                   </span>
                 ) : (
-                  <span className="text-emerald-700">New listing</span>
+                  <span className="text-emerald-700 dark:text-emerald-400">New listing</span>
                 )}
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="size-4 text-primary" />
@@ -173,6 +181,11 @@ export default async function StudioDetailsPage({ params }: Props) {
                   <p className="font-heading text-base font-semibold">
                     {studio.host.name}
                   </p>
+                  {studio.host.email ? (
+                    <p className="text-xs text-muted-foreground">
+                      {studio.host.email}
+                    </p>
+                  ) : null}
                   <p className="text-xs text-muted-foreground">
                     {studio.host.joined}
                     {studio.host.responseRate
@@ -188,20 +201,23 @@ export default async function StudioDetailsPage({ params }: Props) {
 
             <Separator />
 
-            {/* Reviews (backend-backed listings have none yet) */}
-            {studio.reviews.length > 0 ? (
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h2 className="font-heading text-xl font-semibold">
-                    Creator reviews
-                  </h2>
+            {/* Reviews */}
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h2 className="font-heading text-xl font-semibold">
+                  Creator reviews
+                </h2>
+                {studio.reviews.length > 0 ? (
                   <span className="text-sm text-muted-foreground">
                     <span className="font-semibold text-foreground">
                       {studio.rating}
                     </span>{" "}
                     · {studio.reviewsCount} reviews
                   </span>
-                </div>
+                ) : null}
+              </div>
+
+              {studio.reviews.length > 0 ? (
                 <div className="flex flex-col gap-4">
                   {studio.reviews.map((r) => (
                     <article
@@ -228,14 +244,22 @@ export default async function StudioDetailsPage({ params }: Props) {
                     </article>
                   ))}
                 </div>
-              </div>
-            ) : null}
+              ) : (
+                <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border p-8 text-center">
+                  <MessageSquare className="size-6 text-muted-foreground" />
+                  <p className="text-sm font-medium">No reviews yet</p>
+                  <p className="text-sm text-muted-foreground">
+                    Be the first creator to book this space and share your
+                    experience.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right column — booking */}
           <div className={cn("lg:sticky lg:top-24")}>
             <BookingPanel studio={studio} />
-           
           </div>
         </div>
       </div>

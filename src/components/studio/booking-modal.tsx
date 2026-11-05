@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,9 @@ import { API_BASE } from "@/lib/api";
 import type { Studio } from "@/lib/types";
 import { cn } from "cn";
 import { BadgeCheck, CalendarDays, Clock, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 interface BookingModalProps {
   studio: Studio;
@@ -32,15 +33,24 @@ interface BookingModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function mockHours() {
-  return ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-}
+const START_SLOTS = [
+  "09:00",
+  "10:00",
+  "11:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+];
 
 export function BookingModal({
   studio,
   open,
   onOpenChange,
 }: BookingModalProps) {
+  const router = useRouter();
+
   const [date, setDate] = useState("");
   const [startHour, setStartHour] = useState("");
   const [duration, setDuration] = useState("2");
@@ -54,8 +64,33 @@ export function BookingModal({
   const subtotal = rate * hours;
   const serviceFee = Math.round(subtotal * 0.08);
 
+  // Reset the form every time the modal is closed
+  function handleOpenChange(next: boolean) {
+    if (!next) {
+      setDate("");
+      setStartHour("");
+      setDuration("2");
+      setGuests("1");
+      setMessage("");
+      setSuccess(false);
+    }
+    onOpenChange(next);
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
+    const crew = Number(guests);
+
+    if (!Number.isInteger(crew) || crew < 1) {
+      toast.error("Crew size must be at least 1.");
+      return;
+    }
+
+    if (crew > studio.maxCapacity) {
+      toast.error(`This studio fits up to ${studio.maxCapacity} guests.`);
+      return;
+    }
 
     setLoading(true);
     setMessage("");
@@ -73,11 +108,19 @@ export function BookingModal({
           date,
           startTime: startHour,
           duration: hours,
-          guests: Number(guests),
+          guests: crew,
         }),
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
+
+      // Not logged in → send to login and come back to this studio
+      if (response.status === 401) {
+        toast.error("Please log in to book this workspace.");
+        handleOpenChange(false);
+        router.push(`/login?redirect=/studios/${studio.id}`);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(result.message || "Booking failed");
@@ -85,28 +128,37 @@ export function BookingModal({
 
       setSuccess(true);
       setMessage("Booking request submitted successfully!");
+      toast.success("Booking request submitted successfully!");
 
+      router.refresh();
+      setTimeout(() => {
+        handleOpenChange(false);
+        router.push("/my-bookings");
+      }, 1200);
     } catch (error) {
-      setSuccess(false);
-      setMessage(
+      const text =
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again."
-      );
+          : "Something went wrong. Please try again.";
+
+      setSuccess(false);
+      setMessage(text);
+      toast.error(text);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="font-heading text-xl">
             Book this workspace
           </DialogTitle>
           <DialogDescription>
-            {studio.title} · {studio.location} — choose your preferred date and time.
+            {studio.title} · {studio.location} — choose your preferred date and
+            time.
           </DialogDescription>
         </DialogHeader>
 
@@ -159,7 +211,7 @@ export function BookingModal({
                   <SelectValue placeholder="Select a slot" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockHours().map((h) => (
+                  {START_SLOTS.map((h) => (
                     <SelectItem key={h} value={h}>
                       {h}
                     </SelectItem>
@@ -169,7 +221,7 @@ export function BookingModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="booking-duration">Duration</Label>
+              <Label>Duration</Label>
               <Select
                 value={duration}
                 onValueChange={(v) => setDuration(v ?? "2")}
@@ -185,28 +237,6 @@ export function BookingModal({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-              Mock availability for {date || "your date"}
-            </p>
-
-            <div className="flex flex-wrap gap-1.5">
-              {mockHours().map((h) => (
-                <span
-                  key={h}
-                  className={cn(
-                    "rounded-md border px-2 py-1 text-xs font-medium",
-                    h === startHour
-                      ? "border-primary bg-accent text-accent-foreground"
-                      : "border-border text-muted-foreground"
-                  )}
-                >
-                  {h}
-                </span>
-              ))}
             </div>
           </div>
 
@@ -243,7 +273,7 @@ export function BookingModal({
               className={cn(
                 "rounded-md p-3 text-sm",
                 success
-                  ? "bg-green-50 text-green-700"
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                   : "bg-destructive/10 text-destructive"
               )}
             >
@@ -255,7 +285,7 @@ export function BookingModal({
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
             >
               Close
             </Button>

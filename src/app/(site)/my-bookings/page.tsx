@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ArrowLeft, CalendarDays } from "lucide-react";
@@ -18,7 +17,7 @@ export default async function MyBookingsPage() {
   });
 
   if (!session) {
-    redirect("/login");
+    redirect("/login?redirect=/my-bookings");
   }
 
   let bookings: Booking[] = [];

@@ -24,6 +24,12 @@ const item: Variants = {
 const inputCls =
   "h-11 rounded-xl bg-muted/40 pl-10 transition-colors focus-visible:bg-background";
 
+/** শুধু নিজের সাইটের path গ্রহণ করবে (open redirect আটকাতে) */
+function getSafeRedirect(value: string | null) {
+  if (value && value.startsWith("/") && !value.startsWith("//")) return value;
+  return "/";
+}
+
 function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
@@ -47,20 +53,45 @@ function GoogleIcon() {
   );
 }
 
-export function GoogleButton({ label }: { label: string }) {
+export function GoogleButton({
+  label,
+  redirectTo = "/",
+}: {
+  label: string;
+  redirectTo?: string;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleGoogle() {
+    setLoading(true);
+    try {
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: `${
+          window.location.origin
+        }/login?googleLogin=success&redirect=${encodeURIComponent(redirectTo)}`,
+      });
+
+      if (error) {
+        toast.error(error.message || "Google login failed. Please try again.");
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("Google login error:", err);
+      toast.error("Google login failed. Please try again.");
+      setLoading(false);
+    }
+  }
+
   return (
     <Button
       type="button"
       variant="outline"
+      disabled={loading}
       className="h-11 w-full gap-2.5 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md"
-      onClick={() => {
-        authClient.signIn.social({
-          provider: "google",
-          callbackURL: `${window.location.origin}/login?googleLogin=success`,
-        });
-      }}
+      onClick={handleGoogle}
     >
-      <GoogleIcon />
+      {loading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
       {label}
     </Button>
   );
@@ -79,6 +110,7 @@ export function LoginForm() {
   const hasShownGoogleToast = useRef(false);
   const hasClearedSession = useRef(false);
 
+  const redirectTo = getSafeRedirect(searchParams.get("redirect"));
   const isRegistered = searchParams.get("registered") === "true";
   const isGoogleLogin = searchParams.get("googleLogin") === "success";
 
@@ -94,7 +126,7 @@ export function LoginForm() {
     }
   }, [isRegistered, router]);
 
-  // Google Login Success Toast
+  // Google Login Success Toast + desired route এ পাঠানো
   useEffect(() => {
     if (isGoogleLogin && !hasShownGoogleToast.current) {
       hasShownGoogleToast.current = true;
@@ -104,9 +136,10 @@ export function LoginForm() {
         { duration: 4000 }
       );
 
-      router.replace("/");
+      router.replace(redirectTo);
+      router.refresh();
     }
-  }, [isGoogleLogin, router]);
+  }, [isGoogleLogin, redirectTo, router]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -122,7 +155,9 @@ export function LoginForm() {
       });
 
       if (error) {
-        setErrorMessage(error.message || "Login failed. Please try again.");
+        const message = error.message || "Login failed. Please try again.";
+        setErrorMessage(message);
+        toast.error(message);
         return;
       }
 
@@ -130,12 +165,14 @@ export function LoginForm() {
         toast.success("Welcome back! You have successfully logged in.", {
           duration: 4000,
         });
-        router.push("/");
+        router.push(redirectTo);
         router.refresh();
       }
     } catch (error) {
       console.error("Login error:", error);
-      setErrorMessage("Something went wrong. Please try again.");
+      const message = "Something went wrong. Please try again.";
+      setErrorMessage(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -168,7 +205,7 @@ export function LoginForm() {
       )}
 
       <motion.div variants={item} className="flex flex-col gap-4">
-        <GoogleButton label="Continue with Google" />
+        <GoogleButton label="Continue with Google" redirectTo={redirectTo} />
 
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="h-px flex-1 bg-border" />

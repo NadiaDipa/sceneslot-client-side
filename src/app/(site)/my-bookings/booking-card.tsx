@@ -2,13 +2,30 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import type { Booking, BookingStatus } from "@/lib/types";
 import { API_BASE } from "@/lib/api";
 import { cn } from "cn";
-import { Ban, CalendarDays, Clock, MapPin, Users } from "lucide-react";
+import {
+  Ban,
+  CalendarDays,
+  Clock,
+  Loader2,
+  MapPin,
+  TriangleAlert,
+  Users,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const statusStyles: Record<BookingStatus, string> = {
   Pending: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
@@ -26,17 +43,12 @@ export function BookingCard({
 }) {
   const [status, setStatus] = useState<BookingStatus>(booking.status);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [error, setError] = useState("");
 
   const canCancel = status === "Pending";
 
   const handleCancel = async () => {
-    const confirmed = window.confirm(
-      `Are you sure you want to cancel "${booking.studioTitle}" on ${booking.date}?`
-    );
-
-    if (!confirmed) return;
-
     try {
       setIsCancelling(true);
       setError("");
@@ -49,21 +61,25 @@ export function BookingCard({
         }
       );
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(result.message || "Failed to cancel booking.");
       }
 
       setStatus("Cancelled");
+      setConfirmOpen(false);
+      toast.success("Booking cancelled successfully.");
     } catch (error) {
       console.error("Cancel booking error:", error);
 
-      setError(
+      const message =
         error instanceof Error
           ? error.message
-          : "Something went wrong. Please try again."
-      );
+          : "Something went wrong. Please try again.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setIsCancelling(false);
     }
@@ -136,16 +152,15 @@ export function BookingCard({
             <span className="font-mono font-medium">{booking.id}</span>
           </p>
 
-          {error && (
-            <p className="text-xs text-destructive">{error}</p>
-          )}
+          {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-2 sm:items-stretch">
           <p className="font-heading text-lg font-semibold">
             ${booking.total}
             <span className="text-xs font-normal text-muted-foreground">
-              {" "}total
+              {" "}
+              total
             </span>
           </p>
 
@@ -154,17 +169,64 @@ export function BookingCard({
               variant="destructive"
               size="sm"
               className="gap-1.5"
-              onClick={handleCancel}
+              onClick={() => setConfirmOpen(true)}
               disabled={isCancelling}
             >
               <Ban className="size-3.5" />
-              {isCancelling ? "Cancelling..." : "Cancel Booking"}
+              Cancel Booking
             </Button>
           ) : (
             <Separator className="w-24" />
           )}
         </div>
       </div>
+
+      {/* Custom confirmation modal (replaces window.confirm) */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <div className="me-auto grid size-11 place-items-center rounded-xl bg-destructive/10 ring-1 ring-destructive/20">
+              <TriangleAlert className="size-5 text-destructive" />
+            </div>
+            <DialogTitle className="font-heading text-lg font-semibold">
+              Cancel this booking?
+            </DialogTitle>
+            <DialogDescription>
+              Your session at{" "}
+              <span className="font-medium text-foreground">
+                &ldquo;{booking.studioTitle}&rdquo;
+              </span>{" "}
+              on {booking.date} will be cancelled and the time slot will be
+              released for other creators.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmOpen(false)}
+              disabled={isCancelling}
+            >
+              Keep booking
+            </Button>
+
+            <Button
+              variant="destructive"
+              onClick={handleCancel}
+              disabled={isCancelling}
+            >
+              {isCancelling ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Cancelling…
+                </>
+              ) : (
+                "Yes, cancel booking"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </li>
   );
 }

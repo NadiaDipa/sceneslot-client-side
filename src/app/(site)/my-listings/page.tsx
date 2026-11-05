@@ -12,7 +12,7 @@ export default async function MyListingsPage() {
   });
 
   if (!session) {
-    redirect("/login");
+    redirect("/login?redirect=/my-listings");
   }
 
   return (

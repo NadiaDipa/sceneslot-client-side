@@ -17,7 +17,7 @@ export function NewsletterForm() {
 
   if (subscribed) {
     return (
-      <p className="rounded-lg bg-primary/15 px-3 py-2.5 text-sm font-medium text-primary">
+      <p className="rounded-full bg-primary/20 px-4 py-2.5 text-sm font-medium text-white">
         You&apos;re on the list — first issue lands next Tuesday.
       </p>
     );
@@ -34,9 +34,14 @@ export function NewsletterForm() {
         name="email"
         required
         placeholder="you@studio.com"
-        className="h-9 border-foreground/15 bg-background/10 text-background placeholder:text-background/50 focus-visible:border-primary focus-visible:ring-primary/30"
+        className="h-11 rounded-full border-white/15 bg-white/5 text-white placeholder:text-white/45 focus-visible:border-primary focus-visible:ring-primary/40"
       />
-      <Button type="submit" size="icon" aria-label="Subscribe">
+      <Button
+        type="submit"
+        size="icon"
+        aria-label="Subscribe"
+        className="size-11 shrink-0 rounded-full shadow-lg shadow-primary/40 hover:shadow-primary/60"
+      >
         <Send />
       </Button>
     </form>

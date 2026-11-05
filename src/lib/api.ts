@@ -1,7 +1,9 @@
+
 import type { Studio } from "./types";
 
 /** Base URL of the Express + MongoDB backend (sceneslot-server). */
-export const API_BASE = "http://localhost:5000";
+export const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 /** Raw studio document shape stored in the `studios` collection. */
 export interface StudioDoc {
@@ -11,6 +13,7 @@ export interface StudioDoc {
   description?: string;
   overview?: string;
   image?: string;
+  gallery?: string[];
   hourlyRate?: number | string;
   deposit?: number | string;
   maxCapacity?: number | string;
@@ -19,35 +22,42 @@ export interface StudioDoc {
   amenities?: string[];
   hostName?: string;
   hostEmail?: string;
+  ownerName?: string;
+  ownerEmail?: string;
   rating?: number;
   reviewsCount?: number;
 }
 
 /** Map a Mongo document to the `Studio` shape the UI expects. */
 export function mapStudioDoc(doc: StudioDoc): Studio {
-  const image = doc.image ?? "";
+  const gallery =
+    Array.isArray(doc.gallery) && doc.gallery.length > 0
+      ? doc.gallery
+      : doc.image
+        ? [doc.image]
+        : [];
+
+  const image = doc.image ?? gallery[0] ?? "";
+
   return {
     id: String(doc._id),
     title: doc.title ?? "Untitled Studio",
     category: (doc.category ?? "Photo Studios") as Studio["category"],
-    // Docs created with the form only store `overview`; older demo docs
-    // may already include a short `description`.
     description: doc.description ?? doc.overview ?? "",
     overview: doc.overview ?? doc.description ?? "",
     image,
-    gallery: image ? [image] : [],
+    gallery,
     hourlyRate: Number(doc.hourlyRate ?? 0),
     deposit: Number(doc.deposit ?? 0),
     maxCapacity: Number(doc.maxCapacity ?? 1),
     location: doc.location ?? "",
     address: doc.address ?? "",
     amenities: Array.isArray(doc.amenities) ? doc.amenities : [],
-    // Backend-backed listings have no reviews yet
     rating: Number(doc.rating ?? 0),
-reviewsCount: Number(doc.reviewsCount ?? 0),
+    reviewsCount: Number(doc.reviewsCount ?? 0),
     host: {
-      name: doc.hostName ?? "SceneSlot Host",
-      email: doc.hostEmail ?? "",
+      name: doc.hostName ?? doc.ownerName ?? "SceneSlot Host",
+      email: doc.hostEmail ?? doc.ownerEmail ?? "",
       avatar: "",
       joined: "New host",
       responseRate: "",
@@ -57,11 +67,15 @@ reviewsCount: Number(doc.reviewsCount ?? 0),
   };
 }
 
-// Fetch a single studio by ID
-export async function fetchStudioById(id: string): Promise<Studio> {
+// Fetch a single studio by ID. Returns null when the studio does not exist.
+export async function fetchStudioById(id: string): Promise<Studio | null> {
   const res = await fetch(`${API_BASE}/studios/${id}`, {
     cache: "no-store",
   });
+
+  if (res.status === 404 || res.status === 400) {
+    return null;
+  }
 
   if (!res.ok) {
     throw new Error("Failed to fetch studio");

@@ -18,9 +18,10 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 const statusStyles: Record<string, string> = {
-  Active: "bg-emerald-500/10 text-emerald-700",
+  Active: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
   Draft: "bg-secondary text-secondary-foreground",
   Inactive: "bg-destructive/10 text-destructive",
 };
@@ -41,6 +42,7 @@ export function ListingRow({
 
     if (!id) {
       setDeleteFailed(true);
+      toast.error("Could not find this listing. Please refresh the page.");
       return;
     }
 
@@ -57,14 +59,17 @@ export function ListingRow({
         const errorData = await res.json().catch(() => null);
         console.error("Delete failed:", res.status, errorData);
         setDeleteFailed(true);
+        toast.error(errorData?.message || "Failed to delete the studio.");
         return;
       }
 
       setDeleteOpen(false);
+      toast.success("Studio deleted successfully.");
       onDeleted?.(id);
     } catch (err) {
       console.error("Failed to delete listing:", err);
       setDeleteFailed(true);
+      toast.error("Failed to delete the studio. Please try again.");
     } finally {
       setDeleting(false);
     }
@@ -196,6 +201,7 @@ export function MyListingsContent() {
       })
       .catch((err) => {
         console.error("Failed to fetch my listings:", err);
+        toast.error("Could not load your listings. Please try again.");
         setLoading(false);
       });
   }, []);

@@ -72,7 +72,7 @@ export function ProfileDropdown({
           />
         }
       >
-        <Avatar size="sm" className="size-8">
+        <Avatar size="sm" className="size-8 ring-2 ring-primary ring-offset-2 ring-offset-background">
           <AvatarImage
             src={user.image || undefined}
             alt={user.name}

@@ -16,17 +16,27 @@ export default async function StudiosPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const params = await searchParams;
-  const res = await fetch(`${API_BASE}/studios`, {
-    cache: "no-store",
-  });
 
-  const docs: StudioDoc[] = await res.json();
+  let docs: StudioDoc[] = [];
+
+  try {
+    const res = await fetch(`${API_BASE}/studios`, {
+      cache: "no-store",
+    });
+
+    if (res.ok) {
+      docs = await res.json();
+    }
+  } catch (error) {
+    console.error("Failed to fetch studios:", error);
+  }
 
   const studios: Studio[] = docs.map(mapStudioDoc);
 
   const uniqueLocations = [
     ...new Set(studios.map((studio) => studio.location)),
   ];
+
   const initialCategory =
     params.category && (categoryNames as string[]).includes(params.category)
       ? params.category
@@ -69,6 +79,7 @@ export default async function StudiosPage({
       {/* Listing */}
       <section className="container-page py-10 sm:py-14">
         <ExploreStudios
+          key={initialCategory}
           studios={studios}
           uniqueLocations={uniqueLocations}
           initialCategory={initialCategory}

@@ -19,7 +19,6 @@ import type { Studio } from "@/lib/types";
 import { cn } from "cn";
 import {
   BadgeCheck,
-  Camera,
   ImageUp,
   Loader2,
   Lock,
@@ -27,7 +26,16 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+import { toast } from "sonner";
+
+const MAX_IMAGES = 3;
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
 const AMENITY_OPTIONS = [
   "Cyc Wall",
@@ -55,12 +63,18 @@ type FormState = {
   maxCapacity: string;
   location: string;
   address: string;
-  imageUrl: string;
+  gallery: string[];
   amenities: string[];
   overview: string;
 };
 
 function toFormState(studio?: Studio): FormState {
+  const images = studio?.gallery?.length
+    ? studio.gallery
+    : studio?.image
+      ? [studio.image]
+      : [];
+
   return {
     title: studio?.title ?? "",
     category: studio?.category ?? "",
@@ -69,7 +83,7 @@ function toFormState(studio?: Studio): FormState {
     maxCapacity: studio ? String(studio.maxCapacity) : "",
     location: studio?.location ?? "",
     address: studio?.address ?? "",
-    imageUrl: studio?.image ?? "",
+    gallery: images.slice(0, MAX_IMAGES),
     amenities: studio?.amenities ?? [],
     overview: studio?.overview ?? "",
   };
@@ -90,11 +104,11 @@ export function StudioForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<FormState>(() => toFormState(studio));
+  const [imageUrlDraft, setImageUrlDraft] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Host information fallback
   const displayedHostName =
     hostName || studio?.ownerName || studio?.host?.name || "";
 
@@ -114,34 +128,142 @@ export function StudioForm({
     }));
   }
 
-  // Upload a file from the user's computer.
-  async function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+  function addImageUrl() {
+    const url = imageUrlDraft.trim();
 
-    if (!file) return;
+    if (!url) {
+      toast.error("Please enter an image URL.");
+      return;
+    }
+
+    if (form.gallery.length >= MAX_IMAGES) {
+      toast.error("You can add a maximum of 3 images.");
+      return;
+    }
+
+    try {
+      const parsedUrl = new URL(url);
+
+      if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+        throw new Error("Invalid URL");
+      }
+    } catch {
+      toast.error("Please enter a valid image URL.");
+      return;
+    }
+
+    if (form.gallery.includes(url)) {
+      toast.error("This image has already been added.");
+      return;
+    }
+
+    set("gallery", [...form.gallery, url]);
+    setImageUrlDraft("");
+    toast.success("Image URL added.");
+  }
+
+  function removeImage(index: number) {
+    setForm((f) => ({
+      ...f,
+      gallery: f.gallery.filter((_, i) => i !== index),
+    }));
+  }
+
+  async function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+
+    if (!files.length) return;
+
+    const remainingSlots = MAX_IMAGES - form.gallery.length;
+
+    if (files.length > remainingSlots) {
+      toast.error(
+        `You can add only ${remainingSlots} more image(s). Maximum is 3.`,
+      );
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      return;
+    }
+
+    const invalidFile = files.find(
+      (file) => !file.type.startsWith("image/"),
+    );
+
+    if (invalidFile) {
+      toast.error("Please select image files only.");
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      return;
+    }
+
+    const oversizedFile = files.find(
+      (file) => file.size > MAX_FILE_SIZE,
+    );
+
+    if (oversizedFile) {
+      toast.error("Each image must be smaller than 20 MB.");
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      return;
+    }
 
     setUploading(true);
 
     try {
       const formData = new FormData();
-      formData.append("image", file);
+
+      files.forEach((file) => {
+        formData.append("images", file);
+      });
 
       const res = await fetch(`${API_BASE}/upload`, {
         method: "POST",
-        body: formData,
         credentials: "include",
+        body: formData,
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
-      if (!res.ok || !data.imageUrl) {
-        alert(data.error || "Image upload failed.");
-      } else {
-        set("imageUrl", data.imageUrl);
+      if (!res.ok) {
+        throw new Error(
+          data.message || data.error || "Image upload failed.",
+        );
       }
+
+      if (!Array.isArray(data.gallery) || data.gallery.length !== files.length) {
+        throw new Error("Image upload response was incomplete.");
+      }
+
+      setForm((f) => ({
+        ...f,
+        gallery: [
+          ...f.gallery,
+          ...data.gallery.filter(
+            (url: string) => !f.gallery.includes(url),
+          ),
+        ].slice(0, MAX_IMAGES),
+      }));
+
+      toast.success(
+        `${data.gallery.length} image(s) uploaded successfully.`,
+      );
     } catch (error) {
       console.error("Image upload error:", error);
-      alert("Image upload failed. Is the server (port 5000) running?");
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Image upload failed. Please try again.",
+      );
     } finally {
       setUploading(false);
 
@@ -154,12 +276,22 @@ export function StudioForm({
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!form.imageUrl.trim()) {
-      alert("Please upload a cover image from your computer.");
+    if (form.gallery.length === 0) {
+      toast.error("Please add at least one studio image.");
       return;
     }
 
-    if (saving) return;
+    if (form.gallery.length > MAX_IMAGES) {
+      toast.error("You can add a maximum of 3 images.");
+      return;
+    }
+
+    if (!form.category) {
+      toast.error("Please select a category.");
+      return;
+    }
+
+    if (uploading || saving) return;
 
     const studioData = {
       title: form.title,
@@ -169,7 +301,8 @@ export function StudioForm({
       maxCapacity: Number(form.maxCapacity),
       location: form.location,
       address: form.address,
-      image: form.imageUrl,
+      image: form.gallery[0],
+      gallery: form.gallery,
       amenities: form.amenities,
       overview: form.overview,
     };
@@ -192,12 +325,12 @@ export function StudioForm({
         body: JSON.stringify(studioData),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (res.ok) {
         setSubmitted(true);
 
-        alert(
+        toast.success(
           isEdit
             ? "Changes saved successfully!"
             : "Studio published successfully!",
@@ -208,7 +341,7 @@ export function StudioForm({
       } else {
         console.error("Studio save failed:", data);
 
-        alert(
+        toast.error(
           data.error ||
             data.message ||
             (isEdit
@@ -219,7 +352,7 @@ export function StudioForm({
     } catch (error) {
       console.error("Error saving studio:", error);
 
-      alert(
+      toast.error(
         isEdit
           ? "Failed to save changes. Please try again."
           : "Failed to publish studio. Please try again.",
@@ -341,28 +474,63 @@ export function StudioForm({
         </div>
       </fieldset>
 
-      {/* Imagery */}
+      {/* Gallery */}
       <fieldset className="flex flex-col gap-5">
         <legend className="font-heading text-lg font-semibold">
-          Cover image
+          Studio gallery
         </legend>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="studio-image">Cover image</Label>
+        <p className="text-sm text-muted-foreground">
+          Upload up to 3 images of your studio. The first image will be used
+          as the cover image.
+        </p>
 
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="studio-image-url">Add image using URL</Label>
+
+          <div className="flex gap-2">
+            <Input
+              id="studio-image-url"
+              type="url"
+              placeholder="https://example.com/studio.jpg"
+              value={imageUrlDraft}
+              onChange={(e) => setImageUrlDraft(e.target.value)}
+              disabled={uploading || form.gallery.length >= MAX_IMAGES}
+            />
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addImageUrl}
+              disabled={
+                uploading ||
+                form.gallery.length >= MAX_IMAGES ||
+                !imageUrlDraft.trim()
+              }
+            >
+              <Plus className="size-4" />
+              Add
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
           <input
             ref={fileInputRef}
-            id="studio-image"
+            id="studio-images"
             type="file"
             accept="image/*"
+            multiple
             onChange={handleImageChange}
-            className="sr-only w-full"
+            className="sr-only"
+            aria-label="Upload studio images"
+            disabled={uploading || form.gallery.length >= MAX_IMAGES}
           />
 
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
+            disabled={uploading || form.gallery.length >= MAX_IMAGES}
             className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 px-6 py-8 text-center transition-colors hover:border-primary/50 hover:bg-muted/70 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-60"
           >
             {uploading ? (
@@ -373,44 +541,53 @@ export function StudioForm({
 
             <span className="text-sm font-medium">
               {uploading
-                ? "Uploading image…"
-                : "Click to upload from your computer"}
+                ? "Uploading images..."
+                : form.gallery.length >= MAX_IMAGES
+                  ? "Maximum 3 images added"
+                  : "Click to upload from your computer"}
             </span>
 
             <span className="text-xs text-muted-foreground">
-              JPG, PNG, or WebP · up to 20 MB · wide 16:10 images look best on
-              cards
+              JPG, PNG, or WebP · Maximum 20 MB per image
             </span>
           </button>
-
-          {form.imageUrl ? (
-            <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Camera className="size-3.5 text-primary" />
-              <span className="truncate">
-                Uploaded: {form.imageUrl.split("/uploads/").pop()}
-              </span>
-            </p>
-          ) : null}
         </div>
 
-        {form.imageUrl ? (
-          <div className="relative aspect-video w-full max-w-md overflow-hidden rounded-xl ring-1 ring-foreground/10">
-            <img
-              src={form.imageUrl}
-              alt="Cover preview"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+        {form.gallery.length > 0 && (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {form.gallery.map((url, index) => (
+              <div
+                key={`${url}-${index}`}
+                className="relative aspect-video overflow-hidden rounded-xl ring-1 ring-foreground/10"
+              >
+                <img
+                  src={url}
+                  alt={`Studio image ${index + 1}`}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
 
-            <button
-              type="button"
-              onClick={() => set("imageUrl", "")}
-              aria-label="Remove cover image"
-              className="absolute top-2 right-2 grid size-7 place-items-center rounded-full bg-foreground/60 text-background transition-colors hover:bg-destructive"
-            >
-              <X className="size-3.5" />
-            </button>
+                {index === 0 && (
+                  <span className="absolute bottom-2 left-2 rounded-md bg-background/90 px-2 py-1 text-xs font-medium text-foreground">
+                    Cover image
+                  </span>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  aria-label={`Remove image ${index + 1}`}
+                  className="absolute top-2 right-2 grid size-7 place-items-center rounded-full bg-foreground/60 text-background transition-colors hover:bg-destructive"
+                >
+                  <X className="size-3.5" />
+                </button>
+              </div>
+            ))}
           </div>
-        ) : null}
+        )}
+
+        <p className="text-xs text-muted-foreground">
+          {form.gallery.length} / {MAX_IMAGES} images added.
+        </p>
       </fieldset>
 
       {/* Amenities */}
@@ -440,7 +617,7 @@ export function StudioForm({
           ))}
         </div>
 
-        {form.amenities.length > 0 ? (
+        {form.amenities.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {form.amenities.map((a) => (
               <span
@@ -460,7 +637,7 @@ export function StudioForm({
               </span>
             ))}
           </div>
-        ) : null}
+        )}
       </fieldset>
 
       {/* Overview */}
@@ -527,8 +704,7 @@ export function StudioForm({
       {/* Actions */}
       <div className="flex flex-col items-start gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          Fields marked <span className="text-destructive">*</span> are
-          required. Your listing is saved to the SceneSlot database.
+          Your listing is saved to the SceneSlot database.
         </p>
 
         <Button
@@ -546,7 +722,9 @@ export function StudioForm({
           )}
 
           {saving
-            ? "Publishing..."
+            ? mode === "edit"
+              ? "Saving..."
+              : "Publishing..."
             : mode === "edit"
               ? "Save Changes"
               : "Publish Studio"}

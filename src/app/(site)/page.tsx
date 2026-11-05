@@ -14,17 +14,20 @@ import { cn } from "cn";
 import Link from "next/link";
 
 export default async function HomePage() {
- const res = await fetch(`${process.env.API_BASE_URL}/featured-studios`, {
-  cache: "no-store",
-});
+  let featured: Studio[] = [];
 
-if (!res.ok) {
-  throw new Error("Failed to fetch featured studios");
-}
+  try {
+    const res = await fetch(`${process.env.API_BASE_URL}/featured-studios`, {
+      cache: "no-store",
+    });
 
-const docs: StudioDoc[] = await res.json();
-const studios = docs.map((doc) => mapStudioDoc(doc));
-const featured = studios.slice(0, 6);
+    if (res.ok) {
+      const docs: StudioDoc[] = await res.json();
+      featured = docs.map((doc) => mapStudioDoc(doc)).slice(0, 6);
+    }
+  } catch (error) {
+    console.error("Featured studios fetch failed:", error);
+  }
 
   return (
     <>
@@ -55,13 +58,19 @@ const featured = studios.slice(0, 6);
             </Link>
           </Reveal>
 
-          <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((studio: Studio) => (
-              <RevealItem key={studio.id}>
-                <StudioCard studio={studio} className="h-full" />
-              </RevealItem>
-            ))}
-          </RevealGroup>
+          {featured.length > 0 ? (
+            <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((studio: Studio) => (
+                <RevealItem key={studio.id}>
+                  <StudioCard studio={studio} className="h-full" />
+                </RevealItem>
+              ))}
+            </RevealGroup>
+          ) : (
+            <p className="mt-12 text-center text-sm text-muted-foreground">
+              No studios available right now. Please check back soon.
+            </p>
+          )}
         </div>
       </section>
 

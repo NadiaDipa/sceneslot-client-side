@@ -2,47 +2,89 @@
 
 import type { Studio } from "@/lib/types";
 import { cn } from "cn";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
 export function StudioGallery({ studio }: { studio: Studio }) {
   const [active, setActive] = useState(0);
-  const images = studio.gallery.length ? studio.gallery : [studio.image];
+
+  const images = (
+    studio.gallery.length ? studio.gallery : [studio.image]
+  ).filter(Boolean);
+
+  if (images.length === 0) {
+    return (
+      <div className="grid aspect-[16/9] place-items-center rounded-2xl bg-muted text-sm text-muted-foreground">
+        No photos available
+      </div>
+    );
+  }
+
+  const total = images.length;
+  const prev = () => setActive((i) => (i - 1 + total) % total);
+  const next = () => setActive((i) => (i + 1) % total);
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="group/main relative aspect-[16/9] overflow-hidden rounded-2xl">
-        <Image
-          key={images[active]}
-          src={images[active]}
-          alt={`${studio.title} — photo ${active + 1}`}
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 66vw"
-          className="object-cover"
-        />
-        <span
-          aria-hidden
-          className="absolute right-4 bottom-4 rounded-full bg-foreground/60 px-3 py-1 text-xs font-medium text-background backdrop-blur-sm"
-        >
-          {active + 1} / {images.length}
+      {/* Main carousel image */}
+      <div className="relative aspect-[16/9] overflow-hidden rounded-2xl bg-muted">
+        {images.map((src, i) => (
+          <Image
+            key={`${src}-${i}`}
+            src={src}
+            alt={`${studio.title} — photo ${i + 1}`}
+            fill
+            priority={i === 0}
+            sizes="(max-width: 1024px) 100vw, 70vw"
+            className={cn(
+              "object-cover transition-opacity duration-500",
+              i === active ? "opacity-100" : "opacity-0"
+            )}
+          />
+        ))}
+
+        {total > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={prev}
+              aria-label="Previous photo"
+              className="absolute top-1/2 left-3 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white outline-none backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={next}
+              aria-label="Next photo"
+              className="absolute top-1/2 right-3 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white outline-none backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <ChevronRight className="size-5" />
+            </button>
+          </>
+        )}
+
+        <span className="absolute right-3 bottom-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+          {active + 1} / {total}
         </span>
       </div>
 
-      {images.length > 1 ? (
-        <div className="grid grid-cols-4 gap-3" role="tablist" aria-label="Studio gallery">
+      {/* Thumbnails */}
+      {total > 1 && (
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {images.map((src, i) => (
             <button
-              key={src}
+              key={`thumb-${src}-${i}`}
               type="button"
-              role="tab"
-              aria-selected={i === active}
-              aria-label={`Show photo ${i + 1}`}
               onClick={() => setActive(i)}
+              aria-label={`Show photo ${i + 1}`}
+              aria-pressed={active === i}
               className={cn(
-                "relative aspect-[4/3] overflow-hidden rounded-xl outline-none transition-all focus-visible:ring-3 focus-visible:ring-ring/50",
-                i === active
-                  ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                "relative aspect-[4/3] overflow-hidden rounded-xl bg-muted outline-none transition-all focus-visible:ring-2 focus-visible:ring-primary",
+                active === i
+                  ? "ring-2 ring-primary"
                   : "opacity-70 hover:opacity-100"
               )}
             >
@@ -56,7 +98,7 @@ export function StudioGallery({ studio }: { studio: Studio }) {
             </button>
           ))}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

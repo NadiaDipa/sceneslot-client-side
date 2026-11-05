@@ -50,8 +50,11 @@ export function RegisterForm() {
     setPasswordError("");
     setErrorMessage("");
 
+    // Password validation: uppercase, lowercase, min 6 characters
     if (!rules.every((rule) => rule.test(password))) {
-      setPasswordError("Please meet all password requirements.");
+      const message = "Please meet all password requirements.";
+      setPasswordError(message);
+      toast.error(message); // <-- TOAST: invalid password
       return;
     }
 
@@ -66,9 +69,10 @@ export function RegisterForm() {
       });
 
       if (error) {
-        setErrorMessage(
-          error.message || "Registration failed. Please try again."
-        );
+        const message =
+          error.message || "Registration failed. Please try again.";
+        setErrorMessage(message);
+        toast.error(message); // <-- TOAST: registration failed
         return;
       }
 
@@ -78,7 +82,9 @@ export function RegisterForm() {
       }
     } catch (err) {
       console.error("Signup failed:", err);
-      setErrorMessage("Something went wrong. Please try again.");
+      const message = "Something went wrong. Please try again.";
+      setErrorMessage(message);
+      toast.error(message); // <-- TOAST: unexpected error
     } finally {
       setIsLoading(false);
     }

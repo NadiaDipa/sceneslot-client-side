@@ -13,8 +13,9 @@ export default async function AddStudioPage() {
   });
 
   if (!session) {
-    redirect("/login");
+    redirect("/login?redirect=/add-studio");
   }
+
   return (
     <section aria-busy="false" className="py-10 sm:py-14">
       <div className="container-page max-w-4xl">
