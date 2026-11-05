@@ -1,4 +1,3 @@
-
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
@@ -21,4 +20,13 @@ export const auth = betterAuth({
   database: mongodbAdapter(db, {
     client,
   }),
+  // Session data is signed as a JWT and kept in an HTTPOnly cookie
+  // (same settings as the Express server's auth.js)
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+      strategy: "jwt",
+    },
+  },
 });

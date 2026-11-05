@@ -12,8 +12,10 @@ import type { Booking } from "@/lib/types";
 export const metadata: Metadata = { title: "My Bookings" };
 
 export default async function MyBookingsPage() {
+  const requestHeaders = await headers();
+
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: requestHeaders,
   });
 
   if (!session) {
@@ -23,10 +25,11 @@ export default async function MyBookingsPage() {
   let bookings: Booking[] = [];
 
   try {
+    // Forward only the cookie (not the Host header) to the Express server
     const response = await fetch(
       `${process.env.API_BASE_URL}/my-bookings`,
       {
-        headers: await headers(),
+        headers: { cookie: requestHeaders.get("cookie") ?? "" },
         cache: "no-store",
       }
     );

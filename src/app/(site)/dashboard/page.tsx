@@ -49,10 +49,11 @@ export default async function DashboardPage() {
   let dashboardData: DashboardData | null = null;
 
   try {
+    // Forward only the cookie (not the Host header) to the Express server
     const response = await fetch(
       `${process.env.API_BASE_URL}/dashboard`,
       {
-        headers: requestHeaders,
+        headers: { cookie: requestHeaders.get("cookie") ?? "" },
         cache: "no-store",
       }
     );
@@ -118,7 +119,7 @@ export default async function DashboardPage() {
                 Welcome back, {userName.split(" ")[0]}
               </h1>
               <p className="text-sm text-muted-foreground">
-                Here's an overview of your studio activity.
+                Here&apos;s an overview of your studio activity.
               </p>
             </div>
           </div>
@@ -207,6 +208,7 @@ export default async function DashboardPage() {
                       {new Date(item.createdAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
+                        timeZone: "UTC",
                       })}
                     </span>
                   </li>
