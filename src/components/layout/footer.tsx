@@ -104,7 +104,7 @@ export function Footer() {
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* CTA band with gradient border, inside the footer */}
         <Reveal className="pt-14 sm:pt-16">
-          <div className="rounded-3xl bg-gradient-to-r from-primary via-amber-300 to-primary p-px">
+          <div className="rounded-3xl bg-gradient-to-r from-primary via-[#E4D6A9] to-primary p-px">
             <div className="flex flex-col items-center justify-between gap-6 rounded-[calc(1.5rem-1.5px)] bg-foreground px-6 py-10 text-center sm:flex-row sm:px-10 sm:text-left dark:bg-secondary">
               <h2 className="max-w-xl font-heading text-2xl font-bold tracking-tight text-white sm:text-3xl">
                 Own a creative space? Let it shoot for you.

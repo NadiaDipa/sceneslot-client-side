@@ -10,6 +10,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sora);
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -18,11 +19,13 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -39,6 +42,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -46,103 +50,228 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-brand: var(--font-space-grotesk);
 }
+
+/* ----------------------------------
+   LIGHT THEME
+---------------------------------- */
 
 :root {
-  /* SceneSlot — warm paper + charcoal ink + spotlight amber */
-  --background: oklch(0.985 0.005 85);
-  --foreground: oklch(0.225 0.02 60);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.225 0.02 60);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.225 0.02 60);
-  --primary: oklch(0.775 0.155 70);
-  --primary-foreground: oklch(0.24 0.05 55);
-  --secondary: oklch(0.932 0.014 82);
-  --secondary-foreground: oklch(0.28 0.03 58);
-  --muted: oklch(0.955 0.008 82);
-  --muted-foreground: oklch(0.505 0.02 60);
-  --accent: oklch(0.945 0.042 85);
-  --accent-foreground: oklch(0.3 0.06 60);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.905 0.012 78);
-  --input: oklch(0.895 0.012 78);
-  --ring: oklch(0.72 0.14 70);
-  --chart-1: oklch(0.775 0.155 70);
-  --chart-2: oklch(0.55 0.12 40);
-  --chart-3: oklch(0.65 0.1 90);
-  --chart-4: oklch(0.45 0.08 55);
-  --chart-5: oklch(0.32 0.04 50);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.972 0.008 82);
-  --sidebar-foreground: oklch(0.225 0.02 60);
-  --sidebar-primary: oklch(0.775 0.155 70);
-  --sidebar-primary-foreground: oklch(0.24 0.05 55);
-  --sidebar-accent: oklch(0.945 0.042 85);
-  --sidebar-accent-foreground: oklch(0.3 0.06 60);
-  --sidebar-border: oklch(0.905 0.012 78);
-  --sidebar-ring: oklch(0.72 0.14 70);
+  /* Warm ivory ground (derived from Champagne #E4D6A9 — not plain white) */
+  --background: #F2ECE2;
+  /* Very deep espresso, darker shade of Deep Brown #622B14, for text */
+  --foreground: #331B0C;
+
+  /* Slightly raised warm paper, distinct from the ground */
+  --card: #FAF5EB;
+  --card-foreground: #331B0C;
+
+  --popover: #FBF7EF;
+  --popover-foreground: #331B0C;
+
+  /* Warm Brown as the interactive brand color */
+  --primary: #995F2F;
+  --primary-foreground: #FBF7EF;
+
+  /* Champagne-tinted surface */
+  --secondary: #E9DCC4;
+  --secondary-foreground: #5C2D13;
+
+  --muted: #EBE3D4;
+  --muted-foreground: #6F5A45;
+
+  /* Soft Champagne itself as the highlight surface */
+  --accent: #E4D6A9;
+  --accent-foreground: #4E2410;
+
+  --destructive: #B33A26;
+
+  --border: #E1D5C2;
+  --input: #D6C6AE;
+  --ring: #B7814B;
+
+  --chart-1: #995F2F;
+  --chart-2: #978F66;
+  --chart-3: #622B14;
+  --chart-4: #E4D6A9;
+  --chart-5: #8A6A4A;
+
+  --radius: 1rem;
+
+  --sidebar: #F2ECE2;
+  --sidebar-foreground: #331B0C;
+  --sidebar-primary: #995F2F;
+  --sidebar-primary-foreground: #FBF7EF;
+  --sidebar-accent: #E4D6A9;
+  --sidebar-accent-foreground: #4E2410;
+  --sidebar-border: #E1D5C2;
+  --sidebar-ring: #B7814B;
 }
 
+/* ----------------------------------
+   DARK THEME
+---------------------------------- */
+
 .dark {
-  /* Studio dark room */
-  --background: oklch(0.185 0.015 60);
-  --foreground: oklch(0.965 0.006 85);
-  --card: oklch(0.225 0.018 60);
-  --card-foreground: oklch(0.965 0.006 85);
-  --popover: oklch(0.225 0.018 60);
-  --popover-foreground: oklch(0.965 0.006 85);
-  --primary: oklch(0.8 0.15 75);
-  --primary-foreground: oklch(0.24 0.05 55);
-  --secondary: oklch(0.28 0.02 60);
-  --secondary-foreground: oklch(0.965 0.006 85);
-  --muted: oklch(0.28 0.02 60);
-  --muted-foreground: oklch(0.72 0.014 78);
-  --accent: oklch(0.3 0.04 65);
-  --accent-foreground: oklch(0.965 0.006 85);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.62 0.12 70);
-  --chart-1: oklch(0.8 0.15 75);
-  --chart-2: oklch(0.62 0.14 45);
-  --chart-3: oklch(0.66 0.1 90);
-  --chart-4: oklch(0.52 0.1 55);
-  --chart-5: oklch(0.35 0.05 50);
-  --sidebar: oklch(0.225 0.018 60);
-  --sidebar-foreground: oklch(0.965 0.006 85);
-  --sidebar-primary: oklch(0.8 0.15 75);
-  --sidebar-primary-foreground: oklch(0.24 0.05 55);
-  --sidebar-accent: oklch(0.3 0.04 65);
-  --sidebar-accent-foreground: oklch(0.965 0.006 85);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.62 0.12 70);
+  /* Deep espresso — a warm, brown-based dark, not an inverted light */
+  --background: #170E07;
+  /* Warm champagne-cream text */
+  --foreground: #F2E7D3;
+
+  /* Rich brown panels, clearly lifted off the ground */
+  --card: #221510;
+  --card-foreground: #F2E7D3;
+
+  --popover: #291A10;
+  --popover-foreground: #F2E7D3;
+
+  /* Champagne as the interactive brand color in dark mode */
+  --primary: #E4D6A9;
+  --primary-foreground: #2A1709;
+
+  --secondary: #2E1D12;
+  --secondary-foreground: #EFDCC0;
+
+  --muted: #2A1B10;
+  --muted-foreground: #B49F85;
+
+  /* Gold-brown surface highlight */
+  --accent: #3A2816;
+  --accent-foreground: #E4D6A9;
+
+  --destructive: #E0705C;
+
+  /* Champagne-tinted borders so surfaces separate without grey-blue lines */
+  --border: rgb(228 214 169 / 13%);
+  --input: rgb(228 214 169 / 20%);
+  --ring: #C9AC72;
+
+  --chart-1: #C9AC72;
+  --chart-2: #978F66;
+  --chart-3: #E4D6A9;
+  --chart-4: #995F2F;
+  --chart-5: #8A6A4A;
+
+  --sidebar: #1E1209;
+  --sidebar-foreground: #F2E7D3;
+  --sidebar-primary: #E4D6A9;
+  --sidebar-primary-foreground: #2A1709;
+  --sidebar-accent: #3A2816;
+  --sidebar-accent-foreground: #E4D6A9;
+  --sidebar-border: rgb(228 214 169 / 13%);
+  --sidebar-ring: #C9AC72;
 }
+
+/* ----------------------------------
+   BASE
+---------------------------------- */
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    @apply scroll-smooth font-sans;
+  }
+
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(
+        ellipse at 8% 0%,
+        color-mix(in oklch, var(--accent) 22%, transparent),
+        transparent 38%
+      ),
+      radial-gradient(
+        ellipse at 92% 20%,
+        color-mix(in oklch, var(--primary) 8%, transparent),
+        transparent 32%
+      );
+    background-attachment: fixed;
   }
-  /* Subtle amber selection that matches the spotlight palette */
-  ::selection {
-    background: color-mix(in oklch, var(--primary) 25%, transparent);
-  }
-  html {
-    @apply font-sans scroll-smooth;
-  }
+
   h1,
   h2,
   h3,
   h4 {
     @apply font-heading tracking-tight text-balance;
   }
+
+  ::selection {
+    color: var(--primary-foreground);
+    background: var(--primary);
+  }
 }
 
+/* ----------------------------------
+   COMPONENTS
+---------------------------------- */
+
 @layer components {
-  /* Ken Burns — very slow zoom so the hero feels alive without distracting */
+  /* Navbar glass — separate tuned surfaces per theme */
+  .site-header {
+    background: rgb(242 236 226 / 88%);
+    backdrop-filter: blur(18px) saturate(1.1);
+    -webkit-backdrop-filter: blur(18px) saturate(1.1);
+    box-shadow: 0 6px 24px -20px rgb(98 43 20 / 30%);
+  }
+
+  .dark .site-header {
+    background: rgb(23 14 7 / 82%);
+    backdrop-filter: blur(18px) saturate(1.05);
+    -webkit-backdrop-filter: blur(18px) saturate(1.05);
+    box-shadow: 0 6px 24px -20px rgb(0 0 0 / 45%);
+  }
+
+  /* Serif-italic gradient accent word used inside section titles (reference style) */
+  .accent-serif {
+    @apply font-serif italic;
+    background-image: linear-gradient(
+      100deg,
+      #B98A56 0%,
+      #978F66 55%,
+      #C9AC72 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .site-header-scrolled {
+    box-shadow: 0 14px 38px -22px rgb(98 43 20 / 38%);
+    border-bottom-color: rgb(228 214 169 / 45%);
+  }
+
+  .dark .site-header-scrolled {
+    box-shadow: 0 14px 38px -22px rgb(0 0 0 / 60%);
+    border-bottom-color: rgb(228 214 169 / 18%);
+  }
+
+  /* Consistent page container */
+
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Dot backgrounds */
+
+  .bg-dotted {
+    background-image: radial-gradient(oklch(1 0 0 / 12%) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  .bg-dotted-ink {
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  /* Hero animation */
+
   @keyframes ken-burns {
     from {
       transform: scale(1.02);
@@ -152,32 +281,12 @@
     }
   }
 
-  /* Consistent page container used across every section */
-  .container-page {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
-  }
-  /* Subtle spotlight dot grid for dark hero / empty states */
-  .bg-dotted {
-    background-image: radial-gradient(oklch(1 0 0 / 12%) 1px, transparent 1px);
-    background-size: 22px 22px;
-  }
-  .bg-dotted-ink {
-    background-image: radial-gradient(var(--border) 1px, transparent 1px);
-    background-size: 22px 22px;
-  }
-
-  /* Cinematic slow zoom on the hero slide images */
   .hero-slide-img {
     animation: ken-burns 9s ease-out both;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .hero-slide-img {
-      animation: none;
-    }
-  }
-
   /* Hero slider pagination */
+
   .hero-pagination .swiper-pagination-bullet {
     background: rgb(255 255 255 / 0.4);
     border: 1px solid rgb(255 255 255 / 0.35);
@@ -190,7 +299,39 @@
   }
 
   .hero-pagination .swiper-pagination-bullet-active {
-    background: var(--primary);
+    background: #E4D6A9;
     border-color: transparent;
+    width: 32px;
+  }
+
+  /* Custom vertical scrollbar */
+
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--background);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--primary) 75%, var(--background));
+    border: 2px solid var(--background);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-slide-img {
+      animation: none;
+    }
   }
 }

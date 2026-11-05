@@ -44,7 +44,7 @@ export default function AuthLayout({
               Your next great shoot
               <br />
               starts with{" "}
-              <span className="bg-gradient-to-r from-primary to-amber-300 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#C9AC72] to-[#E4D6A9] bg-clip-text font-serif italic text-transparent">
                 the right room.
               </span>
             </h2>

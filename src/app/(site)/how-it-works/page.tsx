@@ -127,7 +127,12 @@ export default function HowItWorksPage() {
       <section className="container-page py-16 sm:py-24" aria-label="For creators">
         <SectionHeading
           eyebrow="For creators"
-          title="Book a studio without the phone calls"
+          title={
+            <>
+              Book a studio{" "}
+              <span className="accent-serif">without the phone calls</span>
+            </>
+          }
           description="Photographers, filmmakers, podcasters and musicians — here's how a SceneSlot booking works from first browse to final take."
         />
         <ol className="grid gap-6 md:grid-cols-2">
@@ -205,7 +210,12 @@ export default function HowItWorksPage() {
         <div className="mx-auto max-w-3xl">
           <SectionHeading
             eyebrow="FAQ"
-            title="Questions, answered"
+            title={
+              <>
+                Questions,{" "}
+                <span className="accent-serif">answered</span>
+              </>
+            }
             description="The details creators and hosts ask about most."
           />
           <Accordion>

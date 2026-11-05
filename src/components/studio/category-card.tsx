@@ -8,14 +8,17 @@ import Link from "next/link";
 export function CategoryCard({
   category,
   className,
+  aspectClassName = "aspect-[4/5]",
 }: {
   category: Category;
   className?: string;
+  /** Aspect ratio of the image area, controllable per grid position (e.g. bento layouts). */
+  aspectClassName?: string;
 }) {
   return (
     <Card
       className={cn(
-        "group relative gap-0 overflow-hidden p-0 ring-0 transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl hover:shadow-foreground/10 motion-reduce:transition-none motion-reduce:hover:scale-100!",
+        "group relative gap-0 overflow-hidden p-0 ring-0 transition-all duration-300 ease-out hover:-translate-y-1 motion-reduce:transition-none hover:shadow-lg hover:shadow-foreground/10",
         className
       )}
     >
@@ -23,29 +26,34 @@ export function CategoryCard({
       <Link
         href={`/studios?category=${encodeURIComponent(category.name)}`}
         aria-label={`Browse ${category.name}`}
-        className="outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="block h-full outline-none focus-visible:ring-3 focus-visible:ring-primary/40 focus-visible:ring-inset"
       >
-        <div className="relative aspect-[4/5] sm:aspect-[3/3.6]">
+        <div className={cn("relative", aspectClassName)}>
           <Image
             src={category.image}
             alt={category.name}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-110 motion-reduce:transition-none"
+            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] motion-reduce:transition-none"
+          />
+          {/* Fixed dark gradient + white text stays readable over any photo in both themes */}
+          <span
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/0"
           />
           <span
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/25 to-transparent"
+            className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"
           />
-          {/* Arrow slides in from the right on hover / keyboard focus */}
-          <span className="absolute top-3 right-3 grid size-8 translate-x-1.5 place-items-center rounded-full bg-background/15 text-background opacity-0 backdrop-blur-sm transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-within:translate-x-0 group-focus-within:opacity-100">
-            <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:scale-110" />
+          {/* Expand affordance slides up into place on hover / keyboard focus */}
+          <span className="absolute top-3 right-3 grid size-9 translate-y-1.5 place-items-center rounded-full border border-white/25 bg-white/15 text-white opacity-0 backdrop-blur-sm transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 motion-reduce:transition-none">
+            <ArrowUpRight className="size-4" />
           </span>
-          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-5">
-            <p className="font-heading text-xl font-semibold text-background">
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 p-4 sm:p-5">
+            <p className="font-heading text-lg font-semibold text-white sm:text-xl">
               {category.name}
             </p>
-            <p className="text-xs leading-relaxed text-background/75">
+            <p className="text-xs leading-relaxed text-white/75">
               {category.tagline}
             </p>
           </div>

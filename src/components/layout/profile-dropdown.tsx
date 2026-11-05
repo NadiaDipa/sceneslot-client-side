@@ -59,107 +59,138 @@ export function ProfileDropdown({
     }
   };
 
+  const menuItemClass =
+    "group flex gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-colors duration-200 data-[highlighted]:bg-primary/15 data-[highlighted]:text-primary";
+
+  const iconBoxClass =
+    "grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-200 group-data-[highlighted]:bg-primary group-data-[highlighted]:text-primary-foreground";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
           <Button
-            variant="outline"
+            variant="ghost"
             className={cn(
-              "h-10 gap-2 rounded-full pl-1 pr-2.5 hover:bg-muted/60",
-              className
+              "h-11 gap-2 rounded-full border border-border/80 bg-card/70 pl-1.5 pr-3 text-foreground",
+              "shadow-sm transition-all duration-300",
+              "hover:border-primary/50 hover:bg-accent/60 hover:text-foreground hover:shadow-[0_4px_18px_-6px_rgb(153_95_47_/_45%)]",
+              "data-[popup-open]:border-primary/60 data-[popup-open]:bg-accent/70",
+              className,
             )}
           />
         }
       >
-        <Avatar size="sm" className="size-8 ring-2 ring-primary ring-offset-2 ring-offset-background">
-          <AvatarImage
-            src={user.image || undefined}
-            alt={user.name}
-          />
-          <AvatarFallback>{initials(user.name)}</AvatarFallback>
+        <Avatar className="size-8 border border-primary/30">
+          <AvatarImage src={user.image || undefined} alt={user.name} />
+          <AvatarFallback className="bg-primary text-xs font-bold text-primary-foreground">
+            {initials(user.name)}
+          </AvatarFallback>
         </Avatar>
 
-        <span className="hidden max-w-28 truncate font-medium sm:block">
+        <span className="hidden max-w-28 truncate text-[13px] font-semibold sm:block">
           {user.name.split(" ")[0]}
         </span>
 
-        <ChevronDown className="size-4 text-muted-foreground" />
+        <ChevronDown className="size-3.5 text-foreground/60 transition-transform duration-200" />
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" sideOffset={8} className="w-64 p-0">
-        {/* User identity header */}
-        <div className="flex items-center gap-3 p-3">
-          <Avatar className="size-11">
-            <AvatarImage
-              src={user.image || undefined}
-              alt={user.name}
-            />
-            <AvatarFallback>{initials(user.name)}</AvatarFallback>
-          </Avatar>
+      <DropdownMenuContent
+        align="end"
+        sideOffset={12}
+        className={cn(
+          "w-[290px] overflow-hidden rounded-2xl border border-primary/20 p-0",
+          "bg-popover shadow-[0_22px_65px_-20px_rgb(51_27_12_/_45%)]",
+        )}
+      >
+        {/* Profile identity */}
+        <div className="relative overflow-hidden border-b border-border/70 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent px-4 py-5">
+          <div className="pointer-events-none absolute -right-8 -top-10 size-32 rounded-full bg-primary/20 blur-3xl" />
 
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">{user.name}</p>
-            <p className="truncate text-xs text-muted-foreground">
-              {user.email}
-            </p>
-            <p className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-accent-foreground">
-              <Sparkles className="size-3" />
-              Member
-            </p>
+          <div className="relative flex items-center gap-3">
+            <Avatar className="size-12 border-2 border-primary/40 shadow-md">
+              <AvatarImage src={user.image || undefined} alt={user.name} />
+              <AvatarFallback className="bg-primary text-sm font-bold text-primary-foreground">
+                {initials(user.name)}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-bold text-popover-foreground">
+                {user.name}
+              </p>
+
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                {user.email}
+              </p>
+
+              <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold tracking-wide text-primary">
+                <Sparkles className="size-3" />
+                MEMBER
+              </span>
+            </div>
           </div>
         </div>
 
-        <DropdownMenuSeparator className="mx-0" />
-
-        <DropdownMenuGroup className="p-1">
-          <DropdownMenuLabel className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wider">
-            Workspace
+        {/* Workspace menu */}
+        <DropdownMenuGroup className="p-2">
+          <DropdownMenuLabel className="px-3 pb-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+            Your workspace
           </DropdownMenuLabel>
 
           <DropdownMenuItem
             render={<Link href="/dashboard" />}
-            className="rounded-md px-2.5 py-1.5"
+            className={menuItemClass}
           >
-            <LayoutDashboard />
+            <span className={iconBoxClass}>
+              <LayoutDashboard className="size-4" />
+            </span>
             Dashboard
           </DropdownMenuItem>
 
           <DropdownMenuItem
             render={<Link href="/add-studio" />}
-            className="rounded-md px-2.5 py-1.5"
+            className={menuItemClass}
           >
-            <ListPlus />
+            <span className={iconBoxClass}>
+              <ListPlus className="size-4" />
+            </span>
             Add New Studio
           </DropdownMenuItem>
 
           <DropdownMenuItem
             render={<Link href="/my-listings" />}
-            className="rounded-md px-2.5 py-1.5"
+            className={menuItemClass}
           >
-            <FolderOpen />
+            <span className={iconBoxClass}>
+              <FolderOpen className="size-4" />
+            </span>
             My Studio Listings
           </DropdownMenuItem>
 
           <DropdownMenuItem
             render={<Link href="/my-bookings" />}
-            className="rounded-md px-2.5 py-1.5"
+            className={menuItemClass}
           >
-            <CalendarCheck />
+            <span className={iconBoxClass}>
+              <CalendarCheck className="size-4" />
+            </span>
             My Bookings
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator className="mx-0" />
 
-        <div className="p-1">
+        <div className="p-2">
           <DropdownMenuItem
             variant="destructive"
-            className="rounded-md px-2.5 py-1.5"
             onClick={handleLogout}
+            className="group flex gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-colors duration-200 data-[highlighted]:bg-destructive/10"
           >
-            <LogOut />
-            Logout
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-destructive/10 text-destructive">
+              <LogOut className="size-4" />
+            </span>
+            Log out
           </DropdownMenuItem>
         </div>
       </DropdownMenuContent>

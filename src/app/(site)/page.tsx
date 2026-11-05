@@ -13,6 +13,9 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "cn";
 import Link from "next/link";
 
+// Always render on request so the build never needs the backend running
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   let featured: Studio[] = [];
 
@@ -41,7 +44,12 @@ export default async function HomePage() {
             <SectionHeading
               align="left"
               eyebrow="Featured"
-              title="Studios creators keep rebooking"
+              title={
+                <>
+                  Studios creators keep{" "}
+                  <span className="accent-serif">rebooking</span>
+                </>
+              }
               description="Hand-picked spaces with verified hosts, published gear lists, and instant booking turned on."
               className="mb-0"
             />
@@ -50,16 +58,17 @@ export default async function HomePage() {
               className={buttonVariants({
                 variant: "outline",
                 size: "lg",
-                className: "shrink-0 gap-2 self-start sm:self-auto",
+                className:
+                  "h-11 shrink-0 gap-2 px-5 font-semibold self-start sm:self-auto",
               })}
             >
               View all studios
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover/button:translate-x-1 motion-reduce:transform-none" />
             </Link>
           </Reveal>
 
           {featured.length > 0 ? (
-            <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
               {featured.map((studio: Studio) => (
                 <RevealItem key={studio.id}>
                   <StudioCard studio={studio} className="h-full" />
@@ -83,20 +92,38 @@ export default async function HomePage() {
           <Reveal>
             <SectionHeading
               eyebrow="Browse categories"
-              title="Find the room shaped like your idea"
+              title={
+                <>
+                  Find the room shaped like{" "}
+                  <span className="accent-serif">your idea</span>
+                </>
+              }
               description="From cyc walls to condenser mics — every category is curated by working creators."
             />
           </Reveal>
-          <RevealGroup className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-5 lg:grid-rows-1">
+          {/* Bento grid: one wide hero tile, then pairs. Rendered statically (no
+              scroll-reveal gating) so all five categories are always visible. */}
+          <div className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-6 md:gap-6">
             {categories.map((category, i) => (
-              <RevealItem
+              <CategoryCard
                 key={category.name}
-                className={cn(i === 4 && "col-span-2 lg:col-span-1")}
-              >
-                <CategoryCard category={category} />
-              </RevealItem>
+                category={category}
+                className={cn(
+                  "col-span-1",
+                  i === 0 && "col-span-2 md:col-span-3",
+                  i === 1 && "md:col-span-3",
+                  (i === 2 || i === 3 || i === 4) && "md:col-span-2",
+                )}
+                aspectClassName={cn(
+                  i === 0
+                    ? "aspect-[16/10] md:aspect-[16/11]"
+                    : i === 1
+                      ? "aspect-[4/5] md:aspect-[16/11]"
+                      : "aspect-[4/5]",
+                )}
+              />
             ))}
-          </RevealGroup>
+          </div>
         </div>
       </section>
 

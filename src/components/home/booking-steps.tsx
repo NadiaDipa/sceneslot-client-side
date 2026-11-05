@@ -1,8 +1,7 @@
-import { Reveal, RevealGroup, RevealItem, DrawLine } from "@/components/ui/reveal";
+import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/shared/section-heading";
-import { cn } from "cn";
 import type { LucideIcon } from "lucide-react";
-import { CalendarClock, Clapperboard, Radar, Zap } from "lucide-react";
+import { ArrowRight, CalendarClock, Clapperboard, Radar, Zap } from "lucide-react";
 
 interface Step {
   icon: LucideIcon;
@@ -44,45 +43,47 @@ export function BookingSteps() {
         <Reveal>
           <SectionHeading
             eyebrow="How it works"
-            title="Four steps between idea and footage"
+            title={
+              <>
+                Four steps between idea{" "}
+                <span className="accent-serif">and footage</span>
+              </>
+            }
             description="SceneSlot handles the paperwork so you can focus on the work — from first browse to final take."
           />
         </Reveal>
-        {/* Steps reveal in sequence; the connector line draws itself through the gaps */}
+
+        {/* Editorial steps: hairline rules instead of cards, ghost numerals, circular icons.
+            The arrow points toward the next step so the progression reads left to right. */}
         <RevealGroup
           as="ol"
-          className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"
         >
-          <DrawLine
-            orientation="horizontal"
-            className="absolute top-[46px] right-0 left-0 z-0 hidden h-px bg-border lg:block"
-          />
-          <DrawLine
-            orientation="vertical"
-            className="absolute top-[46px] bottom-[46px] left-[46px] z-0 w-px bg-border lg:hidden"
-          />
           {steps.map((step, i) => (
             <RevealItem
               key={step.title}
               as="li"
-              className="group relative z-10 flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-foreground/5"
+              className="group relative flex flex-col border-t border-border pt-7"
             >
-              <div className="flex items-center justify-between">
-                <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  <step.icon className="size-5" strokeWidth={1.8} />
-                </span>
+              <div className="flex items-center gap-4">
                 <span
-                  className={cn(
-                    "font-heading text-4xl font-semibold text-transparent opacity-40",
-                    "[-webkit-text-stroke:1px_var(--muted-foreground)]"
-                  )}
                   aria-hidden
+                  className="font-heading text-4xl leading-none font-bold text-foreground/15 transition-colors duration-300 group-hover:text-primary motion-reduce:transition-none"
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
+                <span className="grid size-11 shrink-0 place-items-center rounded-full border border-primary/25 bg-primary/10 text-primary">
+                  <step.icon className="size-5" strokeWidth={1.6} />
+                </span>
+                {i < steps.length - 1 ? (
+                  <ArrowRight
+                    aria-hidden
+                    className="ml-auto hidden size-4 text-muted-foreground/40 lg:block"
+                  />
+                ) : null}
               </div>
-              <div className="flex flex-col gap-1.5">
-                <h3 className="font-heading text-base font-semibold">{step.title}</h3>
+              <div className="mt-5 flex flex-col gap-1.5">
+                <h3 className="font-heading text-lg font-semibold">{step.title}</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {step.description}
                 </p>

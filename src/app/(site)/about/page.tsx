@@ -118,7 +118,12 @@ export default function AboutPage() {
             <SectionHeading
               align="left"
               eyebrow="Mission"
-              title="Every creator, a room that keeps up with them"
+            title={
+              <>
+                Every creator, a room that{" "}
+                <span className="accent-serif">keeps up with them</span>
+              </>
+            }
               className="mb-0"
             />
             <p className="text-base leading-relaxed text-muted-foreground">
@@ -161,7 +166,12 @@ export default function AboutPage() {
         <div className="container-page">
           <SectionHeading
             eyebrow="What we believe"
-            title="Four principles behind every booking"
+            title={
+              <>
+                Four principles{" "}
+                <span className="accent-serif">behind every booking</span>
+              </>
+            }
           />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {values.map((v) => (
@@ -184,7 +194,12 @@ export default function AboutPage() {
       <section className="container-page py-16 sm:py-24" aria-label="Our story">
         <SectionHeading
           eyebrow="Our story"
-          title="Two frustrated shoots became one platform"
+          title={
+            <>
+              Two frustrated shoots became{" "}
+              <span className="accent-serif">one platform</span>
+            </>
+          }
         />
         <ol className="relative mx-auto flex max-w-3xl flex-col gap-8 border-l border-border pl-8">
           {timeline.map((t) => (

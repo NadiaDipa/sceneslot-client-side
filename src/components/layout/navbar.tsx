@@ -11,7 +11,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "cn";
-import { Menu } from "lucide-react";
+import { ArrowUpRight, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -30,13 +30,14 @@ export function Navbar() {
 
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-
-  // Visual only: increase backdrop blur + add a soft bottom shadow after 10px scroll
   const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -46,99 +47,158 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full border-b border-transparent bg-background/60 backdrop-blur-sm transition-[background-color,backdrop-filter,border-color,box-shadow] duration-300 motion-reduce:transition-none",
-        scrolled &&
-          "border-border/70 bg-background/80 backdrop-blur-xl shadow-lg shadow-foreground/5",
+        "site-header sticky top-0 z-40 w-full border-b border-border/70",
+        "transition-all duration-300 ease-out",
+        scrolled && "site-header-scrolled",
       )}
     >
-      <div className="container-page flex h-16 items-center justify-between gap-4">
-        <Logo />
+      <div className="container-page grid h-[72px] grid-cols-[1fr_auto_1fr] items-center gap-3 lg:h-[80px]">
+        {/* Brand */}
+        <div className="flex min-w-0 items-center">
+          <Logo
+            className="transition-opacity duration-200 outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring/60 rounded-lg"
+          />
+        </div>
 
-        {/* Desktop nav */}
+        {/* Desktop navigation */}
         <nav
           aria-label="Main navigation"
-          className="hidden items-center gap-1 md:flex"
+          className="hidden items-center justify-center gap-1 lg:flex"
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "relative rounded-lg px-3 py-2 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-                isActive(link.href)
-                  ? "text-foreground after:absolute after:inset-x-3 after:-bottom-px after:h-0.5 after:rounded-full after:bg-primary"
-                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-              )}
-              aria-current={isActive(link.href) ? "page" : undefined}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "group relative whitespace-nowrap rounded-full px-4 py-2.5",
+                  "text-[13px] font-semibold tracking-wide",
+                  "outline-none transition-all duration-200",
+                  "focus-visible:ring-2 focus-visible:ring-ring/70",
+                  active
+                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/30"
+                    : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground",
+                )}
+              >
+                {link.label}
+
+                {/* Short muted-gold underline for the active pill */}
+                <span
+                  className={cn(
+                    "absolute -bottom-0.5 left-1/2 h-[2px] -translate-x-1/2 rounded-full bg-[#978F66] transition-all duration-300",
+                    active
+                      ? "w-5 opacity-100"
+                      : "w-0 opacity-0 group-hover:w-5 group-hover:opacity-100",
+                  )}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right side */}
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
+        <div className="flex items-center justify-end gap-2 sm:gap-3">
+          <div className="rounded-full border border-border/80 bg-card/70 p-0.5 shadow-sm">
+            <ThemeToggle />
+          </div>
 
           {isPending ? (
             <div
-              className="hidden h-10 w-24 animate-pulse rounded-full bg-muted md:block"
+              className="hidden h-10 w-28 animate-pulse rounded-full bg-muted lg:block"
               aria-hidden
             />
           ) : isAuthenticated ? (
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <ProfileDropdown />
             </div>
           ) : (
-            <div className="hidden items-center gap-2 md:flex">
-              <Button variant="ghost" render={<Link href="/login" />}>
-                Login
+            <div className="hidden items-center gap-2 lg:flex">
+              <Button
+                variant="ghost"
+                render={<Link href="/login" />}
+                className="h-10 rounded-full px-5 text-[13px] font-semibold text-foreground/75 transition-all hover:bg-foreground/5 hover:text-foreground"
+              >
+                Log in
               </Button>
-              <Button render={<Link href="/register" />}>Register</Button>
+
+              <Button
+                render={<Link href="/register" />}
+                className="group h-10 rounded-full px-5 text-[13px] font-bold shadow-md shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/40"
+              >
+                Get Started
+                <ArrowUpRight className="ml-1 size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Button>
             </div>
           )}
 
-          {/* Mobile menu trigger */}
+          {/* Mobile menu */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
               render={
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
-                  className="md:hidden"
+                  className="size-10 rounded-full border-border/80 bg-card/70 text-foreground hover:bg-accent/60 hover:text-accent-foreground lg:hidden"
                   aria-label="Open menu"
                 />
               }
             >
-              <Menu className="size-5" />
+              <Menu className="size-[19px]" />
             </SheetTrigger>
-            <SheetContent side="right" className="w-80">
+
+            <SheetContent
+              side="right"
+              className="w-[min(340px,88vw)] border-l border-border/70 bg-background p-0"
+            >
               <SheetTitle className="sr-only">SceneSlot menu</SheetTitle>
+
               <div className="flex h-full flex-col">
-                <div className="border-b p-4">
+                <div className="border-b border-border/70 px-6 py-6">
                   <Logo />
+                  <p className="mt-3 text-xs tracking-wide text-muted-foreground">
+                    Find your creative space.
+                  </p>
                 </div>
+
                 <nav
                   aria-label="Mobile navigation"
-                  className="flex flex-col gap-1 p-4"
+                  className="flex flex-col gap-2 px-4 py-6"
                 >
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      className={cn(
-                        "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                        isActive(link.href)
-                          ? "bg-accent text-accent-foreground"
-                          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-                      )}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                  <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                    Explore
+                  </p>
+
+                  {navLinks.map((link) => {
+                    const active = isActive(link.href);
+
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setOpen(false)}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(
+                          "flex items-center justify-between rounded-xl px-4 py-3.5",
+                          "text-sm font-semibold transition-all duration-200",
+                          active
+                            ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
+                            : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
+                        )}
+                      >
+                        {link.label}
+
+                        {active && (
+                          <span className="size-1.5 rounded-full bg-[#978F66]" />
+                        )}
+                      </Link>
+                    );
+                  })}
                 </nav>
-                <div className="mt-auto border-t p-4">
+
+                <div className="mt-auto border-t border-border/70 p-5">
                   {isPending ? (
                     <div
                       className="h-10 w-full animate-pulse rounded-full bg-muted"
@@ -147,19 +207,23 @@ export function Navbar() {
                   ) : isAuthenticated ? (
                     <ProfileDropdown />
                   ) : (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-3">
                       <Button
                         variant="outline"
                         render={<Link href="/login" />}
                         onClick={() => setOpen(false)}
+                        className="h-11 w-full rounded-full font-semibold hover:border-primary hover:bg-primary/10 hover:text-primary"
                       >
-                        Login
+                        Log in
                       </Button>
+
                       <Button
                         render={<Link href="/register" />}
                         onClick={() => setOpen(false)}
+                        className="h-11 w-full rounded-full font-semibold shadow-md shadow-primary/25"
                       >
-                        Register
+                        Get Started
+                        <ArrowUpRight className="ml-1 size-4" />
                       </Button>
                     </div>
                   )}
