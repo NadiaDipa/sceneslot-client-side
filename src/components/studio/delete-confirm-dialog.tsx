@@ -54,7 +54,7 @@ export function DeleteConfirmDialog({
           {onError ? (
             <p
               role="alert"
-              className="text-xs font-medium text-destructive"
+              className="text-sm font-medium text-destructive"
             >
               Couldn&apos;t delete this listing — please try again.
             </p>

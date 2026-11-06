@@ -60,7 +60,7 @@ export function ProfileDropdown({
   };
 
   const menuItemClass =
-    "group flex gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-200 data-[highlighted]:bg-primary/15 data-[highlighted]:text-primary";
+    "group flex gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-200 data-[highlighted]:bg-primary/15 data-[highlighted]:text-primary max-sm:py-3";
 
   const iconBoxClass =
     "grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-200 group-data-[highlighted]:bg-primary group-data-[highlighted]:text-primary-foreground";
@@ -88,7 +88,7 @@ export function ProfileDropdown({
           </AvatarFallback>
         </Avatar>
 
-        <span className="hidden max-w-28 truncate text-[13px] font-semibold sm:block">
+        <span className="hidden max-w-28 truncate text-sm font-semibold sm:block">
           {user.name.split(" ")[0]}
         </span>
 
@@ -124,7 +124,7 @@ export function ProfileDropdown({
                 {user.email}
               </p>
 
-              <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold tracking-wide text-primary">
+              <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs font-bold tracking-wide text-primary">
                 <Sparkles className="size-3" />
                 MEMBER
               </span>
@@ -134,7 +134,7 @@ export function ProfileDropdown({
 
         {/* Workspace menu */}
         <DropdownMenuGroup className="p-2">
-          <DropdownMenuLabel className="px-3 pb-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+          <DropdownMenuLabel className="px-3 pb-2 pt-1 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
             Your workspace
           </DropdownMenuLabel>
 
@@ -185,7 +185,7 @@ export function ProfileDropdown({
           <DropdownMenuItem
             variant="destructive"
             onClick={handleLogout}
-            className="group flex gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-colors duration-200 data-[highlighted]:bg-destructive/10"
+            className="group flex gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors duration-200 data-[highlighted]:bg-destructive/10 max-sm:py-3"
           >
             <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-destructive/10 text-destructive">
               <LogOut className="size-4" />

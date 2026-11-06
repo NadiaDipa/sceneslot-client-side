@@ -15,7 +15,7 @@ export function ThemeToggle() {
 
   // Avoid hydration mismatch: render a same-size placeholder until mounted
   if (!mounted) {
-    return <div className="size-9 rounded-full" aria-hidden />;
+    return <div className="size-10 rounded-full" aria-hidden />;
   }
 
   const isDark = resolvedTheme === "dark";

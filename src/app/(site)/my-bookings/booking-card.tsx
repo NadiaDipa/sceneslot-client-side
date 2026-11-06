@@ -87,35 +87,37 @@ export function BookingCard({
 
   return (
     <li className="overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/10 transition-shadow hover:shadow-md hover:shadow-foreground/5">
-      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
+      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:gap-6 sm:p-5">
         <Link
           href={`/studios/${booking.studioId}`}
-          className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:aspect-video sm:h-24 sm:w-40"
+          className="relative aspect-[2/1] w-full shrink-0 overflow-hidden rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:aspect-auto sm:h-[132px] sm:w-[220px]"
         >
           <Image
             src={booking.studioImage}
             alt={booking.studioTitle}
             fill
-            sizes="200px"
+            sizes="220px"
             priority={priority}
             loading={priority ? "eager" : undefined}
             className="object-cover"
           />
         </Link>
 
-        {/* Info — centered on mobile under the thumbnail, left from sm up */}
-        <div className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center sm:items-start sm:text-left">
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+        {/* Left-aligned on every breakpoint; flex-1 keeps it absorbing the
+            middle so the price/action column sits grouped on the right from
+            sm up instead of floating in empty space. */}
+        <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5 text-left">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/studios/${booking.studioId}`}
-              className="font-heading text-base font-semibold outline-none transition-colors hover:text-accent-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="font-heading text-xl leading-[1.2] font-semibold outline-none transition-colors hover:text-accent-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               {booking.studioTitle}
             </Link>
 
             <span
               className={cn(
-                "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+                "inline-flex items-center rounded-full px-2.5 py-1 text-[0.8125rem] font-semibold",
                 statusStyles[status]
               )}
             >
@@ -123,45 +125,46 @@ export function BookingCard({
             </span>
           </div>
 
-          <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="size-3.5" />
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="size-4 shrink-0" />
               {booking.location}
             </span>
 
-            <span className="inline-flex items-center gap-1">
-              <CalendarDays className="size-3.5" />
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="size-4 shrink-0" />
               {booking.date}
             </span>
 
-            <span className="inline-flex items-center gap-1">
-              <Clock className="size-3.5" />
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="size-4 shrink-0" />
               {booking.hours[0]} – {booking.hours[1]} ·{" "}
               {Number(booking.hours[1].split(":")[0]) -
                 Number(booking.hours[0].split(":")[0])}
               h
             </span>
 
-            <span className="inline-flex items-center gap-1">
-              <Users className="size-3.5" />
-              {booking.guests} guests
+            <span className="inline-flex items-center gap-1.5">
+              <Users className="size-4 shrink-0" />
+              {booking.guests} {booking.guests === 1 ? "guest" : "guests"}
             </span>
           </p>
 
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[0.8125rem] text-muted-foreground">
             Booking ref{" "}
-            <span className="font-mono font-medium">{booking.id}</span>
+            <span className="break-all font-mono font-medium">{booking.id}</span>
           </p>
 
-          {error && <p className="text-xs text-destructive">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
 
-        {/* Price + cancel action — centered on mobile under a hairline divider,
-            right-aligned as before from sm up */}
-        <div className="flex w-full shrink-0 flex-col items-center gap-3 border-t border-border/70 pt-3 text-center sm:w-auto sm:items-stretch sm:gap-2 sm:border-0 sm:pt-0 sm:text-left">
-          <p className="font-heading text-lg font-semibold">
+        {/* Price + action — consistent right column from sm up (hairline divider
+            replaces the empty middle gap), full-width 44px actions on mobile.
+            Width raised to sm:w-52 so the "Cancel Booking" button has room. */}
+        <div className="flex w-full shrink-0 flex-col items-start gap-3 border-t border-border/70 pt-3 sm:w-52 sm:items-stretch sm:justify-center sm:border-t-0 sm:border-l sm:border-border/70 sm:pl-6 sm:pt-0">
+          <p className="font-heading text-[1.375rem] leading-[1.2] font-bold">
             ${booking.total}
-            <span className="text-xs font-normal text-muted-foreground">
+            <span className="text-sm font-normal text-muted-foreground">
               {" "}
               total
             </span>
@@ -171,11 +174,11 @@ export function BookingCard({
             <Button
               variant="destructive"
               size="sm"
-              className="gap-1.5"
+              className="max-sm:h-11 max-sm:w-full sm:h-10 gap-1.5 px-4 text-sm font-semibold whitespace-nowrap"
               onClick={() => setConfirmOpen(true)}
               disabled={isCancelling}
             >
-              <Ban className="size-3.5" />
+              <Ban className="size-4" />
               Cancel Booking
             </Button>
           ) : (

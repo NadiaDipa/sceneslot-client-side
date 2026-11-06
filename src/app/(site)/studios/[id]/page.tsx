@@ -78,7 +78,7 @@ export default async function StudioDetailsPage({ params }: Props) {
                   Booking available
                 </Badge>
               </div>
-              <h1 className="font-heading text-3xl font-semibold sm:text-4xl">
+              <h1 className="font-heading text-[2rem] leading-[1.15] font-semibold text-balance sm:text-4xl">
                 {studio.title}
               </h1>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -99,7 +99,8 @@ export default async function StudioDetailsPage({ params }: Props) {
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Users className="size-4 text-primary" />
-                  Up to {studio.maxCapacity} guests
+                  Up to {studio.maxCapacity}{" "}
+                  {studio.maxCapacity === 1 ? "guest" : "guests"}
                 </span>
               </div>
               <p className="text-base leading-relaxed text-muted-foreground">
@@ -114,15 +115,15 @@ export default async function StudioDetailsPage({ params }: Props) {
                 { label: "Security deposit", value: `$${studio.deposit}` },
                 {
                   label: "Max capacity",
-                  value: `${studio.maxCapacity} guests`,
+                  value: `${studio.maxCapacity} ${studio.maxCapacity === 1 ? "guest" : "guests"}`,
                 },
               ].map((fact) => (
                 <div
                   key={fact.label}
                   className="rounded-xl border border-border bg-card p-4"
                 >
-                  <p className="text-xs text-muted-foreground">{fact.label}</p>
-                  <p className="font-heading mt-1 text-lg font-semibold">
+                  <p className="text-sm text-muted-foreground">{fact.label}</p>
+                  <p className="font-heading mt-1 text-[1.25rem] leading-[1.2] font-semibold">
                     {fact.value}
                   </p>
                 </div>
@@ -131,7 +132,7 @@ export default async function StudioDetailsPage({ params }: Props) {
 
             {/* Amenities */}
             <div className="flex flex-col gap-4">
-              <h2 className="font-heading text-xl font-semibold text-center sm:text-left">
+              <h2 className="font-heading text-2xl leading-[1.2] font-semibold text-balance text-center sm:text-left">
                 Amenities
               </h2>
               <ul className="grid grid-cols-1 justify-items-center gap-x-6 gap-y-2.5 text-center sm:grid-cols-2 sm:justify-items-start sm:text-left">
@@ -149,7 +150,7 @@ export default async function StudioDetailsPage({ params }: Props) {
 
             {/* Overview */}
             <div className="flex flex-col items-center gap-4 sm:items-start">
-              <h2 className="font-heading text-xl font-semibold text-center sm:text-left">
+              <h2 className="font-heading text-2xl leading-[1.2] font-semibold text-balance text-center sm:text-left">
                 About this space
               </h2>
               <p className="text-sm leading-relaxed text-muted-foreground text-center sm:text-left sm:text-base">
@@ -161,7 +162,7 @@ export default async function StudioDetailsPage({ params }: Props) {
 
             {/* Host */}
             <div className="flex flex-col gap-3">
-              <h2 className="font-heading text-xl font-semibold text-center sm:text-left">
+              <h2 className="font-heading text-2xl leading-[1.2] font-semibold text-balance text-center sm:text-left">
                 Meet your host
               </h2>
               <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-5 text-center sm:flex-row sm:items-start sm:text-left">
@@ -180,15 +181,15 @@ export default async function StudioDetailsPage({ params }: Props) {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-center gap-1 sm:items-start">
-                  <p className="font-heading text-base font-semibold">
+                  <p className="font-heading text-lg leading-[1.2] font-semibold">
                     {studio.host.name}
                   </p>
                   {studio.host.email ? (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       {studio.host.email}
                     </p>
                   ) : null}
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     {studio.host.joined}
                     {studio.host.responseRate
                       ? ` · ${studio.host.responseRate}`
@@ -206,7 +207,7 @@ export default async function StudioDetailsPage({ params }: Props) {
             {/* Reviews */}
             <div className="flex flex-col gap-4">
               <div className="flex flex-wrap items-baseline justify-center gap-2 text-center sm:justify-between sm:text-left">
-                <h2 className="font-heading text-xl font-semibold">
+                <h2 className="font-heading text-2xl leading-[1.2] font-semibold text-balance">
                   Creator reviews
                 </h2>
                 {studio.reviews.length > 0 ? (
@@ -232,8 +233,10 @@ export default async function StudioDetailsPage({ params }: Props) {
                             <AvatarImage src={r.avatar} alt={r.author} />
                           </Avatar>
                           <div>
-                            <p className="text-sm font-semibold">{r.author}</p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-base font-semibold">
+                              {r.author}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
                               {r.date}
                             </p>
                           </div>

@@ -43,7 +43,7 @@ export function SectionHeading({
           {centered ? <span aria-hidden className="h-px w-7 bg-primary/50" /> : null}
         </span>
       ) : null}
-      <h2 className="text-3xl font-bold leading-[1.08] tracking-tight text-balance sm:text-4xl lg:text-[2.65rem]">
+      <h2 className="text-4xl font-bold leading-[1.2] tracking-tight text-balance lg:text-[2.75rem]">
         {title}
       </h2>
       {description ? (

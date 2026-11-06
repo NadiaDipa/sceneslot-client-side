@@ -50,7 +50,7 @@ export default async function MyBookingsPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="mb-4 gap-2 sm:-ml-2"
+            className="mb-4 gap-2 text-sm font-medium text-foreground/85 hover:text-foreground sm:-ml-2"
             render={<Link href="/dashboard" />}
           >
             <ArrowLeft className="size-4" />
@@ -58,11 +58,11 @@ export default async function MyBookingsPage() {
           </Button>
 
           <div className="flex flex-col gap-1 sm:items-start">
-            <h1 className="font-heading text-3xl font-semibold sm:text-4xl">
+            <h1 className="font-heading text-[2rem] leading-[1.15] font-semibold text-balance sm:text-4xl">
               My bookings
             </h1>
 
-            <p className="text-sm text-muted-foreground sm:text-base">
+            <p className="text-base text-muted-foreground">
               Track confirmed sessions, pending approvals, and past shoots.
             </p>
           </div>

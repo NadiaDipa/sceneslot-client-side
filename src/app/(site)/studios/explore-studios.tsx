@@ -39,14 +39,20 @@ export function ExploreStudios({
   studios,
   uniqueLocations,
   initialCategory = "All Categories",
+  initialLocationQuery = "",
 }: {
   studios: Studio[];
   uniqueLocations: string[];
   initialCategory?: string;
+  /* Hero search's Location text (?location=…) — drives the strict
+     matchesLocationTerm filter below (kept separate from the Location
+     select, which remains an exact picker). */
+  initialLocationQuery?: string;
 }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(initialCategory);
   const [location, setLocation] = useState("all");
+  const [locationTerm, setLocationTerm] = useState(initialLocationQuery);
   const [price, setPrice] = useState("all");
   const [sort, setSort] = useState<SortKey>("recommended");
 
@@ -54,12 +60,14 @@ export function ExploreStudios({
     query !== "" ||
     category !== "All Categories" ||
     location !== "all" ||
+    locationTerm !== "" ||
     price !== "all";
 
   function clearFilters() {
     setQuery("");
     setCategory("All Categories");
     setLocation("all");
+    setLocationTerm("");
     setPrice("all");
   }
 
@@ -89,6 +97,12 @@ export function ExploreStudios({
             matchWord(term, s.description) ||
             matchWord(term, s.amenities.join(" "))
         );
+      /* Hero search's Location field (?location=…): strict — the typed text
+         must appear in the studio's location value itself, so results can't
+         sneak in via descriptions or amenities mentioning the area. */
+      const matchesLocationTerm =
+        locationTerm === "" ||
+        s.location.toLowerCase().includes(locationTerm.toLowerCase());
       const matchesCategory =
         category === "All Categories" || s.category === category;
       const matchesLocation = location === "all" || s.location === location;
@@ -98,7 +112,13 @@ export function ExploreStudios({
         (price === "40-80" && s.hourlyRate >= 40 && s.hourlyRate <= 80) ||
         (price === "80-120" && s.hourlyRate > 80 && s.hourlyRate <= 120) ||
         (price === "over-120" && s.hourlyRate > 120);
-      return matchesQuery && matchesCategory && matchesLocation && matchesPrice;
+      return (
+        matchesQuery &&
+        matchesLocationTerm &&
+        matchesCategory &&
+        matchesLocation &&
+        matchesPrice
+      );
     });
 
     switch (sort) {
@@ -118,7 +138,7 @@ export function ExploreStudios({
         );
     }
     return list;
-  }, [studios, query, category, location, price, sort]);
+  }, [studios, query, category, location, locationTerm, price, sort]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -131,7 +151,7 @@ export function ExploreStudios({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search studios, amenities, or vibes…"
             aria-label="Search studios"
-            className="h-10 pl-9 text-base sm:h-11"
+            className="h-11 pl-9 text-base"
           />
           {query ? (
             <button
@@ -220,6 +240,7 @@ export function ExploreStudios({
             <Badge variant="secondary">{category}</Badge>
           ) : null}
           {location !== "all" ? <Badge variant="secondary">{location}</Badge> : null}
+          {locationTerm ? <Badge variant="secondary">📍 {locationTerm}</Badge> : null}
           {price !== "all" ? (
             <Badge variant="secondary">{priceOptions.find((p) => p.value === price)?.label}</Badge>
           ) : null}

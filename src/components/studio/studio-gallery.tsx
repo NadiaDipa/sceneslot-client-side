@@ -27,8 +27,9 @@ export function StudioGallery({ studio }: { studio: Studio }) {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Main carousel image */}
-      <div className="relative aspect-[16/9] overflow-hidden rounded-2xl bg-muted">
+      {/* Main carousel image — 3:2 on mobile (≈240px at 360–375w, inside the
+          220–280px spec window); 16:9 from sm up unchanged */}
+      <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-muted sm:aspect-[16/9]">
         {images.map((src, i) => (
           <Image
             key={`${src}-${i}`}
@@ -50,7 +51,7 @@ export function StudioGallery({ studio }: { studio: Studio }) {
               type="button"
               onClick={prev}
               aria-label="Previous photo"
-              className="absolute top-1/2 left-3 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white outline-none backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-primary"
+              className="absolute top-1/2 left-3 grid size-10 max-sm:size-11 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white outline-none backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-primary"
             >
               <ChevronLeft className="size-5" />
             </button>
@@ -59,7 +60,7 @@ export function StudioGallery({ studio }: { studio: Studio }) {
               type="button"
               onClick={next}
               aria-label="Next photo"
-              className="absolute top-1/2 right-3 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white outline-none backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-primary"
+              className="absolute top-1/2 right-3 grid size-10 max-sm:size-11 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white outline-none backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-primary"
             >
               <ChevronRight className="size-5" />
             </button>

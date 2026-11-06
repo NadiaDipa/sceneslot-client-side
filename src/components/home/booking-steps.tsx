@@ -38,7 +38,7 @@ const steps: Step[] = [
 
 export function BookingSteps() {
   return (
-    <section className="py-16 sm:py-24" aria-label="How booking works">
+    <section className="pt-16 pb-8 sm:pt-24 sm:pb-12" aria-label="How booking works">
       <div className="container-page">
         <Reveal>
           <SectionHeading
@@ -71,7 +71,7 @@ export function BookingSteps() {
               <div className="flex items-center justify-center gap-4 lg:justify-start">
                 <span
                   aria-hidden
-                  className="font-heading text-4xl leading-none font-bold text-foreground/15 transition-colors duration-300 group-hover:text-primary max-sm:text-primary/40 max-sm:group-active:text-primary motion-reduce:transition-none"
+                  className="font-heading text-5xl leading-none font-bold text-foreground/60 dark:text-foreground/65 transition-colors duration-300 group-hover:text-primary max-sm:group-active:text-primary motion-reduce:transition-none"
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { cn } from "cn";
 import {
   ArrowRight,
@@ -8,7 +7,6 @@ import {
   CalendarPlus,
   DollarSign,
   Plus,
-  Settings,
   Star,
   TrendingUp,
 } from "lucide-react";
@@ -33,6 +31,12 @@ interface DashboardData {
     status: string;
     createdAt: string;
   }[];
+}
+
+// The backend builds the activity detail string (e.g. "2027-01-02 · 13:00 · 1 guests"),
+// so fix the singular form here on the frontend.
+function fixGuestPlural(detail: string) {
+  return detail.replace(/\b1 guests\b/, "1 guest");
 }
 
 export default async function DashboardPage() {
@@ -75,10 +79,12 @@ export default async function DashboardPage() {
     .join("")
     .toUpperCase();
 
+  const hasRating = (dashboardData?.summary.averageRating ?? 0) > 0;
+
   const summary = [
     {
       icon: CalendarCheck,
-      label: "Total bookings",
+      label: "Active bookings",
       value: dashboardData?.summary.totalBookings ?? "—",
     },
     {
@@ -90,10 +96,11 @@ export default async function DashboardPage() {
     },
     {
       icon: Star,
-      label: "Average rating",
-      value: dashboardData
-        ? dashboardData.summary.averageRating.toFixed(1)
-        : "—",
+      label: hasRating ? "Average rating" : "No ratings yet",
+      value:
+        dashboardData && hasRating
+          ? dashboardData.summary.averageRating.toFixed(1)
+          : "—",
     },
     {
       icon: TrendingUp,
@@ -102,10 +109,13 @@ export default async function DashboardPage() {
     },
   ];
 
-  const activity = (dashboardData?.recentActivity ?? []).slice(0, 4);
+  // Hide cancelled bookings so the list matches the "Active bookings" count
+  const activity = (dashboardData?.recentActivity ?? [])
+    .filter((item) => item.status !== "Cancelled")
+    .slice(0, 4);
 
   return (
-    <section className="py-10 sm:py-14">
+    <section className="pt-8 pb-12 sm:pt-12 sm:pb-16">
       <div className="container-page flex flex-col gap-10">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3 sm:gap-4">
@@ -114,19 +124,15 @@ export default async function DashboardPage() {
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
 
-            <div className="flex flex-col gap-0.5">
-              <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
+            <div className="flex flex-col gap-1">
+              <h1 className="font-heading text-[2rem] leading-[1.15] font-semibold text-balance sm:text-[2.25rem]">
                 Welcome back, {userName.split(" ")[0]}
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-base text-muted-foreground">
                 Here&apos;s an overview of your studio activity.
               </p>
             </div>
           </div>
-
-          <Button variant="outline" size="icon" aria-label="Account settings">
-            <Settings />
-          </Button>
         </header>
 
         <div
@@ -136,17 +142,17 @@ export default async function DashboardPage() {
           {summary.map((item) => (
             <div
               key={item.label}
-              className="flex flex-col items-center gap-3 rounded-2xl border-border bg-card p-5 text-center ring-1 ring-foreground/10 sm:items-start sm:text-left"
+              className="flex flex-col items-center gap-4 rounded-2xl border-border bg-card p-4 text-center ring-1 ring-foreground/10 sm:items-start sm:p-6 sm:text-left"
             >
               <span className="grid size-9 place-items-center rounded-lg bg-accent text-accent-foreground">
                 <item.icon className="size-4.5" strokeWidth={1.8} />
               </span>
 
               <div>
-                <p className="font-heading text-2xl font-semibold">
+                <p className="font-heading text-[1.75rem] leading-[1.2] font-bold">
                   {item.value}
                 </p>
-                <p className="text-xs text-muted-foreground">{item.label}</p>
+                <p className="text-sm text-muted-foreground">{item.label}</p>
               </div>
             </div>
           ))}
@@ -161,13 +167,13 @@ export default async function DashboardPage() {
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
           <div className="flex flex-col gap-4">
             <div className="flex items-baseline justify-between">
-              <h2 className="font-heading text-xl font-semibold">
+              <h2 className="font-heading text-2xl leading-[1.2] font-semibold text-balance">
                 Recent activity
               </h2>
 
               <Link
                 href="/my-bookings"
-                className="text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                className="inline-flex items-center py-1.5 -my-1 text-sm font-semibold text-foreground/80 underline-offset-4 transition-colors hover:text-foreground hover:underline"
               >
                 View all bookings
               </Link>
@@ -195,16 +201,16 @@ export default async function DashboardPage() {
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium">{item.title}</p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {item.detail}
+                      <p className="text-sm font-semibold">{item.title}</p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {fixGuestPlural(item.detail)}
                       </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
+                      <p className="mt-1 text-[0.8125rem] font-medium text-muted-foreground">
                         Status: {item.status}
                       </p>
                     </div>
 
-                    <span className="shrink-0 text-xs text-muted-foreground">
+                    <span className="shrink-0 text-[0.8125rem] text-muted-foreground">
                       {new Date(item.createdAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -222,7 +228,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <h2 className="font-heading text-xl font-semibold">
+            <h2 className="font-heading text-2xl leading-[1.2] font-semibold text-balance">
               Quick actions
             </h2>
 
@@ -250,17 +256,17 @@ export default async function DashboardPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group flex items-center gap-3.5 rounded-2xl border-border bg-card p-4 ring-1 ring-foreground/10 transition-all outline-none hover:-translate-y-0.5 hover:shadow-md hover:shadow-foreground/5 focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="group flex min-h-16 items-center gap-3.5 rounded-2xl border-border bg-card p-4 ring-1 ring-foreground/10 transition-all outline-none hover:-translate-y-0.5 hover:shadow-md hover:shadow-foreground/5 focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-secondary text-secondary-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                     <item.icon className="size-4" />
                   </span>
 
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-medium">
+                    <span className="block text-base font-semibold">
                       {item.title}
                     </span>
-                    <span className="block truncate text-xs text-muted-foreground">
+                    <span className="block truncate text-sm text-muted-foreground">
                       {item.desc}
                     </span>
                   </span>

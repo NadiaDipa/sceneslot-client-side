@@ -85,7 +85,7 @@ function FacebookGlyph({ className }: { className?: string }) {
 
 /* Link hover: shift to primary with a small underline slide-in */
 const footerLinkClasses =
-  "relative inline-block text-sm text-white/65 transition-colors hover:text-primary after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 motion-reduce:after:transition-none";
+  "relative inline-block text-sm text-[#e8dccb]/90 transition-colors hover:text-primary after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 motion-reduce:after:transition-none";
 
 export function Footer() {
   return (
@@ -105,8 +105,8 @@ export function Footer() {
         {/* CTA band with gradient border, inside the footer */}
         <Reveal className="pt-14 sm:pt-16">
           <div className="rounded-3xl bg-gradient-to-r from-primary via-[#E4D6A9] to-primary p-px">
-            <div className="flex flex-col items-center justify-between gap-6 rounded-[calc(1.5rem-1.5px)] bg-foreground px-6 py-10 text-center sm:flex-row sm:px-10 sm:text-left dark:bg-secondary">
-              <h2 className="max-w-xl font-heading text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            <div className="flex flex-col items-center justify-between gap-6 rounded-[calc(1.5rem-1.5px)] bg-foreground px-5 py-7 text-center sm:flex-row sm:px-10 sm:py-8 sm:text-left dark:bg-secondary">
+              <h2 className="max-w-xl font-heading text-2xl font-bold tracking-tight text-balance text-white sm:text-3xl">
                 Own a creative space? Let it shoot for you.
               </h2>
               <Link
@@ -114,7 +114,7 @@ export function Footer() {
                 className={buttonVariants({
                   size: "lg",
                   className:
-                    "shrink-0 gap-2 shadow-lg shadow-primary/40 hover:shadow-primary/60",
+                    "w-full shrink-0 gap-2 shadow-lg shadow-primary/40 hover:shadow-primary/60 sm:w-auto",
                 })}
               >
                 Host your space
@@ -129,7 +129,7 @@ export function Footer() {
             {/* Brand — centered on mobile, left-aligned from sm up */}
             <div className="flex flex-col items-center gap-4 text-center sm:items-start sm:text-left sm:pr-4">
               <Logo light />
-              <p className="max-w-xs text-sm leading-relaxed text-white/65">
+              <p className="max-w-xs text-sm leading-relaxed text-[#e8dccb]">
                 SceneSlot is the peer-to-peer marketplace where creators find the
                 spaces that bring their ideas to light — and where studio owners
                 turn downtime into income.
@@ -142,7 +142,7 @@ export function Footer() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={s.label}
-                    className="grid size-10 place-items-center rounded-full border border-white/15 bg-white/5 text-white/70 transition-all duration-300 outline-none hover:-translate-y-1 hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-lg hover:shadow-primary/30 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none motion-reduce:hover:translate-y-0!"
+                    className="grid size-10 place-items-center rounded-full border border-white/15 bg-white/5 text-[#e8dccb] transition-all duration-300 outline-none hover:-translate-y-1 hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-lg hover:shadow-primary/30 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none motion-reduce:hover:translate-y-0!"
                   >
                     {s.node}
                   </a>
@@ -176,7 +176,7 @@ export function Footer() {
               <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-white">
                 Stay in the loop
               </h3>
-              <p className="text-sm text-white/65">
+              <p className="text-sm text-[#e8dccb]">
                 Drop-in rates, new studios, and creator stories — once a week, no
                 noise.
               </p>
@@ -188,7 +188,7 @@ export function Footer() {
         {/* Bottom bar — mobile keeps the centered stack; desktop restores the
             classic split: copyright left, legal links right, one clean row */}
         <div className="flex flex-col items-center justify-center gap-3 border-t border-white/10 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
-          <p className="text-xs text-white/55">
+          <p className="text-xs text-[#e8dccb]/75">
             © {new Date().getFullYear()} SceneSlot Inc. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 sm:justify-end">

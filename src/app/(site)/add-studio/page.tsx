@@ -17,18 +17,18 @@ export default async function AddStudioPage() {
   }
 
   return (
-    <section aria-busy="false" className="py-10 sm:py-14">
+    <section aria-busy="false" className="pt-8 pb-12 sm:pt-12 sm:pb-16">
       <div className="container-page max-w-4xl">
         {/* Page header — back link and intro centered on mobile, left from sm */}
         <div className="mb-10 flex flex-col items-center gap-4 text-center sm:mb-10 sm:flex-col sm:items-stretch sm:gap-3 sm:text-left">
           <Link
             href="/dashboard"
-            className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:ml-0"
+            className="inline-flex h-11 w-fit items-center gap-1.5 text-sm font-medium text-foreground/85 transition-colors hover:text-foreground sm:ml-0 sm:h-auto sm:py-0"
           >
             ← Back to dashboard
           </Link>
           <div className="flex w-full flex-col items-center gap-2 sm:items-start sm:text-left">
-            <h1 className="font-heading text-3xl font-semibold sm:text-4xl">
+            <h1 className="font-heading text-[2rem] leading-[1.15] font-semibold text-balance sm:text-4xl">
               List your creative space
             </h1>
             <p className="mx-auto max-w-2xl text-base leading-relaxed text-muted-foreground sm:mx-0">

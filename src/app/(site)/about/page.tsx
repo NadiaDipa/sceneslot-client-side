@@ -154,7 +154,7 @@ export default function AboutPage() {
                   <s.icon className="size-5" strokeWidth={1.8} />
                 </span>
                 <p className="font-heading text-2xl font-semibold">{s.value}</p>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
+                <p className="text-sm text-muted-foreground">{s.label}</p>
               </div>
             ))}
           </div>
@@ -182,7 +182,7 @@ export default function AboutPage() {
                 <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <v.icon className="size-5" strokeWidth={1.8} />
                 </span>
-                <h3 className="font-heading text-base font-semibold">{v.title}</h3>
+                <h3 className="font-heading text-lg leading-[1.3] font-semibold">{v.title}</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">{v.body}</p>
               </div>
             ))}
@@ -245,8 +245,8 @@ export default function AboutPage() {
                       {m.name.split(" ").map((p) => p[0]).join("")}
                     </AvatarFallback>
                   </Avatar>
-                  <p className="font-heading text-sm font-semibold text-background">{m.name}</p>
-                  <p className="text-xs text-background/60">{m.role}</p>
+                  <p className="font-heading text-base font-semibold text-background">{m.name}</p>
+                  <p className="text-sm text-background/60">{m.role}</p>
                 </li>
               ))}
             </ul>

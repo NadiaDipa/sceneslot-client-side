@@ -37,10 +37,11 @@ export function CategoryCard({
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] motion-reduce:transition-none"
           />
           {/* Fixed dark gradient + white text stays readable over any photo in both themes.
-              Deepened on hover so labels never compete with brighter photos. */}
+              Stronger stops (90/40/5) keep the caption anchored over bright photos;
+              deepened further on hover so labels never compete with the image. */}
           <span
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/0"
+            className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/5"
           />
           <span
             aria-hidden
@@ -54,7 +55,7 @@ export function CategoryCard({
             <p className="font-heading text-lg font-semibold text-white sm:text-xl">
               {category.name}
             </p>
-            <p className="text-xs leading-relaxed text-white/80">
+            <p className="text-sm leading-relaxed text-white/85">
               {category.tagline}
             </p>
           </div>

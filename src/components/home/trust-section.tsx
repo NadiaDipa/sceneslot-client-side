@@ -71,7 +71,7 @@ export function TrustSection({ className }: { className?: string }) {
                   key={p.title}
                   className="group flex flex-col items-center gap-4 text-center max-sm:pt-8 sm:items-start sm:text-left"
                 >
-                  <span className="grid size-12 place-items-center rounded-full border border-primary/25 bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground motion-reduce:transition-none">
+                  <span className="grid size-12 place-items-center rounded-full border border-primary/25 bg-primary/10 text-secondary-foreground transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground motion-reduce:transition-none">
                     <p.icon className="size-5" strokeWidth={1.6} />
                   </span>
                   <h3 className="font-heading text-base font-semibold leading-snug text-foreground">

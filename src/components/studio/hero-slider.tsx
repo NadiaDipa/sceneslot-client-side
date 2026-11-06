@@ -14,12 +14,13 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, type Variants } from "motion/react";
 import { Autoplay, Keyboard, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import { cn } from "cn";
-import { categories } from "@/data/categories";
+import { HeroCategorySelect } from "@/components/studio/hero-category-select";
 import "swiper/css";
 import "swiper/css/navigation";
 
@@ -51,7 +52,9 @@ const slides: HeroSlide[] = [
     image:
       "https://images.unsplash.com/photo-1675635069927-cf0522ccdf6e?q=80&w=1920&auto=format&fit=crop",
     category: "Sound Stages",
-    headline: "Full-scale stages for full-scale ideas",
+    /* Non-breaking hyphen keeps "Full\u2011scale" on one line mobile
+       (text-balance otherwise breaks it at the regular hyphen) */
+    headline: "Full‑scale stages for full‑scale ideas",
     description:
       "Blackout sound stages with rigging grids, drive-in access, and production offices for film and commercial crews.",
   },
@@ -113,9 +116,32 @@ const copyItemVariants: Variants = {
 export function HeroSlider() {
   const swiperRef = useRef<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  /* Hero search criteria — submitted to /studios (see handleHeroSearch) */
+  const [heroLocation, setHeroLocation] = useState("");
+  const [heroCategory, setHeroCategory] = useState<string | null>(null);
+  const router = useRouter();
+
+  function handleHeroSearch(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    /* Reuses the /studios page's existing supported criteria:
+       - category → exact filter (existing ?category param)
+       - location → strict location-field filter (new ?location param)
+       - date has no matching logic anywhere yet (no availability model),
+         so it is intentionally not sent. Empty state → all studios. */
+    const params = new URLSearchParams();
+    if (heroCategory) params.set("category", heroCategory);
+    const locationText = heroLocation.trim();
+    if (locationText) params.set("location", locationText);
+    const qs = params.toString();
+    router.push(qs.length ? `/studios?${qs}` : "/studios");
+  }
 
   return (
     <section className="relative" aria-label="Featured spaces">
+      {/* Fully content-sized slider: the min-height floors live on the slides.
+          The Swiper wrapper is a flex row (align stretch), so every slide also
+          stretches to the tallest slide — slide heights stay identical, and the
+          CTA → search-panel gap (fixed margins) never depends on content. */}
       <Swiper
         modules={[Autoplay, Keyboard, Navigation]}
         onSwiper={(s) => (swiperRef.current = s)}
@@ -124,14 +150,23 @@ export function HeroSlider() {
         keyboard={{ enabled: true }}
         autoplay={{ delay: 6000, disableOnInteraction: false }}
         grabCursor
-        className="group/hero h-[52rem] w-full sm:h-[45rem] lg:h-[48rem]"
+        className="group/hero h-auto w-full"
       >
         {slides.map((slide, i) => {
           /* Presentation only: highlight the last headline word */
           const lastWord = slide.headline.slice(slide.headline.lastIndexOf(" ") + 1);
           const rest = slide.headline.slice(0, slide.headline.length - lastWord.length);
           return (
-            <SwiperSlide key={i} className="relative overflow-hidden">
+            <SwiperSlide
+              key={i}
+              /* h-auto! overrides Swiper's built-in `height: 100%` (which
+                 collapses to the slide's own content height and leaves a
+                 cream gap under the shorter slides). With height:auto the
+                 wrapper's flex stretch equalizes ALL slides to the tallest
+                 one — the hero's dark image then always covers the full
+                 slider, and the pagination bars always sit on the image. */
+              className="relative flex h-auto! min-h-[70svh] flex-col overflow-hidden sm:min-h-[45rem] lg:min-h-[48rem]"
+            >
               {/* Background image — slow Ken Burns zoom while active */}
               <motion.span
                 className="absolute inset-0 motion-reduce:transform-none!"
@@ -158,22 +193,38 @@ export function HeroSlider() {
                 aria-hidden
                 className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/20"
               />
+              {/* Extra readability wash: guarantees white copy contrast on bright photos.
+                  pointer-events-none keeps arrows / panel / buttons fully clickable. */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/55 via-black/30 to-black/10"
+              />
               <span aria-hidden className="bg-dotted absolute inset-0 opacity-40" />
 
-              {/* Search panel is hard-pinned to the slide bottom (below). The copy block
-                  uses mt-auto (not my-auto): it hugs the bottom of the padded box, so the
-                  gap between CTA and panel is CONSTANT per breakpoint regardless of how
-                  many lines the headline wraps — leftover space collects above the copy,
-                  where it reads as plain dark backdrop. */}
+              {/* Content-sized slide (floors on the SwiperSlide above; svh =
+                  small viewport, so the phone browser bar can't push the
+                  search panel off-screen). Copy is top-anchored and the
+                  search panel is in normal flow with fixed margins, so the
+                  gap between them is content-height-independent. */}
+              {/* Structured flex column, identical on every slide:
+                  pt = navbar clearance, fixed bottom inset = pagination zone
+                  (panel → bars gap and bars → hero bottom are constants by
+                  construction, never leftover-space-dependent). */}
               <motion.div
-                className="container-page relative flex h-full flex-col pt-28 pb-64 sm:pb-60 lg:pt-32"
+                className="container-page relative flex h-full flex-col pt-12 pb-[4.5rem] sm:pt-24"
                 variants={copyVariants}
                 initial="hidden"
                 animate={activeIndex === i ? "show" : "hidden"}
               >
-              {/* Centered as one group on mobile; the box stays bottom-anchored
-                  (mt-auto) and left-aligned from sm up, so desktop is unchanged. */}
-                <div className="mt-auto flex w-fit max-w-4xl flex-col items-start max-sm:mx-auto max-sm:items-center max-sm:text-center">
+              {/* Zone A (flex-1, centered): pill/headline/description/CTAs/stats.
+                  Every child carries a reserved min-height (headline 2 lines
+                  desktop / 3 mobile, description 2 lines desktop / 3 mobile)
+                  and the stats row a fixed min-h, so the copy block has the
+                  SAME height on every slide — all variable slide height is
+                  absorbed by this zone, and every y-position below (buttons,
+                  stats, search panel, pagination) is identical per viewport. */}
+                <div className="flex min-h-0 flex-1 flex-col justify-center">
+                  <div className="flex w-fit max-w-5xl flex-col items-start max-sm:mx-auto max-sm:items-center max-sm:text-center">
                   {/* Glass category pill */}
                   <motion.span
                     variants={copyItemVariants}
@@ -185,7 +236,10 @@ export function HeroSlider() {
 
                   <motion.h1
                     variants={copyItemVariants}
-                    className="mt-4 max-w-[52rem] text-5xl leading-[1.02] font-bold tracking-[-0.03em] text-white sm:text-6xl lg:text-7xl 2xl:text-[5.25rem]"
+                    /* Fluid size (clamp 40→72px, per spec) + reserved
+                       min-height of 2 lines desktop / 3 lines mobile, so a
+                       1-line headline can never shift anything below. */
+                    className="mt-3 max-w-[52rem] min-h-[3.15em] text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.05] font-bold tracking-[-0.03em] text-balance hyphens-none text-white sm:mt-4 sm:min-h-[2.1em]"
                   >
                     {rest}
                     <span className="bg-gradient-to-r from-[#C9AC72] via-[#978F66] to-[#E4D6A9] bg-clip-text font-serif text-[1.08em] italic text-transparent">
@@ -195,15 +249,18 @@ export function HeroSlider() {
 
                   <motion.p
                     variants={copyItemVariants}
-                    className="mt-4 max-w-2xl text-base leading-relaxed text-white/85 line-clamp-2 sm:text-lg"
+                    /* Reserved min-height: 3 lines mobile / 2 lines desktop,
+                       so description length never moves the CTAs. */
+                    className="mt-3 max-w-2xl min-h-[4.875rem] text-base leading-relaxed text-white/90 line-clamp-3 sm:mt-4 sm:min-h-[3.656rem] sm:text-lg sm:line-clamp-2"
                   >
                     {slide.description}
                   </motion.p>
 
-                  {/* CTAs — both link to /studios as per requirement */}
+                  {/* CTAs — both link to /studios as per requirement.
+                      44px tap targets on mobile, side-by-side when they fit. */}
                   <motion.div
                     variants={copyItemVariants}
-                    className="mt-7 flex max-sm:justify-center flex-wrap items-center gap-3 sm:gap-4"
+                    className="mt-3 flex max-sm:justify-center flex-wrap items-center gap-2.5 sm:mt-7 sm:gap-4"
                   >
                     <Link
                       href="/studios"
@@ -216,8 +273,11 @@ export function HeroSlider() {
                       Explore Studios
                       <ArrowRight className="size-4 transition-transform duration-300 group-hover/button:translate-x-1 motion-reduce:transform-none" />
                     </Link>
+                    {/* Same route as the Footer's "Host Your Space" link: /add-studio
+                        server-checks the session and redirects guests to
+                        /login?redirect=/add-studio */}
                     <Link
-                      href="/studios"
+                      href="/add-studio"
                       className={buttonVariants({
                         size: "lg",
                         variant: "outline",
@@ -229,21 +289,31 @@ export function HeroSlider() {
                     </Link>
                   </motion.div>
 
-                  {/* Subtle stat strip */}
+                  {/* Stat strip — the wrapper is ALWAYS rendered with a reserved
+                      min-height equal to the row's rendered height (28px), so a
+                      slide without stats keeps the exact same buttons →
+                      search-bar rhythm; an empty row stays space-keeping but
+                      invisible. Search panel top spacing therefore comes from
+                      the same source (this wrapper + the pinned panel inset)
+                      on every slide. */}
                   <motion.div
                     variants={copyItemVariants}
-                    className="mt-7 hidden items-center gap-5 2xl:flex 2xl:gap-6"
-                    aria-label="SceneSlot at a glance"
+                    className={cn(
+                      "mt-4 flex min-h-7 items-center justify-center gap-4 sm:mt-7 sm:justify-start sm:gap-5",
+                      stats.length === 0 && "invisible",
+                    )}
+                    aria-label={stats.length ? "SceneSlot at a glance" : undefined}
+                    aria-hidden={stats.length === 0 || undefined}
                   >
                     {stats.map((stat, idx) => (
                       <span
                         key={stat.label}
                         className={cn(
                           "flex items-baseline gap-1.5",
-                          idx > 0 && "border-l border-white/20 pl-5 sm:pl-6",
+                          idx > 0 && "border-l border-white/20 pl-4 sm:pl-6",
                         )}
                       >
-                        <span className="font-heading text-lg font-bold text-white sm:text-xl">
+                        <span className="font-heading text-sm font-bold text-white sm:text-xl">
                           {stat.value}
                         </span>
                         <span className="text-xs font-medium text-white/70 sm:text-sm">
@@ -253,15 +323,20 @@ export function HeroSlider() {
                     ))}
                   </motion.div>
                 </div>
+              </div>
 
-                {/* Marketplace search panel — pinned to the slide bottom with position:absolute
-                    so slide-content overflow (headline wraps) can NEVER push it down into the
-                    pagination band. Insets mirror container-page padding; max-w keeps the same
-                    left-aligned 4xl footprint as before. */}
-                <motion.div
-                  variants={copyItemVariants}
-                  className="absolute inset-x-4 bottom-24 grid max-w-4xl grid-cols-1 gap-1 rounded-2xl bg-background/95 p-1.5 shadow-2xl ring-1 ring-black/10 backdrop-blur-md sm:inset-x-6 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-stretch sm:gap-0 sm:divide-x sm:divide-border lg:inset-x-8"
-                >
+                  {/* Zone B: search panel, fixed (normal flow) with a constant
+                      Zone A → panel margin of 48px mobile / 56px desktop —
+                      both ≥ the 48px spec and never content-dependent.
+                      max-w keeps the same left-aligned 4xl footprint. */}
+                  {/* Panel is a real form: Search (type=submit) reads the
+                      selected criteria and navigates to /studios with them.
+                      Classes unchanged — identical look and layout. */}
+                  <motion.form
+                    onSubmit={handleHeroSearch}
+                    variants={copyItemVariants}
+                    className="relative mt-12 grid max-w-4xl grid-cols-1 gap-1 rounded-2xl bg-background/95 p-1.5 shadow-2xl ring-1 ring-black/10 backdrop-blur-md sm:mt-14 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-stretch sm:gap-0 sm:divide-x sm:divide-border sm:w-full"
+                  >
                   {searchFields.map((field) => (
                     <div
                       key={field.name}
@@ -275,27 +350,28 @@ export function HeroSlider() {
                         strokeWidth={1.8}
                       />
                       <div className="flex min-w-0 flex-1 flex-col gap-0.5 leading-tight">
-                        <span className="text-[0.7rem] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+                        <span className="text-xs font-bold tracking-[0.14em] text-muted-foreground uppercase">
                           {field.label}
                         </span>
                         {field.type === "select" ? (
-                          <select
+                          <HeroCategorySelect
+                            value={heroCategory}
+                            onValueChange={setHeroCategory}
+                          />
+                        ) : field.type === "text" ? (
+                          <input
                             aria-label={field.label}
-                            defaultValue=""
-                            className="w-full cursor-pointer appearance-none bg-transparent pr-1 text-[0.95rem] font-medium text-foreground outline-none"
-                          >
-                            <option value="" disabled>
-                              Choose a category
-                            </option>
-                            {categories.map((c) => (
-                              <option key={c.name} value={c.name} className="text-foreground">
-                                {c.name}
-                              </option>
-                            ))}
-                          </select>
+                            name={field.name}
+                            type={field.type}
+                            placeholder={field.placeholder}
+                            value={heroLocation}
+                            onChange={(e) => setHeroLocation(e.target.value)}
+                            className="w-full bg-transparent text-[0.95rem] font-medium text-foreground outline-none placeholder:text-muted-foreground/70"
+                          />
                         ) : (
                           <input
                             aria-label={field.label}
+                            name={field.name}
                             type={field.type}
                             placeholder={field.placeholder}
                             className="w-full bg-transparent text-[0.95rem] font-medium text-foreground outline-none placeholder:text-muted-foreground/70"
@@ -304,8 +380,8 @@ export function HeroSlider() {
                       </div>
                     </div>
                   ))}
-                  <Link
-                    href="/studios"
+                  <button
+                    type="submit"
                     className={buttonVariants({
                       size: "lg",
                       className:
@@ -315,8 +391,12 @@ export function HeroSlider() {
                   >
                     <Search className="size-4" />
                     Search
-                  </Link>
-                </motion.div>
+                  </button>
+                </motion.form>
+                {/* No trailing spacer: the container's fixed pb-[4.5rem] puts
+                    the panel 72px above the slide bottom, i.e. 28px above the
+                    pagination bars (which sit 24–44px from the bottom) —
+                    within the required 24–32px on every slide/viewport. */}
               </motion.div>
             </SwiperSlide>
           );

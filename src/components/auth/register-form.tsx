@@ -8,14 +8,19 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { GoogleButton } from "@/components/auth/login-form";
 import { signUp } from "@/lib/auth-client";
+import { hasDigit, MIN_PASSWORD_LENGTH } from "@/lib/password-policy";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { motion, type Variants } from "motion/react";
 
 const rules = [
-  { label: "At least 6 characters", test: (v: string) => v.length >= 6 },
+  {
+    label: `At least ${MIN_PASSWORD_LENGTH} characters`,
+    test: (v: string) => v.length >= MIN_PASSWORD_LENGTH,
+  },
   { label: "One uppercase letter", test: (v: string) => /[A-Z]/.test(v) },
   { label: "One lowercase letter", test: (v: string) => /[a-z]/.test(v) },
+  { label: "One number", test: hasDigit },
 ];
 
 const container: Variants = {
@@ -50,7 +55,8 @@ export function RegisterForm() {
     setPasswordError("");
     setErrorMessage("");
 
-    // Password validation: uppercase, lowercase, min 6 characters
+    // Password validation: the checklist is a single gate (length ≥ 8,
+    // upper + lower + digit), so the submit can never race the server rules.
     if (!rules.every((rule) => rule.test(password))) {
       const message = "Please meet all password requirements.";
       setPasswordError(message);
@@ -92,8 +98,14 @@ export function RegisterForm() {
       });
 
       if (error) {
+        /* The server (Better Auth) rejects short passwords with a bare
+           "Password too short" — replace it with the exact rule so the
+           message is actionable, and surface every other server error
+           verbatim in the banner + toast. */
         const message =
-          error.message || "Registration failed. Please try again.";
+          (error as { code?: string }).code === "PASSWORD_TOO_SHORT"
+            ? `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`
+            : error.message || "Registration failed. Please try again.";
         setErrorMessage(message);
         toast.error(message); // <-- TOAST: registration failed
         return;

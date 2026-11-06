@@ -36,17 +36,17 @@ export default async function EditStudioPage({ params }: Props) {
   if (!studio) notFound();
 
   return (
-    <section className="py-10 sm:py-14">
+    <section className="pt-8 pb-12 sm:pt-12 sm:pb-16">
       <div className="container-page max-w-4xl">
         <div className="mb-10 flex flex-col gap-3">
           <Link
             href="/my-listings"
-            className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex h-11 w-fit items-center gap-1.5 text-sm font-medium text-foreground/85 transition-colors hover:text-foreground sm:h-auto sm:py-0"
           >
             ← Back to listings
           </Link>
           <div className="flex flex-col gap-2">
-            <h1 className="font-heading text-3xl font-semibold sm:text-4xl">
+            <h1 className="font-heading text-[2rem] leading-[1.15] font-semibold text-balance sm:text-4xl">
               Edit &ldquo;{studio.title}&rdquo;
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">

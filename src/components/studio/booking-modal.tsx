@@ -163,9 +163,14 @@ export function BookingModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* Field labels: 12px bold uppercase (spec) — inputs are the shared
+              h-11/16px ui primitives */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="booking-date">
+              <Label
+                htmlFor="booking-date"
+                className="text-xs font-bold uppercase tracking-wide"
+              >
                 <CalendarDays className="size-3.5 text-primary" />
                 Date
               </Label>
@@ -180,7 +185,10 @@ export function BookingModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="booking-guests">
+              <Label
+                htmlFor="booking-guests"
+                className="text-xs font-bold uppercase tracking-wide"
+              >
                 <Users className="size-3.5 text-primary" />
                 Crew size
               </Label>
@@ -198,7 +206,7 @@ export function BookingModal({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
-              <Label>
+              <Label className="text-xs font-bold uppercase tracking-wide">
                 <Clock className="size-3.5 text-primary" />
                 Start time
               </Label>
@@ -221,7 +229,9 @@ export function BookingModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label>Duration</Label>
+              <Label className="text-xs font-bold uppercase tracking-wide">
+                Duration
+              </Label>
               <Select
                 value={duration}
                 onValueChange={(v) => setDuration(v ?? "2")}

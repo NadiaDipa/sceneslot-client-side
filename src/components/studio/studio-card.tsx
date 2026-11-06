@@ -51,7 +51,7 @@ export function StudioCard({
       {/* Content: ratings keep a fixed-height row so titles align across the grid.
           Name/rating/location center on mobile; price + button (footer) untouched. */}
       <CardContent className="flex flex-1 flex-col items-center gap-3 p-5 pb-6 text-center sm:items-start sm:p-6 sm:text-left">
-        <div className="flex min-h-5 items-center gap-2 text-[0.8rem] text-muted-foreground sm:text-sm">
+        <div className="flex min-h-5 items-center gap-2 text-[0.875rem] text-muted-foreground">
           {studio.reviewsCount > 0 ? (
             <>
               <RatingStars rating={studio.rating} />
@@ -66,7 +66,7 @@ export function StudioCard({
             <span>New Studio · No reviews yet</span>
           )}
         </div>
-        <h3 className="font-heading text-xl leading-snug font-semibold tracking-[-0.01em] sm:text-2xl">
+        <h3 className="font-heading text-xl leading-snug font-semibold tracking-[-0.01em] sm:text-[1.375rem]">
           <Link
             href={`/studios/${studio.id}`}
             className="rounded-sm outline-none transition-colors hover:text-primary focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -74,29 +74,30 @@ export function StudioCard({
             {studio.title}
           </Link>
         </h3>
-        <p className="flex items-center gap-1.5 text-[0.8rem] text-muted-foreground sm:text-sm">
+        <p className="flex items-center gap-1.5 text-[0.875rem] text-muted-foreground">
           <MapPin className="size-3.5 shrink-0 text-primary" />
           <span className="min-w-0 truncate">{studio.location}</span>
         </p>
       </CardContent>
 
       {/* Footer: price first, then a full, clearly-clickable booking action */}
-      <CardFooter className="items-center gap-4 border-border/70 bg-muted/40 px-4 py-4 sm:px-6">
+      <CardFooter className="items-center gap-4 border-border/70 bg-muted/40 px-5 py-4 sm:px-6">
         <div className="flex min-w-0 flex-col overflow-hidden leading-tight">
           {/* No whitespace-nowrap: "$180" and "/ hour" stayed unsplittable at
               max-content width, which (with the nowrap sub-line below) pushed the
               footer's min-content to ~379px — beyond the ~358px mobile grid track,
               so the card overflowed the viewport and a horizontal scrollbar appeared. */}
-          <span className="font-heading text-xl font-bold text-foreground sm:text-2xl sm:whitespace-nowrap">
+          <span className="font-heading text-xl font-bold text-foreground sm:whitespace-nowrap">
             ${studio.hourlyRate}
             <span className="ml-1 text-sm font-medium text-muted-foreground">
               / hour
             </span>
           </span>
-          {/* line-clamp-1 instead of truncate: truncate is white-space:nowrap, whose
-              min-content kept the whole sentence unsplittable and inflated the card's
-              intrinsic width; the clamp still reads identically at full width. */}
-          <span className="line-clamp-1 text-[0.7rem] text-muted-foreground">
+          {/* line-clamp-2 shows the full sentence ("Free cancellation" included) and
+              can wrap when the footer is squeezed instead of ellipsizing mid-word.
+              min-h-8 reserves the 2-line height so every card in the grid keeps the
+              same footer height (and equal card heights) at every column width. */}
+          <span className="line-clamp-2 min-h-8 text-xs text-muted-foreground">
             Instant booking · Free cancellation
           </span>
         </div>

@@ -37,8 +37,15 @@ export default async function HomePage() {
       {/* A. Hero slider */}
       <HeroSlider />
 
-      {/* B. Featured studios */}
-      <section className="py-16 sm:py-24" aria-label="Featured studios">
+      {/* B. Featured studios
+          bg-background: the body's viewport-fixed radial gradient used to leave a
+          misaligned "band" edge mid-heading here; this section now paints its own
+          opaque background so the band starts cleanly at the section's top edge
+          (below the hero image) and ends cleanly at the categories section. */}
+      <section
+        className="bg-background py-16 sm:py-24"
+        aria-label="Featured studios"
+      >
         <div className="container-page">
           <Reveal className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
             <SectionHeading
@@ -116,7 +123,10 @@ export default async function HomePage() {
                 )}
                 aspectClassName={cn(
                   i === 0
-                    ? "aspect-[16/10] md:aspect-[16/11]"
+                    ? /* The Photo Studios photo has a pale wall strip baked into its
+                           last ~5%; a slight bottom-left-anchored zoom crops it past
+                           the tile's overflow clip so no hard line shows at the edge. */
+                      "aspect-[16/10] md:aspect-[16/11] [&_img]:origin-bottom-left [&_img]:scale-[1.08]"
                     : i === 1
                       ? "aspect-[4/5] md:aspect-[16/11]"
                       : "aspect-[4/5]",

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function StudiosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; location?: string }>;
 }) {
   const params = await searchParams;
 
@@ -54,7 +54,7 @@ export default async function StudiosPage({
           <span className="font-mono text-xs font-medium tracking-widest text-muted-foreground uppercase">
             The marketplace
           </span>
-          <h1 className="font-heading text-3xl font-semibold sm:text-4xl lg:text-5xl">
+          <h1 className="font-heading text-[2rem] leading-[1.15] font-semibold text-balance sm:text-4xl lg:text-5xl">
             Explore creative studios
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
@@ -83,6 +83,7 @@ export default async function StudiosPage({
           studios={studios}
           uniqueLocations={uniqueLocations}
           initialCategory={initialCategory}
+          initialLocationQuery={params.location?.trim() ?? ""}
         />
       </section>
     </>

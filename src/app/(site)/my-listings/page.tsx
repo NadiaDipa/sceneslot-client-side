@@ -16,7 +16,7 @@ export default async function MyListingsPage() {
   }
 
   return (
-    <section className="container-page py-10 sm:py-14">
+    <section className="container-page pt-8 pb-12 sm:pt-12 sm:pb-16">
       <MyListingsContent />
     </section>
   );

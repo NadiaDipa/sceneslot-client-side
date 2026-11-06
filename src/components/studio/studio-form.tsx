@@ -710,7 +710,7 @@ export function StudioForm({
         <Button
           type="submit"
           size="lg"
-          className="shrink-0 gap-2"
+          className="w-full shrink-0 gap-2 sm:w-auto rounded-full"
           disabled={saving || uploading}
         >
           {saving ? (
