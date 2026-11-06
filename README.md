@@ -1,84 +1,99 @@
 # SceneSlot – Creative Studio Booking Platform
 
-SceneSlot is a peer-to-peer marketplace where photographers, filmmakers, podcasters and musicians discover, compare and book creative studios by the hour, and where studio owners list and manage their spaces.
+SceneSlot is a creative studio booking platform designed to connect studio owners with individuals looking for suitable spaces for photography, filmmaking, podcasting, music production, and other creative activities.
 
-**Live Website:** [Add Live Website URL]
-**Server Repository:** [Add Server GitHub URL]
+Users can explore available studios, view studio information, and manage their bookings. Studio owners can also list and manage their creative spaces through the platform.
+
+## Live Website
+
+[SceneSlot – Live Website](https://sceneslot-client.vercel.app)
+
+## GitHub Repositories
+
+- **Client Repository:** [SceneSlot Client](https://github.com/NadiaDipa/spaceslot-client-side)
+- **Server Repository:** [SceneSlot Server](https://github.com/NadiaDipa/sceneslot-server-side)
 
 ## Key Features
 
-- Hero slider, featured studios (latest 6 from MongoDB) and browse-by-category cards that open `/studios` with the category pre-selected.
-- Explore page with search, category filter and an empty state when nothing matches.
-- Studio details page with a photo gallery carousel, amenities, host details, reviews and a "Book Workspace Now" booking modal.
-- Private routes for adding, editing and deleting your own studio listings, with a confirmation modal before deleting.
-- Image upload (up to 3 photos per studio) through the ImgBB API, or paste an image URL.
-- Booking system with "Pending" status, a My Bookings page with status badges, and cancellation for pending bookings.
-- Double-booking prevention: overlapping time slots on the same date are rejected with a clear error message.
-- Email/password and Google authentication with protected routes that return the user to the page they wanted after login.
-- Light / dark theme toggle, branded loading skeletons, a custom 404 page, and Sonner toast notifications for every auth, CRUD and booking action.
-- Fully responsive on mobile, tablet and desktop.
+- Responsive homepage with a hero slider and featured studios.
+- Browse studios by category.
+- Explore studios with search and category filtering options.
+- View detailed studio information, images, amenities, and host details.
+- User authentication with email/password and Google sign-in.
+- Add, update, and manage personal studio listings.
+- Upload studio images or provide image URLs.
+- Book studios and manage personal bookings.
+- View booking information and booking status.
+- Cancel eligible bookings.
+- Light and dark theme support.
+- Loading states, notifications, and custom error pages.
+- Responsive interface for mobile, tablet, and desktop devices.
 
 ## Technology Stack
 
 | Layer | Technology |
-| --- | --- |
-| Frontend | Next.js (App Router), React, TypeScript, Tailwind CSS, shadcn/ui |
-| Authentication | Better Auth (MongoDB adapter), HTTPOnly session cookies |
-| Backend | Node.js, Express.js, MongoDB, Multer |
-| Image hosting | ImgBB API |
-| Other | Swiper.js, Motion, Sonner, next-themes, Lucide React |
-
-## Security Note
-
-Protected server routes (`POST /studios`, `PUT /studios/:id`, `DELETE /studios/:id`, `POST /bookings`, and others) verify the Better Auth signed session token stored in an HTTPOnly cookie and respond with `401 Unauthorized` when the user is not logged in. Studio edits and deletes are also restricted to the listing owner.
+|---|---|
+| Frontend | Next.js, React, TypeScript |
+| Styling | Tailwind CSS, shadcn/ui |
+| Authentication | Better Auth |
+| Backend | Node.js, Express.js |
+| Database | MongoDB |
+| Image Hosting | ImgBB |
+| UI & Animation | Swiper.js, Motion |
+| Notifications | Sonner |
+| Theme | next-themes |
+| Icons | Lucide React |
 
 ## Local Setup
 
-**1. Clone both repositories**
+### 1. Clone the Repositories
 
-```bash
-git clone YOUR_CLIENT_REPOSITORY_URL sceneslot-client
-git clone YOUR_SERVER_REPOSITORY_URL sceneslot-server
+```javascript
+git clone https://github.com/NadiaDipa/spaceslot-client-side.git sceneslot-client
+git clone https://github.com/NadiaDipa/sceneslot-server-side.git sceneslot-server
 ```
 
-**2. Set up the server**
+### 2. Set Up the Server
 
-```bash
+```javascript
 cd sceneslot-server
 npm install
 ```
 
-Create a `.env` file:
+Create a `.env` file in the server directory and configure the required environment variables:
 
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-BETTER_AUTH_SECRET=a_long_random_secret
-BETTER_AUTH_URL=http://localhost:5000
+```javascript
+BETTER_AUTH_SECRET=your_auth_secret
+BETTER_AUTH_URL=http://localhost:3000
+
+MONGODB_URI_BETTER_AUTH=your_mongodb_connection_string
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-IMGBB_API_KEY=your_imgbb_api_key
+
+API_BASE_URL=http://localhost:5000
+
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
 ```
 
 Start the server:
 
-```bash
+```javascript
 npm run dev
 ```
 
-**3. Set up the client**
+### 3. Set Up the Client
 
 Open another terminal:
 
-```bash
+```javascript
 cd sceneslot-client
 npm install
 ```
 
-Create a `.env` file (the secret and database must match the server):
+Create a `.env` file in the client directory and configure the required environment variables:
 
-```env
-BETTER_AUTH_SECRET=the_same_secret_as_the_server
+```javascript
+BETTER_AUTH_SECRET=your_auth_secret
 BETTER_AUTH_URL=http://localhost:3000
 MONGODB_URI_BETTER_AUTH=your_mongodb_connection_string
 GOOGLE_CLIENT_ID=your_google_client_id
@@ -88,15 +103,18 @@ API_BASE_URL=http://localhost:5000
 
 Start the client:
 
-```bash
+```javascript
 npm run dev
 ```
 
-The client runs on `http://localhost:3000` and the server on `http://localhost:5000`.
+The application will be available at:
 
-For Google login, add `http://localhost:5000/api/auth/callback/google` as an authorized redirect URI in the Google Cloud Console.
+- **Client:** http://localhost:3000
+- **Server:** http://localhost:5000
 
-## Examiner Test Credentials
+For Google sign-in, configure the appropriate OAuth credentials and callback URL in the Google Cloud Console.
 
-- **Email:** [Add Test Email]
-- **Password:** [Add Test Password]
+## Project Purpose
+
+SceneSlot aims to make creative workspace discovery and booking more convenient by providing a platform where users can explore different studios and studio owners can showcase their spaces.
+
