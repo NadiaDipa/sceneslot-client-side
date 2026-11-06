@@ -166,7 +166,7 @@ export default function HowItWorksPage() {
               "mx-auto text-center"
             )}
           >
-            <Badge className="mx-auto h-6 bg-primary/20 text-primary">
+            <Badge className="mx-auto h-6 bg-primary text-primary-foreground">
               For studio owners
             </Badge>
             <h2 className="font-heading text-3xl font-semibold sm:text-4xl text-background">

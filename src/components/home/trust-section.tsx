@@ -1,15 +1,6 @@
-import { buttonVariants } from "@/components/ui/button";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { cn } from "cn";
-import {
-  ArrowRight,
-  Building2,
-  Camera,
-  ShieldCheck,
-  UserCheck,
-  Wrench,
-} from "lucide-react";
-import Link from "next/link";
+import { Building2, Camera, ShieldCheck, UserCheck, Wrench } from "lucide-react";
 
 const pillars = [
   {
@@ -71,17 +62,19 @@ export function TrustSection({ className }: { className?: string }) {
               </p>
             </div>
 
-            {/* Four pillars, revealed in stagger — open layout, no nested cards */}
-            <RevealGroup className="relative mt-10 grid gap-10 px-6 pb-10 sm:grid-cols-2 sm:px-10 sm:pb-14 sm:pt-2 lg:grid-cols-4 lg:gap-x-6">
+            {/* Four pillars, revealed in stagger — open layout, no nested cards.
+                Fixed heading/description gaps keep all four columns reading evenly.
+                Hairline dividers separate the stacked pillars on mobile only. */}
+            <RevealGroup className="relative mt-12 grid gap-10 px-6 pb-14 pt-2 max-sm:divide-y max-sm:divide-border/60 sm:px-10 sm:pb-16 lg:grid-cols-4 lg:gap-x-8">
               {pillars.map((p) => (
                 <RevealItem
                   key={p.title}
-                  className="group flex flex-col gap-3.5"
+                  className="group flex flex-col items-center gap-4 text-center max-sm:pt-8 sm:items-start sm:text-left"
                 >
                   <span className="grid size-12 place-items-center rounded-full border border-primary/25 bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground motion-reduce:transition-none">
                     <p.icon className="size-5" strokeWidth={1.6} />
                   </span>
-                  <h3 className="font-heading text-base font-semibold text-foreground">
+                  <h3 className="font-heading text-base font-semibold leading-snug text-foreground">
                     {p.title}
                   </h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
@@ -90,32 +83,6 @@ export function TrustSection({ className }: { className?: string }) {
                 </RevealItem>
               ))}
             </RevealGroup>
-
-            {/* Host CTA strip */}
-            <div className="relative border-t bg-muted/40">
-              <div className="flex flex-col items-center justify-between gap-6 px-6 py-8 sm:flex-row sm:px-10 sm:py-10">
-                <div className="max-w-xl text-center sm:text-left">
-                  <h3 className="text-xl font-semibold text-foreground sm:text-2xl">
-                    Own a creative space? Let it shoot for you.
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                    List your studio in 15 minutes, set your own hours, and keep 88%
-                    of every booking. No listing fees.
-                  </p>
-                </div>
-                <Link
-                  href="/add-studio"
-                  className={buttonVariants({
-                    size: "lg",
-                    className:
-                      "h-12 shrink-0 gap-2 rounded-lg px-7 text-sm font-semibold",
-                  })}
-                >
-                  Host Your Space
-                  <ArrowRight className="size-4 transition-transform duration-300 group-hover/button:translate-x-1 motion-reduce:transform-none" />
-                </Link>
-              </div>
-            </div>
           </div>
         </Reveal>
       </div>

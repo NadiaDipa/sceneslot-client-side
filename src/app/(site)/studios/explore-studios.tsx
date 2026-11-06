@@ -64,13 +64,31 @@ export function ExploreStudios({
   }
 
   const results = useMemo(() => {
+    /* Multi-term AND search with word-aware matching:
+       - Title/category use token-prefix matching (so "photo" finds
+         "Photography Loft", "workshops" finds the "Art Workshops" category).
+       - Description/amenities use whole-word matching (with a simple trailing
+         plural, so "portrait" still matches "portraits") — raw substring
+         matching made coincidental hits relevant, e.g. "art" matching
+         "voice-over artists" on a sound-stage listing. */
+    const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const escapeRegex = (term: string) =>
+      term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const matchPrefix = (term: string, text: string) =>
+      new RegExp(`\\b${escapeRegex(term)}\\w*`, "i").test(text);
+    const matchWord = (term: string, text: string) =>
+      new RegExp(`\\b${escapeRegex(term)}(?:e?s)?\\b`, "i").test(text);
+
     let list = studios.filter((s) => {
-      const q = query.trim().toLowerCase();
       const matchesQuery =
-        q === "" ||
-        s.title.toLowerCase().includes(q) ||
-        s.description.toLowerCase().includes(q) ||
-        s.amenities.some((a) => a.toLowerCase().includes(q));
+        terms.length === 0 ||
+        terms.every(
+          (term) =>
+            matchPrefix(term, s.title) ||
+            matchPrefix(term, s.category) ||
+            matchWord(term, s.description) ||
+            matchWord(term, s.amenities.join(" "))
+        );
       const matchesCategory =
         category === "All Categories" || s.category === category;
       const matchesLocation = location === "all" || s.location === location;
@@ -158,7 +176,7 @@ export function ExploreStudios({
             },
           ].map((group) => (
             <div key={group.label} className="flex flex-col gap-1.5">
-              <Label htmlFor={`filter-${group.label}`} className="text-xs text-muted-foreground">
+              <Label htmlFor={`filter-${group.label}`} className="text-sm text-foreground/80">
                 {group.label}
               </Label>
               <Select value={group.value} onValueChange={group.onValueChange}>

@@ -107,9 +107,9 @@ export default async function DashboardPage() {
   return (
     <section className="py-10 sm:py-14">
       <div className="container-page flex flex-col gap-10">
-        <header className="flex flex-wrap items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <Avatar className="size-14">
+        <header className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <Avatar className="size-12 sm:size-14">
               <AvatarImage src={session.user.image || ""} alt={userName} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
@@ -136,7 +136,7 @@ export default async function DashboardPage() {
           {summary.map((item) => (
             <div
               key={item.label}
-              className="flex flex-col gap-3 rounded-2xl border-border bg-card p-5 ring-1 ring-foreground/10"
+              className="flex flex-col items-center gap-3 rounded-2xl border-border bg-card p-5 text-center ring-1 ring-foreground/10 sm:items-start sm:text-left"
             >
               <span className="grid size-9 place-items-center rounded-lg bg-accent text-accent-foreground">
                 <item.icon className="size-4.5" strokeWidth={1.8} />

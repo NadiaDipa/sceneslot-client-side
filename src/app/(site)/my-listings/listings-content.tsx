@@ -87,8 +87,10 @@ export function ListingRow({
         />
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-2">
+      {/* Content — centered hierarchy on mobile: title/status, meta, then
+          price and host under a hairline divider; left-aligned from sm up */}
+      <div className="flex min-w-0 flex-1 flex-col items-center gap-2 text-center sm:items-start sm:text-left">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
           <h2 className="font-heading text-base font-semibold">
             {listing.title}
           </h2>
@@ -111,15 +113,20 @@ export function ListingRow({
           </span>
         </p>
 
-        <p className="text-sm">
-          <span className="font-semibold">${listing.hourlyRate}</span>
-          <span className="text-muted-foreground"> / hour</span>
+        <p className="font-heading text-lg font-bold sm:text-base">
+          ${listing.hourlyRate}
+          <span className="ml-1 text-xs font-medium text-muted-foreground sm:ml-0">
+            / hour
+          </span>
         </p>
 
-        <div className="flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:gap-4">
+        <div className="flex w-full flex-col items-center gap-1 border-t border-border/70 pt-3 text-xs text-muted-foreground sm:w-auto sm:flex-row sm:gap-4 sm:border-0 sm:pt-0 sm:text-left">
           <span className="inline-flex items-center gap-1.5">
             <UserRound className="size-3.5" />
-            Host: {listing.ownerName || "Not available"}
+            Host:{" "}
+            <span className="font-semibold text-foreground">
+              {listing.ownerName || "Not available"}
+            </span>
           </span>
 
           <span className="inline-flex items-center gap-1.5">
@@ -129,7 +136,9 @@ export function ListingRow({
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">
+      {/* Actions — the same Edit / View / Delete controls, centered as a row
+          on mobile under a hairline divider, left as before on desktop */}
+      <div className="flex shrink-0 items-center justify-center gap-3 border-t border-border/70 pt-3 sm:justify-start sm:gap-2 sm:border-0 sm:pt-0">
         <Button
           variant="outline"
           size="icon"
@@ -221,7 +230,8 @@ export function MyListingsContent() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      {/* Header — centered on mobile, split left/right from sm up */}
+      <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
         <div className="flex flex-col gap-1">
           <h1 className="font-heading text-3xl font-semibold sm:text-4xl">
             My studio listings

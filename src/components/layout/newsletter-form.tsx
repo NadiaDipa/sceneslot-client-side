@@ -34,7 +34,7 @@ export function NewsletterForm() {
         name="email"
         required
         placeholder="you@studio.com"
-        className="h-11 rounded-full border-white/15 bg-white/5 text-white placeholder:text-white/45 focus-visible:border-primary focus-visible:ring-primary/40"
+        className="h-11 rounded-full border-white/15 bg-white/5 text-white placeholder:text-white/65 focus-visible:border-primary focus-visible:ring-primary/40"
       />
       <Button
         type="submit"

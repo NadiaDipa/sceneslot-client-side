@@ -60,7 +60,7 @@ export function ProfileDropdown({
   };
 
   const menuItemClass =
-    "group flex gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-colors duration-200 data-[highlighted]:bg-primary/15 data-[highlighted]:text-primary";
+    "group flex gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-200 data-[highlighted]:bg-primary/15 data-[highlighted]:text-primary";
 
   const iconBoxClass =
     "grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-200 group-data-[highlighted]:bg-primary group-data-[highlighted]:text-primary-foreground";

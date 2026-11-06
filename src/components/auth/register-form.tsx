@@ -61,9 +61,32 @@ export function RegisterForm() {
     setIsLoading(true);
 
     try {
+      // Emails are normalized to lowercase consistently (registration, login,
+      // and database lookups) so casing can never create second accounts.
+      const normalizedEmail = email.trim().toLowerCase();
+
+      // Duplicate guard: Better Auth returns an un-distinguishable generic
+      // success for an existing email when auto sign-in is off, so check
+      // case-insensitively first and surface a real error.
+      const checkRes = await fetch(
+        `/api/users/check-email?email=${encodeURIComponent(normalizedEmail)}`
+      );
+
+      if (checkRes.ok) {
+        const { exists } = await checkRes.json();
+
+        if (exists) {
+          const message =
+            "An account with this email already exists. Please log in instead.";
+          setErrorMessage(message);
+          toast.error(message);
+          return;
+        }
+      }
+
       const { data, error } = await signUp.email({
         name,
-        email,
+        email: normalizedEmail,
         password,
         image: photoUrl.trim() || undefined,
       });
@@ -170,7 +193,7 @@ export function RegisterForm() {
             onChange={(e) => setPhotoUrl(e.target.value)}
             className={inputCls}
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Optional — a profile photo builds trust with hosts.
           </p>
         </div>
@@ -220,7 +243,7 @@ export function RegisterForm() {
                 return (
                   <li
                     key={rule.label}
-                    className={`flex items-center gap-2 text-xs transition-colors ${
+                    className={`flex items-center gap-2 text-[0.8rem] transition-colors ${
                       isValid
                         ? "text-emerald-600 dark:text-emerald-400"
                         : "text-muted-foreground"
@@ -239,7 +262,7 @@ export function RegisterForm() {
           )}
 
           {passwordError && (
-            <p className="text-xs text-destructive" role="alert">
+            <p className="text-sm text-destructive" role="alert">
               {passwordError}
             </p>
           )}

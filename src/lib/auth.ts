@@ -30,3 +30,22 @@ export const auth = betterAuth({
     },
   },
 });
+
+/**
+ * Case-insensitive email existence check for the app's own duplicate
+ * prevention. Better Auth itself only ever writes normalized (lowercase)
+ * emails, but a case-insensitive query also catches any legacy record that
+ * may have been stored with mixed casing before this was enforced.
+ */
+// NOTE: emails are always stored lowercase; Better Auth normalizes writes.
+export async function userEmailExists(email: string): Promise<boolean> {
+  const escaped = email.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  if (!escaped) return false;
+
+  const doc = await db
+    .collection("user")
+    .findOne({ email: { $regex: `^${escaped}$`, $options: "i" } });
+
+  return Boolean(doc);
+}

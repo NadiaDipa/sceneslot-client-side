@@ -40,7 +40,7 @@ export default async function HomePage() {
       {/* B. Featured studios */}
       <section className="py-16 sm:py-24" aria-label="Featured studios">
         <div className="container-page">
-          <Reveal className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <Reveal className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
             <SectionHeading
               align="left"
               eyebrow="Featured"
@@ -59,7 +59,7 @@ export default async function HomePage() {
                 variant: "outline",
                 size: "lg",
                 className:
-                  "h-11 shrink-0 gap-2 px-5 font-semibold self-start sm:self-auto",
+                  "h-11 shrink-0 gap-2 px-5 font-semibold self-center sm:self-auto",
               })}
             >
               View all studios

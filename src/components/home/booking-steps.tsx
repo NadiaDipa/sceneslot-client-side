@@ -63,12 +63,15 @@ export function BookingSteps() {
             <RevealItem
               key={step.title}
               as="li"
-              className="group relative flex flex-col border-t border-border pt-7"
+              className="group relative flex flex-col rounded-2xl border-t border-border px-3 -mx-3 pt-7 pb-2 text-center transition-colors duration-300 hover:bg-primary/10 group-active:bg-primary/10 lg:px-3 lg:-mx-3 lg:pb-2 lg:text-left motion-reduce:transition-none"
             >
-              <div className="flex items-center gap-4">
+              {/* Numeral and icon share a centered row (centered on mobile, left on +lg);
+                  the arrow sits at the outer edge of each column so progression reads
+                  left to right. */}
+              <div className="flex items-center justify-center gap-4 lg:justify-start">
                 <span
                   aria-hidden
-                  className="font-heading text-4xl leading-none font-bold text-foreground/15 transition-colors duration-300 group-hover:text-primary motion-reduce:transition-none"
+                  className="font-heading text-4xl leading-none font-bold text-foreground/15 transition-colors duration-300 group-hover:text-primary max-sm:text-primary/40 max-sm:group-active:text-primary motion-reduce:transition-none"
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
@@ -78,12 +81,14 @@ export function BookingSteps() {
                 {i < steps.length - 1 ? (
                   <ArrowRight
                     aria-hidden
-                    className="ml-auto hidden size-4 text-muted-foreground/40 lg:block"
+                    className="ml-auto hidden size-4 text-muted-foreground/40 transition-colors duration-300 group-hover:translate-x-0.5 group-hover:text-primary lg:block motion-reduce:transform-none motion-reduce:transition-none"
                   />
                 ) : null}
               </div>
-              <div className="mt-5 flex flex-col gap-1.5">
-                <h3 className="font-heading text-lg font-semibold">{step.title}</h3>
+              <div className="mt-5 flex flex-col gap-2">
+                <h3 className="font-heading text-lg font-semibold leading-snug">
+                  {step.title}
+                </h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {step.description}
                 </p>

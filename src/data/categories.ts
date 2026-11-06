@@ -32,16 +32,16 @@ export const categories: Category[] = [
     tagline: "Broadcast-ready recording nooks",
     description:
       "Acoustically treated rooms with mixers, mics, and live-editing setups.",
-    image: img("1478737270239-2f02b77fc618"),
-
+    // Bright, warm-toned podcast suite (condenser mic, headphones, monitoring screen)
+    image: img("1589903308904-1010c2294adc"),
   },
   {
     name: "Music Suites",
     tagline: "Rehearsal & recording suites",
     description:
       "Isolated live rooms, control rooms, and backline-equipped rehearsal spaces.",
-    image: img("1767570924190-7b62f034cd5b"),
-
+    // Professionally lit control room: mixing console, studio monitors, guitar wall
+    image: img("1598488035139-bdbb2231ce04"),
   },
   {
     name: "Art Workshops",

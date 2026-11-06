@@ -5,7 +5,7 @@ import { cn } from "cn";
 export function StudioCardSkeleton({ className }: { className?: string }) {
   return (
     <Card className={cn("gap-0 overflow-hidden pt-0", className)}>
-      <Skeleton className="aspect-[4/3] w-full rounded-none" />
+      <Skeleton className="aspect-[3/2] w-full rounded-none" />
       <CardContent className="flex flex-col gap-2.5 p-5">
         <Skeleton className="h-3.5 w-28" />
         <Skeleton className="h-5 w-3/4" />

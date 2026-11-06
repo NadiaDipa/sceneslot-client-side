@@ -12,18 +12,18 @@ export function Logo({ className, light = false }: LogoProps) {
     <Link
       href="/"
       className={cn(
-        "group inline-flex items-center gap-2.5",
+        "group inline-flex items-center gap-2 sm:gap-3",
         light ? "text-white" : "text-foreground",
         className
       )}
     >
       <svg
-        width="38"
-        height="38"
+        width="42"
+        height="42"
         viewBox="0 0 40 40"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="shrink-0"
+        className="shrink-0 size-8 sm:size-[42px] transition-transform duration-300 group-hover:rotate-[8deg] motion-reduce:transform-none"
         aria-hidden
       >
         <defs>
@@ -68,7 +68,7 @@ export function Logo({ className, light = false }: LogoProps) {
         <circle cx="20" cy="20" r="2.1" fill="#978F66" />
       </svg>
 
-      <span className="font-brand text-[21px] leading-none font-semibold tracking-tight">
+      <span className="font-brand text-[18px] leading-none font-bold tracking-[-0.015em] sm:text-[23px]">
         Scene
         <span className={light ? "text-[#E4D6A9]" : "text-primary"}>
           Slot

@@ -17,12 +17,17 @@ export function SectionHeading({
   className,
 }: SectionHeadingProps) {
   const centered = align === "center";
+  /* Left-aligned headings still center on mobile — the two pages using this
+     variant (featured studios, about mission) are requested mobile-centered,
+     while tablet/desktop keep the left alignment. */
 
   return (
     <div
       className={cn(
         "mb-10 flex flex-col gap-4 sm:mb-12",
-        centered ? "items-center text-center" : "items-start",
+        centered
+          ? "items-center text-center"
+          : "items-start text-left max-sm:items-center max-sm:text-center",
         className
       )}
     >
@@ -30,7 +35,7 @@ export function SectionHeading({
         <span
           className={cn(
             "inline-flex items-center gap-2.5 text-xs font-semibold tracking-[0.2em] uppercase text-primary",
-            centered && "justify-center"
+            centered ? "justify-center" : "max-sm:justify-center"
           )}
         >
           <span aria-hidden className="h-px w-7 bg-primary/50" />

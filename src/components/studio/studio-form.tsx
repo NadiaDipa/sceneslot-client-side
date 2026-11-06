@@ -547,7 +547,7 @@ export function StudioForm({
                   : "Click to upload from your computer"}
             </span>
 
-            <span className="text-xs text-muted-foreground">
+            <span className="text-[0.8rem] text-muted-foreground">
               JPG, PNG, or WebP · Maximum 20 MB per image
             </span>
           </button>
@@ -661,7 +661,7 @@ export function StudioForm({
             className="resize-y"
           />
 
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[0.8rem] text-muted-foreground">
             {form.overview.length} characters · you can edit this later from My
             Studio Listings.
           </p>

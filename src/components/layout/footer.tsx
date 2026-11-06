@@ -126,15 +126,15 @@ export function Footer() {
         {/* Columns */}
         <Reveal delay={0.1}>
           <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.4fr] lg:py-16">
-            {/* Brand */}
-            <div className="flex flex-col gap-4 sm:pr-4">
+            {/* Brand — centered on mobile, left-aligned from sm up */}
+            <div className="flex flex-col items-center gap-4 text-center sm:items-start sm:text-left sm:pr-4">
               <Logo light />
               <p className="max-w-xs text-sm leading-relaxed text-white/65">
                 SceneSlot is the peer-to-peer marketplace where creators find the
                 spaces that bring their ideas to light — and where studio owners
                 turn downtime into income.
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2 sm:justify-start">
                 {socialIcons.map((s) => (
                   <a
                     key={s.label}
@@ -154,7 +154,7 @@ export function Footer() {
               <nav
                 key={col.title}
                 aria-label={col.title}
-                className="flex flex-col gap-3"
+                className="flex flex-col items-center gap-3 text-center sm:items-start sm:text-left"
               >
                 <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-white">
                   {col.title}
@@ -171,8 +171,8 @@ export function Footer() {
               </nav>
             ))}
 
-            {/* Newsletter */}
-            <div className="flex flex-col gap-3">
+            {/* Newsletter — centered on mobile; the form's max-w keeps it balanced */}
+            <div className="flex flex-col items-center gap-3 text-center sm:items-start sm:text-left">
               <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-white">
                 Stay in the loop
               </h3>
@@ -185,12 +185,13 @@ export function Footer() {
           </div>
         </Reveal>
 
-        {/* Bottom bar */}
-        <div className="flex flex-col items-center justify-between gap-3 border-t border-white/10 py-6 sm:flex-row">
+        {/* Bottom bar — mobile keeps the centered stack; desktop restores the
+            classic split: copyright left, legal links right, one clean row */}
+        <div className="flex flex-col items-center justify-center gap-3 border-t border-white/10 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
           <p className="text-xs text-white/55">
             © {new Date().getFullYear()} SceneSlot Inc. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 sm:justify-end">
             <Link href="/terms" className={footerLinkClasses}>
               Terms of Service
             </Link>

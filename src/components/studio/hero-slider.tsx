@@ -124,7 +124,7 @@ export function HeroSlider() {
         keyboard={{ enabled: true }}
         autoplay={{ delay: 6000, disableOnInteraction: false }}
         grabCursor
-        className="group/hero h-[44rem] w-full sm:h-[45rem] lg:h-[46rem] 2xl:h-[48rem]"
+        className="group/hero h-[52rem] w-full sm:h-[45rem] lg:h-[48rem]"
       >
         {slides.map((slide, i) => {
           /* Presentation only: highlight the last headline word */
@@ -160,15 +160,20 @@ export function HeroSlider() {
               />
               <span aria-hidden className="bg-dotted absolute inset-0 opacity-40" />
 
-              {/* Copy block floats at optical center; search stays anchored at the bottom.
-                  Generous top padding keeps everything clear of the fixed Navbar. */}
+              {/* Search panel is hard-pinned to the slide bottom (below). The copy block
+                  uses mt-auto (not my-auto): it hugs the bottom of the padded box, so the
+                  gap between CTA and panel is CONSTANT per breakpoint regardless of how
+                  many lines the headline wraps — leftover space collects above the copy,
+                  where it reads as plain dark backdrop. */}
               <motion.div
-                className="container-page relative flex h-full flex-col pt-28 pb-20 lg:pt-32"
+                className="container-page relative flex h-full flex-col pt-28 pb-64 sm:pb-60 lg:pt-32"
                 variants={copyVariants}
                 initial="hidden"
                 animate={activeIndex === i ? "show" : "hidden"}
               >
-                <div className="my-auto flex w-fit max-w-4xl flex-col items-start">
+              {/* Centered as one group on mobile; the box stays bottom-anchored
+                  (mt-auto) and left-aligned from sm up, so desktop is unchanged. */}
+                <div className="mt-auto flex w-fit max-w-4xl flex-col items-start max-sm:mx-auto max-sm:items-center max-sm:text-center">
                   {/* Glass category pill */}
                   <motion.span
                     variants={copyItemVariants}
@@ -190,7 +195,7 @@ export function HeroSlider() {
 
                   <motion.p
                     variants={copyItemVariants}
-                    className="mt-4 max-w-2xl text-base leading-relaxed text-white/85 line-clamp-2 sm:text-lg sm:line-clamp-none"
+                    className="mt-4 max-w-2xl text-base leading-relaxed text-white/85 line-clamp-2 sm:text-lg"
                   >
                     {slide.description}
                   </motion.p>
@@ -198,14 +203,14 @@ export function HeroSlider() {
                   {/* CTAs — both link to /studios as per requirement */}
                   <motion.div
                     variants={copyItemVariants}
-                    className="mt-7 flex flex-wrap items-center gap-3 sm:gap-4"
+                    className="mt-7 flex max-sm:justify-center flex-wrap items-center gap-3 sm:gap-4"
                   >
                     <Link
                       href="/studios"
                       className={buttonVariants({
                         size: "lg",
                         className:
-                          "h-12 px-7 text-sm font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40",
+                          "h-11 px-5 text-sm font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 sm:h-12 sm:px-7",
                       })}
                     >
                       Explore Studios
@@ -217,7 +222,7 @@ export function HeroSlider() {
                         size: "lg",
                         variant: "outline",
                         className:
-                          "h-12 border-white/30 bg-white/5 px-7 text-white backdrop-blur-md hover:border-white/50 hover:bg-white/15 hover:text-white",
+                          "h-11 border-white/30 bg-white/5 px-5 text-white backdrop-blur-md hover:border-white/50 hover:bg-white/15 hover:text-white sm:h-12 sm:px-7",
                       })}
                     >
                       Host Your Space
@@ -227,7 +232,7 @@ export function HeroSlider() {
                   {/* Subtle stat strip */}
                   <motion.div
                     variants={copyItemVariants}
-                    className="mt-7 hidden items-center gap-5 sm:flex sm:gap-6"
+                    className="mt-7 hidden items-center gap-5 2xl:flex 2xl:gap-6"
                     aria-label="SceneSlot at a glance"
                   >
                     {stats.map((stat, idx) => (
@@ -249,17 +254,19 @@ export function HeroSlider() {
                   </motion.div>
                 </div>
 
-                {/* Marketplace search panel (UI only — Search links to /studios).
-                    A light, labeled card reads clearly over any slide image. */}
+                {/* Marketplace search panel — pinned to the slide bottom with position:absolute
+                    so slide-content overflow (headline wraps) can NEVER push it down into the
+                    pagination band. Insets mirror container-page padding; max-w keeps the same
+                    left-aligned 4xl footprint as before. */}
                 <motion.div
                   variants={copyItemVariants}
-                  className="mt-8 grid w-full max-w-4xl grid-cols-1 gap-1 rounded-2xl bg-background/95 p-1.5 shadow-2xl ring-1 ring-black/10 backdrop-blur-md sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-stretch sm:gap-0 sm:divide-x sm:divide-border"
+                  className="absolute inset-x-4 bottom-24 grid max-w-4xl grid-cols-1 gap-1 rounded-2xl bg-background/95 p-1.5 shadow-2xl ring-1 ring-black/10 backdrop-blur-md sm:inset-x-6 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-stretch sm:gap-0 sm:divide-x sm:divide-border lg:inset-x-8"
                 >
                   {searchFields.map((field) => (
                     <div
                       key={field.name}
                       className={cn(
-                        "flex min-w-0 items-center gap-3 rounded-xl px-4 py-2.5 transition-colors hover:bg-muted/70 sm:h-14",
+                        "flex min-w-0 items-center gap-3 rounded-xl px-4 py-2.5 transition-colors hover:bg-muted/70 sm:h-14 sm:py-2",
                         field.name !== "location" && "hidden sm:flex",
                       )}
                     >
@@ -268,14 +275,14 @@ export function HeroSlider() {
                         strokeWidth={1.8}
                       />
                       <div className="flex min-w-0 flex-1 flex-col gap-0.5 leading-tight">
-                        <span className="text-[0.6rem] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+                        <span className="text-[0.7rem] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
                           {field.label}
                         </span>
                         {field.type === "select" ? (
                           <select
                             aria-label={field.label}
                             defaultValue=""
-                            className="w-full cursor-pointer appearance-none bg-transparent pr-1 text-sm font-medium text-foreground outline-none"
+                            className="w-full cursor-pointer appearance-none bg-transparent pr-1 text-[0.95rem] font-medium text-foreground outline-none"
                           >
                             <option value="" disabled>
                               Choose a category
@@ -291,7 +298,7 @@ export function HeroSlider() {
                             aria-label={field.label}
                             type={field.type}
                             placeholder={field.placeholder}
-                            className="w-full bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground/60"
+                            className="w-full bg-transparent text-[0.95rem] font-medium text-foreground outline-none placeholder:text-muted-foreground/70"
                           />
                         )}
                       </div>
@@ -302,7 +309,7 @@ export function HeroSlider() {
                     className={buttonVariants({
                       size: "lg",
                       className:
-                        "h-12 w-full gap-2 text-sm font-semibold sm:h-14 sm:w-auto sm:min-w-40",
+                        "h-11 w-full gap-2 text-sm font-semibold sm:h-14 sm:w-auto sm:min-w-40",
                     })}
                     aria-label="Search studios"
                   >
@@ -315,9 +322,11 @@ export function HeroSlider() {
           );
         })}
 
-        {/* Progress-bar pagination — active bar fills over the autoplay cycle */}
+        {/* Progress-bar pagination — active bar fills over the autoplay cycle.
+            Buttons carry the hit area (h-5); the visible bar stays slim, so it
+            stays clear of the search panel and remains easy to tap on mobile. */}
         <div
-          className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 sm:gap-3"
+          className="absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 sm:gap-1.5"
           role="group"
           aria-label="Slide progress"
         >
@@ -328,17 +337,22 @@ export function HeroSlider() {
               aria-label={`Go to slide ${idx + 1}`}
               aria-current={activeIndex === idx ? "true" : undefined}
               onClick={() => swiperRef.current?.slideToLoop(idx)}
-              className="relative h-1 w-14 cursor-pointer overflow-hidden rounded-full bg-white/25 outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring/50 sm:w-20 motion-reduce:transition-none"
+              className="group/pill flex h-5 cursor-pointer items-center px-1 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 motion-reduce:transition-none"
             >
-              {activeIndex === idx && (
-                <motion.span
-                  key={activeIndex}
-                  className="absolute inset-0 origin-left rounded-full bg-primary"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 6, ease: "linear" }}
-                />
-              )}
+              <span
+                aria-hidden
+                className="relative h-1 w-12 overflow-hidden rounded-full bg-white/30 ring-1 ring-inset ring-white/25 transition-colors duration-300 group-hover/pill:bg-white/40 sm:w-16"
+              >
+                {activeIndex === idx && (
+                  <motion.span
+                    key={activeIndex}
+                    className="absolute inset-0 origin-left rounded-full bg-[#E4D6A9]"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 6, ease: "linear" }}
+                  />
+                )}
+              </span>
             </button>
           ))}
         </div>

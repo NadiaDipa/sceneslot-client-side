@@ -53,8 +53,9 @@ export function Navbar() {
       )}
     >
       <div className="container-page grid h-[72px] grid-cols-[1fr_auto_1fr] items-center gap-3 lg:h-[80px]">
-        {/* Brand */}
-        <div className="flex min-w-0 items-center">
+        {/* Brand — left on mobile (forced per design), left on desktop.
+            Explicit column placement keeps one clean row: logo left, controls right. */}
+        <div className="col-start-1 flex min-w-0 items-center justify-start lg:justify-start">
           <Logo
             className="transition-opacity duration-200 outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring/60 rounded-lg"
           />
@@ -99,8 +100,9 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Right side */}
-        <div className="flex items-center justify-end gap-2 sm:gap-3">
+        {/* Right side — same column arrangement on mobile and desktop:
+            controls at the far RIGHT, keeping one row with the left logo. */}
+        <div className="col-start-3 flex items-center justify-end gap-2 sm:gap-3 lg:col-start-3 lg:justify-end">
           <div className="rounded-full border border-border/80 bg-card/70 p-0.5 shadow-sm">
             <ThemeToggle />
           </div>

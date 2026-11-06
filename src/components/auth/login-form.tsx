@@ -149,7 +149,7 @@ export function LoginForm() {
 
     try {
       const { data, error } = await authClient.signIn.email({
-        email,
+        email: email.trim().toLowerCase(),
         password,
         rememberMe: remember,
       });
@@ -243,7 +243,7 @@ export function LoginForm() {
             <Label htmlFor="login-password">Password</Label>
             <Link
               href="/login"
-              className="text-xs font-medium text-accent-foreground underline-offset-4 hover:underline"
+              className="text-sm font-medium text-accent-foreground underline-offset-4 hover:underline"
               aria-label="Reset your password"
             >
               Forgot password?

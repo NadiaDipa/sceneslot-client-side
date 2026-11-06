@@ -92,7 +92,7 @@ export default function AboutPage() {
         <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/60 to-foreground/30" />
         <div aria-hidden className="bg-dotted absolute inset-0 opacity-30" />
         <div className="container-page relative flex max-w-3xl flex-col items-center gap-4 text-center">
-          <Badge className="h-6 bg-primary/20 text-primary">
+          <Badge className="h-6 bg-primary text-primary-foreground">
             <Aperture className="size-3.5" />
             About SceneSlot
           </Badge>
@@ -114,7 +114,7 @@ export default function AboutPage() {
       {/* Mission */}
       <section className="container-page py-16 sm:py-24" aria-label="Our mission">
         <div className="grid items-center gap-10 lg:grid-cols-2">
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col items-center gap-5 text-center sm:items-start sm:gap-5 sm:text-left">
             <SectionHeading
               align="left"
               eyebrow="Mission"
@@ -148,7 +148,7 @@ export default function AboutPage() {
             {stats.map((s) => (
               <div
                 key={s.label}
-                className="flex flex-col gap-2 rounded-2xl border-border bg-card p-6 ring-1 ring-foreground/10"
+                className="flex flex-col items-center gap-2 rounded-2xl border-border bg-card p-6 text-center ring-1 ring-foreground/10 sm:items-start sm:text-left"
               >
                 <span className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground">
                   <s.icon className="size-5" strokeWidth={1.8} />
@@ -177,7 +177,7 @@ export default function AboutPage() {
             {values.map((v) => (
               <div
                 key={v.title}
-                className="group flex flex-col gap-3 rounded-2xl border-border bg-card p-6 ring-1 ring-foreground/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-foreground/5"
+                className="group flex flex-col items-center gap-3.5 rounded-2xl border-border bg-card p-6 text-center ring-1 ring-foreground/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-foreground/5 sm:items-start sm:text-left"
               >
                 <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <v.icon className="size-5" strokeWidth={1.8} />
@@ -223,7 +223,7 @@ export default function AboutPage() {
         <div className="container-page">
           <div className="rounded-3xl bg-foreground px-6 py-14 text-background sm:px-10">
             <div className="mb-10 flex max-w-2xl flex-col gap-3 text-center mx-auto">
-              <Badge className="mx-auto h-6 bg-primary/20 text-primary">
+              <Badge className="mx-auto h-6 bg-primary text-primary-foreground">
                 <Sparkles className="size-3.5" />
                 The team
               </Badge>

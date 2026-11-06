@@ -103,8 +103,9 @@ export function BookingCard({
           />
         </Link>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <div className="flex flex-wrap items-center gap-2">
+        {/* Info — centered on mobile under the thumbnail, left from sm up */}
+        <div className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center sm:items-start sm:text-left">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
             <Link
               href={`/studios/${booking.studioId}`}
               className="font-heading text-base font-semibold outline-none transition-colors hover:text-accent-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -155,7 +156,9 @@ export function BookingCard({
           {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-2 sm:items-stretch">
+        {/* Price + cancel action — centered on mobile under a hairline divider,
+            right-aligned as before from sm up */}
+        <div className="flex w-full shrink-0 flex-col items-center gap-3 border-t border-border/70 pt-3 text-center sm:w-auto sm:items-stretch sm:gap-2 sm:border-0 sm:pt-0 sm:text-left">
           <p className="font-heading text-lg font-semibold">
             ${booking.total}
             <span className="text-xs font-normal text-muted-foreground">

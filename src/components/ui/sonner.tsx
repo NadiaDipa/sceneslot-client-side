@@ -22,7 +22,7 @@ export function Toaster() {
           toast:
             "!w-full !gap-3 !rounded-2xl !border !border-border/60 !bg-background/85 !px-4 !py-3.5 !text-foreground !shadow-[0_12px_40px_-12px_rgba(0,0,0,0.35)] !backdrop-blur-xl",
           title: "!text-sm !font-semibold",
-          description: "!text-xs !text-muted-foreground",
+          description: "!text-sm !text-muted-foreground",
         },
       }}
     />

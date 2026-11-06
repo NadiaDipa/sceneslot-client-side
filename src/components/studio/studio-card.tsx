@@ -22,8 +22,8 @@ export function StudioCard({
         className,
       )}
     >
-      {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      {/* Image — slightly shorter (3/2) so the card reads as image + content, not all image */}
+      <div className="relative aspect-[3/2] overflow-hidden">
         <Image
           src={studio.image}
           alt={studio.title}
@@ -48,21 +48,25 @@ export function StudioCard({
         </span>
       </div>
 
-      <CardContent className="flex flex-1 flex-col gap-2.5 p-5">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      {/* Content: ratings keep a fixed-height row so titles align across the grid.
+          Name/rating/location center on mobile; price + button (footer) untouched. */}
+      <CardContent className="flex flex-1 flex-col items-center gap-3 p-5 pb-6 text-center sm:items-start sm:p-6 sm:text-left">
+        <div className="flex min-h-5 items-center gap-2 text-[0.8rem] text-muted-foreground sm:text-sm">
           {studio.reviewsCount > 0 ? (
             <>
               <RatingStars rating={studio.rating} />
-              <span className="font-semibold text-foreground">
+              <span className="font-semibold whitespace-nowrap text-foreground">
                 {studio.rating.toFixed(1)}
               </span>
-              <span>({studio.reviewsCount} reviews)</span>
+              <span className="min-w-0 truncate">
+                ({studio.reviewsCount} reviews)
+              </span>
             </>
           ) : (
             <span>New Studio · No reviews yet</span>
           )}
         </div>
-        <h3 className="font-heading text-lg font-semibold leading-snug">
+        <h3 className="font-heading text-xl leading-snug font-semibold tracking-[-0.01em] sm:text-2xl">
           <Link
             href={`/studios/${studio.id}`}
             className="rounded-sm outline-none transition-colors hover:text-primary focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -70,22 +74,29 @@ export function StudioCard({
             {studio.title}
           </Link>
         </h3>
-        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <p className="flex items-center gap-1.5 text-[0.8rem] text-muted-foreground sm:text-sm">
           <MapPin className="size-3.5 shrink-0 text-primary" />
-          {studio.location}
+          <span className="min-w-0 truncate">{studio.location}</span>
         </p>
       </CardContent>
 
       {/* Footer: price first, then a full, clearly-clickable booking action */}
-      <CardFooter className="items-center gap-4 border-border/70 bg-muted/40 p-4">
-        <div className="flex min-w-0 flex-col leading-tight">
-          <span className="font-heading text-lg font-bold whitespace-nowrap text-foreground">
+      <CardFooter className="items-center gap-4 border-border/70 bg-muted/40 px-4 py-4 sm:px-6">
+        <div className="flex min-w-0 flex-col overflow-hidden leading-tight">
+          {/* No whitespace-nowrap: "$180" and "/ hour" stayed unsplittable at
+              max-content width, which (with the nowrap sub-line below) pushed the
+              footer's min-content to ~379px — beyond the ~358px mobile grid track,
+              so the card overflowed the viewport and a horizontal scrollbar appeared. */}
+          <span className="font-heading text-xl font-bold text-foreground sm:text-2xl sm:whitespace-nowrap">
             ${studio.hourlyRate}
-            <span className="ml-1 text-xs font-medium text-muted-foreground">
+            <span className="ml-1 text-sm font-medium text-muted-foreground">
               / hour
             </span>
           </span>
-          <span className="truncate text-[0.7rem] text-muted-foreground">
+          {/* line-clamp-1 instead of truncate: truncate is white-space:nowrap, whose
+              min-content kept the whole sentence unsplittable and inflated the card's
+              intrinsic width; the clamp still reads identically at full width. */}
+          <span className="line-clamp-1 text-[0.7rem] text-muted-foreground">
             Instant booking · Free cancellation
           </span>
         </div>
@@ -94,7 +105,7 @@ export function StudioCard({
           aria-label={`View details for ${studio.title}`}
           className={buttonVariants({
             className:
-              "ml-auto h-10 shrink-0 gap-2 rounded-lg px-4 text-sm font-semibold max-sm:flex-1",
+              "ml-auto h-11 shrink-0 gap-2 rounded-lg px-5 text-[0.95rem] font-semibold max-sm:flex-1",
           })}
         >
           View Details
