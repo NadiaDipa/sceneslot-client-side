@@ -10,7 +10,7 @@ Users can explore available studios, view studio information, and manage their b
 
 ## GitHub Repositories
 
-- **Client Repository:** [SceneSlot Client](https://github.com/NadiaDipa/spaceslot-client-side)
+- **Client Repository:** [SceneSlot Client](https://github.com/NadiaDipa/sceneslot-client-side)
 - **Server Repository:** [SceneSlot Server](https://github.com/NadiaDipa/sceneslot-server-side)
 
 ## Key Features
@@ -49,7 +49,7 @@ Users can explore available studios, view studio information, and manage their b
 ### 1. Clone the Repositories
 
 ```bash
-git clone https://github.com/NadiaDipa/spaceslot-client-side.git sceneslot-client
+git clone https://github.com/NadiaDipa/sceneslot-client-side.git sceneslot-client
 
 git clone https://github.com/NadiaDipa/sceneslot-server-side.git sceneslot-server
 ```
